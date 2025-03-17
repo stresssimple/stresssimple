@@ -6,13 +6,34 @@
 	import { PlusOutline } from 'flowbite-svelte-icons';
 	import { activeTab } from '$lib/stores/activeTab.store';
 
+	const defaultTestSource = `import { StressTest } from './StressTest.js';
+
+export class Test extends StressTest {
+    private request:number = 1;
+    // Create http client
+    private googleClient = this.http.baseUrl("https://google.com").create();
+
+    // Test function
+    public async test(userId: string): Promise<void> {
+        console.log("Test with " + userId + ' request number '+this.request++);
+
+        // Send request to google and wait for response
+        const googleResponse = await this.googleClient.get("").name("google").send();
+    }
+
+    // Optional interval between tests in milliseconds
+    public interval(): number { 
+        return Math.random() * 1000;
+    }
+}`;
+
 	function addTest() {
 		let id: string = v7();
 		tests.addTest({
 			id: id,
 			name: 'New Test ' + $tests.length,
 			description: 'This is a new test',
-			source: `console.log("Hello World test ${$tests.length}");`,
+			source: defaultTestSource,
 			modules: []
 		});
 		activeTest.setActiveById(id);

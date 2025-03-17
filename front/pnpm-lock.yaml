@@ -14,6 +14,9 @@ importers:
       chart.js:
         specifier: ^4.4.8
         version: 4.4.8
+      chartjs-plugin-annotation:
+        specifier: ^3.1.0
+        version: 3.1.0(chart.js@4.4.8)
       monaco-editor:
         specifier: ^0.52.2
         version: 0.52.2
@@ -912,6 +915,11 @@ packages:
   chart.js@4.4.8:
     resolution: {integrity: sha512-IkGZlVpXP+83QpMm4uxEiGqSI7jFizwVtF3+n5Pc3k7sMO+tkd0qxh2OzLhenM0K80xtmAONWGBn082EiBQSDA==}
     engines: {pnpm: '>=8'}
+
+  chartjs-plugin-annotation@3.1.0:
+    resolution: {integrity: sha512-EkAed6/ycXD/7n0ShrlT1T2Hm3acnbFhgkIEJLa0X+M6S16x0zwj1Fv4suv/2bwayCT3jGPdAtI9uLcAMToaQQ==}
+    peerDependencies:
+      chart.js: '>=4.0.0'
 
   check-error@2.1.1:
     resolution: {integrity: sha512-OAlb+T7V4Op9OwdkjmguYRqncdlx5JiofwOAUkmTF+jNdHwzTaTs4sRAGpzLF3oOz5xAyDGrPgeIDFQmDOTiJw==}
@@ -2811,6 +2819,10 @@ snapshots:
   chart.js@4.4.8:
     dependencies:
       '@kurkle/color': 0.3.4
+
+  chartjs-plugin-annotation@3.1.0(chart.js@4.4.8):
+    dependencies:
+      chart.js: 4.4.8
 
   check-error@2.1.1: {}
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { PUBLIC_API_URL } from '$env/static/public';
 
-	import { afterNavigate } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { runsStore } from '$lib/stores/runs.store';
 	import axios from 'axios';
@@ -73,7 +73,7 @@
 		</ButtonGroup>
 	</div>
 </div>
-<div class="grid grid-cols-2 gap-4">
+<div class="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
 	<div>
 		<Label>Duration</Label>
 		<div>
@@ -95,7 +95,7 @@
 			<span>{users}</span>
 		</div>
 	</div>
-	<div>
+	<!-- <div>
 		<Label>Audit type</Label>
 		<div>
 			<Select bind:value={auditType}>
@@ -116,7 +116,7 @@
 				<span>{auditPercentage}%</span>
 			</div>
 		</div>
-	{/if}
+	{/if} -->
 </div>
 
 <div>
@@ -134,7 +134,7 @@
 		</TableHead>
 		<TableBody>
 			{#each $runsStore as run}
-				<TableBodyRow>
+				<TableBodyRow on:click={() => goto('runs/' + run.runId)} class="cursor-pointer">
 					<TableBodyCell>{run.users}</TableBodyCell>
 					<TableBodyCell>{run.durationMinutes}min</TableBodyCell>
 					<TableBodyCell>{run.rampUpMinutes == 0 ? '-' : run.rampUpMinutes + 'min'}</TableBodyCell>
@@ -146,9 +146,6 @@
 					<TableBodyCell>{toHumanDate(run.lastUpdated)}</TableBodyCell>
 					<TableBodyCell>{run.error}</TableBodyCell>
 					<TableBodyCell>
-						<Button size="xs" color="blue" href={'runs/' + run.runId}>
-							<GlobeOutline size="xs" />
-						</Button>
 						{#if run.status === 'running'}
 							<Button size="xs" color="yellow" on:click={() => StopRun(run.runId)}>
 								<StopOutline size="xs" />

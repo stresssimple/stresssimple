@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { runsStore, toHumanDate } from '$lib';
+	import { toHumanDate } from '$lib';
 	import LineChart from '$lib/components/LineChart.svelte';
 	import axios from 'axios';
 	import { onDestroy, onMount } from 'svelte';
@@ -70,6 +70,16 @@
 						text: 'Users over time',
 						padding: 4
 					}
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						suggestedMax: 10,
+						title: {
+							display: true,
+							text: 'Active users'
+						}
+					}
 				}
 			}}
 			dataOptions={{}}
@@ -94,12 +104,21 @@
 						text: 'Request duration over time',
 						padding: 4
 					}
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						title: {
+							display: true,
+							text: 'seconds'
+						}
+					}
 				}
 			}}
 			dataOptions={{}}
 		/>
 	</div>
-	<div class="col-span-2 container h-64">
+	<div class="container col-span-2 h-64">
 		<LineChart
 			labels={$rpsLabels}
 			data={$rpsData}
@@ -117,6 +136,15 @@
 						display: true,
 						text: 'HTTP Requests per second over time',
 						padding: 4
+					}
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						title: {
+							display: true,
+							text: 'Requests per second'
+						}
 					}
 				}
 			}}

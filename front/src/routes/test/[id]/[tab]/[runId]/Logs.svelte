@@ -52,8 +52,8 @@
 <div>
 	{#each rows as row}
 		<div class="flex">
-			<pre class="text-sm text-blue-600">{toHumanDate(new Date(row.time))}</pre>
-			<pre class="text-sm"> - {row.msg}</pre>
+			<pre class="w-24 text-sm text-blue-600">{toHumanDate(new Date(row.time))}</pre>
+			<pre class="text-sm">{row.msg}</pre>
 		</div>
 	{/each}
 </div>
