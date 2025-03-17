@@ -1,0 +1,61 @@
+services:
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=securepassword
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=test-runs
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-secret-token
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  frontend:
+    build:
+      context: ./Front/.
+      dockerfile: ./Dockerfile
+    image: frontend:latest
+    container_name: frontend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+    depends_on:
+      - backend
+  backend:
+    build:
+      context: ./Backend/.
+      dockerfile: ./Dockerfile
+    image: backend:latest
+    container_name: backend
+    volumes:
+      - tests_data:/app/tmp
+    environment:
+      - RUNS_FOLDER=tmp/runs
+      - RUNNER_TEMPLATE_FOLDER=tmp/runner_templates
+      - TESTS_FOLDER=tmp/tests
+      - AUDIT_FOLDER=tmp/audit
+      - REDIS_HOST=redis
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=my-secret-token
+      - INFLUXDB_ORG=my-org
+      - INFLUXDB_BUCKET=test-runs
+      - CONTAINER=true
+    ports:
+      - "3000:3000"
+    depends_on:
+      - influxdb
+      - redis
+volumes:
+  influxdb_data:
+  tests_data:
