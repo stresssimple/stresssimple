@@ -1,0 +1,48 @@
+<script lang="ts">
+	import { v7 } from 'uuid';
+	import { activeTest, tests } from '$lib/stores/tests.store';
+	import { page } from '$app/state';
+	import { Button } from 'flowbite-svelte';
+	import { PlusOutline } from 'flowbite-svelte-icons';
+	import { activeTab } from '$lib/stores/activeTab.store';
+
+	function addTest() {
+		let id: string = v7();
+		tests.addTest({
+			id: id,
+			name: 'New Test ' + $tests.length,
+			description: 'This is a new test',
+			source: `console.log("Hello World test ${$tests.length}");`,
+			modules: []
+		});
+		activeTest.setActiveById(id);
+		tests.save($activeTest);
+	}
+</script>
+
+<div class="m-2">
+	<h2 class="m-2 text-lg font-semibold">Tests</h2>
+	<div>
+		{#each $tests as test}
+			<a
+				class="block w-full rounded p-2 hover:bg-gray-200"
+				class:active={page.params.id == test.id}
+				href="/test/{test.id}/{$activeTab}"
+			>
+				<span class:italic={page.params.id == test.id} class:font-bold={page.params.id == test.id}
+					>{test.name}</span
+				>
+			</a>
+		{/each}
+	</div>
+	<div class="flex justify-end p-4">
+		<Button size="xs" on:click={addTest}><PlusOutline class="me-2 h-4 w-4" />Add</Button>
+	</div>
+</div>
+
+<style lang="postcss">
+	@reference "../../app.css";
+	.active {
+		@apply bg-blue-200;
+	}
+</style>
