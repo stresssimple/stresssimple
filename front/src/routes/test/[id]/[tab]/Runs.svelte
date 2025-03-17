@@ -55,11 +55,13 @@
 		clearInterval(timerInterval);
 	});
 
-	async function StopRun(runId: string): Promise<void> {
+	async function StopRun(e: Event, runId: string): Promise<void> {
+		e.stopPropagation();
 		await axios.post(`${PUBLIC_API_URL}/runs/` + page.params.id + '/' + runId + '/stop');
 	}
 
-	async function DeleteRun(runId: string): Promise<void> {
+	async function DeleteRun(e: Event, runId: string): Promise<void> {
+		e.stopPropagation();
 		await axios.delete(`${PUBLIC_API_URL}/runs/` + page.params.id + '/' + runId);
 		runsStore.load(page.params.id);
 	}
@@ -147,11 +149,11 @@
 					<TableBodyCell>{run.error}</TableBodyCell>
 					<TableBodyCell>
 						{#if run.status === 'running'}
-							<Button size="xs" color="yellow" on:click={() => StopRun(run.runId)}>
+							<Button size="xs" color="yellow" on:click={(e) => StopRun(e, run.runId)}>
 								<StopOutline size="xs" />
 							</Button>
 						{:else}
-							<Button size="xs" color="red" on:click={() => DeleteRun(run.runId)}>
+							<Button size="xs" color="red" on:click={(e) => DeleteRun(e, run.runId)}>
 								<DeleteRowOutline size="xs" />
 							</Button>
 						{/if}
