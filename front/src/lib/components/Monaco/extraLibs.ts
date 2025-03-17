@@ -15,7 +15,7 @@ declare interface HttpRequestFactory
   successOn(status: number): HttpRequestFactory;
   failOn(status: number): HttpRequestFactory;
   send(
-    successCheck: (response: HttpResponse) => boolean | undefined
+    successCheck?: (response: HttpResponse) => boolean | undefined
   ): Promise<HttpResponse>;
 }
 
