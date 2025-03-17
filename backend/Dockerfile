@@ -4,7 +4,7 @@ FROM node:latest AS build
 RUN npm install -g @nestjs/cli pnpm
 
 # Create and change to the app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
@@ -19,13 +19,13 @@ COPY . .
 RUN npm run build
 
 FROM node:latest AS production
-WORKDIR /usr/src/app
-RUN npm install -g pnpm
+WORKDIR /app
+RUN npm install -g pnpm typescript
 
 # Copy the build output from the previous stage
-COPY --from=build /usr/src/app/dist ./dist
-COPY --from=build /usr/src/app/package*.json ./
-
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/package*.json ./
+COPY templates ./templates
 RUN pnpm install --prod
 
 # Expose the port the app runs on

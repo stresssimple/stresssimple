@@ -8,7 +8,7 @@ export class RunnersManager {
   constructor(private readonly logger: Logger) {
     const redis = new Redis({
       host: process.env['REDIS_HOST'] || 'localhost',
-      port: 6379,
+      port: Number.parseInt(process.env['REDIS_PORT']),
     });
     redis.subscribe('runners');
     redis.on('message', (channel, message) => {

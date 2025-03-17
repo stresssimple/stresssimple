@@ -18,7 +18,7 @@ services:
     image: redis:latest
     container_name: redis
     ports:
-      - "6379:6379"
+      - "16379:6379"
 
   frontend:
     build:
@@ -46,6 +46,7 @@ services:
       - TESTS_FOLDER=tmp/tests
       - AUDIT_FOLDER=tmp/audit
       - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - INFLUXDB_URL=http://influxdb:8086
       - INFLUXDB_TOKEN=my-secret-token
       - INFLUXDB_ORG=my-org

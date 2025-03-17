@@ -151,6 +151,7 @@ export class TemplateRunnerService {
         INFLUXDB_ORG: process.env['INFLUXDB_ORG'],
         INFLUXDB_BUCKET: process.env['INFLUXDB_BUCKET'],
         REDIS_HOST: process.env['REDIS_HOST'],
+        REDIS_PORT: process.env['REDIS_PORT'],
         AUDIT_FOLDER: path.join(cwd(), process.env['AUDIT_FOLDER']),
       },
     });

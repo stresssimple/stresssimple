@@ -1,0 +1,32 @@
+{
+  "name": "stressjs",
+  "version": "1.0.0",
+  "description": "Running stress test on your server just became easier",
+  "main": "index.js",
+  "scripts": {
+    "install": "cd backend && pnpm install && cd ../front && pnpm install",
+    "start:backend": "cd backend && npm run start",
+    "start:frontend": "cd front && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hananmil/stressjs.git"
+  },
+  "author": "Hanan Mil",
+  "license": "ISC",
+  "categories": [
+    "Development Tools",
+    "Utilities"
+  ],
+  "keywords": [
+    "stress",
+    "test",
+    "server",
+    "load",
+    "testing"
+  ],
+  "bugs": {
+    "url": "https://github.com/hananmil/stressjs/issues"
+  },
+  "homepage": "https://github.com/hananmil/stressjs#readme"
+}
