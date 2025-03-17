@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { beforeNavigate, goto } from '$app/navigation';
+	import DeleteConfirmation from '$lib/components/DeleteConfirmation.svelte';
 	import { activeTest, tests } from '$lib/stores/tests.store';
 	import { Button, ButtonGroup, Input, Label, Modal, Textarea } from 'flowbite-svelte';
+
+	let deleteConfirmDialog: DeleteConfirmation;
 
 	let navigating: string | undefined = undefined;
 	let saveModal = $state(false);
@@ -10,6 +13,7 @@
 	let originalDescription = $derived($activeTest.description);
 	let name = $state($activeTest.name);
 	let description = $state($activeTest.description);
+
 	$effect(() => {
 		name = $activeTest.name;
 		description = $activeTest.description;
@@ -51,6 +55,11 @@
 			navigating = undefined;
 		}
 	};
+
+	async function deleteTest(id: string | undefined) {
+		if (!id) return;
+		await tests.deleteTest(id);
+	}
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -59,6 +68,11 @@
 		<ButtonGroup class="mb-4" size="sm">
 			<Button disabled={!isDirty()} on:click={save}>Save</Button>
 			<Button disabled={!isDirty()} on:click={discard}>Discard</Button>
+			<Button
+				color="red"
+				on:click={() => deleteConfirmDialog.openDeleteModal($activeTest.name, $activeTest.id)}
+				>Delete</Button
+			>
 		</ButtonGroup>
 	</div>
 	<div>
@@ -70,6 +84,7 @@
 		<Textarea id="description" rows={5} bind:value={description} />
 	</div>
 </div>
+
 <Modal
 	title="Editor has unsaved changes"
 	bind:open={saveModal}
@@ -82,10 +97,12 @@
 	<Button on:click={() => discard()}>Discard</Button>
 </Modal>
 
+<DeleteConfirmation bind:this={deleteConfirmDialog} onConfirmed={deleteTest} />
+
 <style lang="postcss">
 	@reference "tailwindcss";
 
 	:global(label) {
-		@apply mt-4 mb-2;
+		@apply mb-2 mt-4;
 	}
 </style>

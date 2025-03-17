@@ -45,4 +45,10 @@ export class TestsService {
     const content = JSON.stringify(test, null, 2);
     fs.writeFileSync(filePath + '.json', content);
   }
+
+  public deleteTest(id: string) {
+    this.logger.log(`Deleting test ${id}`);
+    const filePath = path.join(this.TESTS_FOLDER, id);
+    fs.rmSync(filePath + '.json');
+  }
 }

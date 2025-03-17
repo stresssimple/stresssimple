@@ -9,16 +9,16 @@
 <div class="flex h-full w-full flex-col">
 	<Navbar let:hidden let:toggle class="shadow">
 		<NavBrand href="/">
-			<span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"
+			<span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white"
 				>StressJS</span
 			>
 		</NavBrand>
 	</Navbar>
 	<div class="flex grow flex-row">
-		<div class="max-w-80 min-w-60 shadow-inner shadow-gray-200">
+		<div class="min-w-60 max-w-80 shadow-inner shadow-gray-200">
 			<Tests />
 		</div>
-		<div class="h-full w-full">
+		<div class="ml-2 h-full w-full">
 			{@render children()}
 		</div>
 	</div>

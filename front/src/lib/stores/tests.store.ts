@@ -20,7 +20,11 @@ function createTestsStore() {
 			update((tests) => [...tests, test]);
 			axios.post(`${PUBLIC_API_URL}/tests`, test);
 		},
-		removeTest: (id: string) => update((tests) => tests.filter((test) => test.id !== id)),
+		deleteTest: async (id: string) => {
+			await axios.delete(`${PUBLIC_API_URL}/tests/${id}`);
+
+			update((tests) => tests.filter((test) => test.id !== id));
+		},
 		save: (test: any) => {
 			update((tests) => tests.map((t) => (t.id === test.id ? test : t)));
 			axios.put(`${PUBLIC_API_URL}/tests`, test);
