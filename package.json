@@ -15,11 +15,11 @@
   "author": "Hanan Mil",
   "license": "ISC",
   "categories": [
-    "Development Tools",
-    "Utilities"
+    "Testing"
   ],
   "keywords": [
     "stress",
+    "stress test",
     "test",
     "server",
     "load",
