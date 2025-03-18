@@ -5,14 +5,13 @@
 	import { runStore } from '$lib/stores/run.store';
 	import { TabItem, Tabs } from 'flowbite-svelte';
 	import General from './General.svelte';
-	import { toHumanDate, toHumanTime } from '$lib';
+	import { runsStore, toHumanDate, toHumanTime } from '$lib';
 	import Logs from './Logs.svelte';
 	import Audit from './Audit.svelte';
 
 	onMount(async () => {
-		console.log('onMount');
 		runStore.clear();
-		runStore.load(page.params.id, page.params.runId);
+		await runStore.load(page.params.runId);
 	});
 	let runtimeMilliseconds = $derived(() => {
 		if (!$runStore) {
@@ -21,9 +20,10 @@
 		const end = $runStore.endTime ?? $runStore.lastUpdated;
 		return end.getTime() - $runStore.startTime.getTime();
 	});
+	$inspect($runStore);
 </script>
 
-{#if $runStore && $runStore.runId === page.params.runId}
+{#if $runStore && $runStore.id === page.params.runId}
 	<div class="flex flex-col items-center">
 		<h1 class="text-3xl">Test run</h1>
 		<pre>{$runStore.runId}</pre>
