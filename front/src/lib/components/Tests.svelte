@@ -30,14 +30,12 @@ export class Test extends StressTest {
 	function addTest() {
 		let id: string = v7();
 		tests.addTest({
-			id: id,
 			name: 'New Test ' + $tests.length,
 			description: 'This is a new test',
 			source: defaultTestSource,
 			modules: []
 		});
 		activeTest.setActiveById(id);
-		tests.save($activeTest);
 	}
 </script>
 

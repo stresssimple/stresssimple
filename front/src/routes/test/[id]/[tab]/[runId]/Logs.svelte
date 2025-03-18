@@ -11,7 +11,7 @@
 
 	async function getLogs() {
 		axios
-			.get(`${PUBLIC_API_URL}/runs/${page.params.id}/${page.params.runId}/logs`)
+			.get(`${PUBLIC_API_URL}/audit/${page.params.runId}/logs`)
 			.then((res) => res.data)
 			.then((data) => {
 				total = data.total;
@@ -21,7 +21,7 @@
 							if (!line || line?.length === 0) {
 								return null;
 							}
-							return JSON.parse(line);
+							return line;
 						} catch (e) {
 							console.error('failed to parse >' + line + '<');
 							return null;
@@ -52,8 +52,9 @@
 <div>
 	{#each rows as row}
 		<div class="flex">
-			<pre class="w-24 text-sm text-blue-600">{toHumanDate(new Date(row.time))}</pre>
-			<pre class="text-sm">{row.msg}</pre>
+			<pre class="w-24 text-sm text-blue-600">{toHumanDate(new Date(row.timestamp))}</pre>
+			<pre class="w-12 text-sm">{row.level}</pre>
+			<pre class="text-sm">{row.message}</pre>
 		</div>
 	{/each}
 </div>

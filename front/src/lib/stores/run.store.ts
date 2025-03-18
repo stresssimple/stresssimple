@@ -9,7 +9,7 @@ function createRunStore() {
 	return {
 		subscribe,
 		load: async (testId: string, runId: string) => {
-			const response = await axios.get<any>(`${PUBLIC_API_URL}/runs/${testId}/${runId}`);
+			const response = await axios.get<any>(`${PUBLIC_API_URL}/runs/${runId}`);
 			const run = response.data;
 			if (!run) {
 				console.error('Run not found');
@@ -21,7 +21,7 @@ function createRunStore() {
 			set(run);
 			if (interval !== 0) return;
 			interval = setInterval(async () => {
-				const response = await axios.get<any>(`${PUBLIC_API_URL}/runs/${testId}/${runId}`);
+				const response = await axios.get<any>(`${PUBLIC_API_URL}/runs/${runId}`);
 				const run = response.data;
 				if (!run) {
 					console.error('Run not found');

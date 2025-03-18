@@ -7,15 +7,25 @@ import { InfluxModule } from '../influxdb/influx.module';
 import { RunScheduler } from './run.scheduler';
 import { RunReportController } from './runReport.controller';
 import { TemplateRunnerModule } from '../template-runner/templateRunner.module';
-import { TemplateRunnerController } from './templateRunner.controller';
 import { RunnersManager } from './runners.manager';
+import { TestExecution } from '../mysql/TestExecution';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppLogsModule } from '../appLogs/AppLogs.module';
+import { AuditWriter } from './audit.writer';
+import { AuditRecord } from '../mysql/AuditRecord';
 
 @Module({
-  imports: [TestsModule, InfluxModule, TemplateRunnerModule],
+  imports: [
+    TestsModule,
+    InfluxModule,
+    TemplateRunnerModule,
+    AppLogsModule,
+    TypeOrmModule.forFeature([TestExecution, AuditRecord]),
+  ],
   providers: [
     RunsService,
     RunnersManager,
-    TemplateRunnerController,
+    AuditWriter,
     RunScheduler,
     {
       provide: Logger,
@@ -23,6 +33,6 @@ import { RunnersManager } from './runners.manager';
       inject: [INQUIRER],
     },
   ],
-  controllers: [RunsController, RunReportController, TemplateRunnerController],
+  controllers: [RunsController, RunReportController],
 })
 export class RunsModule {}

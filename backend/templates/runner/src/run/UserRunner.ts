@@ -1,4 +1,3 @@
-import { InfluxDB } from '@influxdata/influxdb-client';
 import { StressTest } from '../StressTest.js';
 import { InfluxService } from '../influx/influx.service.js';
 import { ctx } from '../run.context.js';
@@ -24,8 +23,6 @@ export class UserRunner {
   }
 
   private async run(): Promise<void> {
-    console.log(`Running user ${this.userId}`);
-    const influxWriter = this.influx.getWriteApi();
     while (this.status !== 'stopping') {
       const startTime = process.hrtime.bigint();
       try {

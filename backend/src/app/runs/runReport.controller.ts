@@ -1,4 +1,4 @@
-import { Controller, Get, Logger, Param } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { InfluxService } from '../influxdb/influx.service';
 import { RunsService } from './runs.service';
 
@@ -10,12 +10,8 @@ export class RunReportController {
   ) {}
 
   @Get(':testId/:runId')
-  async getRunReport(
-    @Param('testId') testId: string,
-    @Param('runId') runId: string,
-    @Param('measurement') measurement: string,
-  ) {
-    const run = await this.runs.getRun(testId, runId);
+  async getRunReport(@Param('runId') runId: string) {
+    const run = await this.runs.getRun(runId);
     if (!run) {
       return null;
     }
@@ -27,18 +23,13 @@ export class RunReportController {
     const endTime = new Date((run.endTime ?? run.lastUpdated).getTime() + 1000);
 
     return {
-      users: await this.usersData(testId, runId, startTime, endTime),
-      http: await this.httpRequestsData(testId, runId, startTime, endTime),
-      rps: await this.rpsData(testId, runId, startTime, endTime),
+      users: await this.usersData(runId, startTime, endTime),
+      http: await this.httpRequestsData(runId, startTime, endTime),
+      rps: await this.rpsData(runId, startTime, endTime),
     };
   }
 
-  private async rpsData(
-    testId: string,
-    runId: string,
-    startTime: Date,
-    endTime: Date,
-  ) {
+  private async rpsData(runId: string, startTime: Date, endTime: Date) {
     const duration = endTime.getTime() - startTime.getTime();
     const windowPeriod = Math.ceil(duration / 1000 / 200) + 's';
 
@@ -46,7 +37,6 @@ export class RunReportController {
   |> range(start: ${startTime.toISOString()}, stop: ${endTime.toISOString()})
   |> filter(fn: (r) => r["_measurement"] == "http_request")
   |> filter(fn: (r) => r["runId"] == "${runId}")
-  |> filter(fn: (r) => r["testId"] == "${testId}")
   |> filter(fn: (r) => r["_field"] == "duration")
   |> aggregateWindow(every:1s, fn: count, createEmpty: true)
   |> aggregateWindow(every: ${windowPeriod}, fn: mean, createEmpty: true)
@@ -83,12 +73,7 @@ export class RunReportController {
       );
   }
 
-  private async usersData(
-    testId: string,
-    runId: string,
-    startTime: Date,
-    endTime: Date,
-  ) {
+  private async usersData(runId: string, startTime: Date, endTime: Date) {
     const duration = endTime.getTime() - startTime.getTime();
     const windowPeriod = Math.ceil(duration / 1000 / 200) + 's';
 
@@ -96,7 +81,6 @@ export class RunReportController {
   |> range(start: ${startTime.toISOString()}, stop: ${endTime.toISOString()})
   |> filter(fn: (r) => r["_measurement"] == "test_duration")
   |> filter(fn: (r) => r["runId"] == "${runId}")
-  |> filter(fn: (r) => r["testId"] == "${testId}")
   |> group(columns: ["_measurement", "runId", "_field","userId"])
   |> aggregateWindow(every: ${windowPeriod}, fn: count, createEmpty: false)
   |> group(columns: ["_measurement", "runId", "_field"])
@@ -117,7 +101,6 @@ export class RunReportController {
   }
 
   private async httpRequestsData(
-    testId: string,
     runId: string,
     startTime: Date,
     endTime: Date,
@@ -129,7 +112,6 @@ export class RunReportController {
   |> range(start: ${startTime.toISOString()}, stop: ${endTime.toISOString()})
   |> filter(fn: (r) => r["_measurement"] == "http_request")
   |> filter(fn: (r) => r["runId"] == "${runId}")
-  |> filter(fn: (r) => r["testId"] == "${testId}")
   |> filter(fn: (r) => r["_field"] == "duration")
   |> aggregateWindow(every: ${windowPeriod}, fn: median, createEmpty: true)
   |> yield(name: "median")`;

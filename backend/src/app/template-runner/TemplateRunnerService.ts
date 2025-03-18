@@ -2,10 +2,10 @@ import { exec, spawn } from 'child_process';
 import * as fs from 'fs/promises';
 import { existsSync, rmSync } from 'fs';
 import * as path from 'path';
-import pino from 'pino';
 import { Logger } from '@nestjs/common';
 import { copyAsyncRecursive } from './fs.helpers';
 import { cwd } from 'process';
+import { AppLogsService } from '../appLogs/AppLogsService';
 
 const TEMPLATE_FOLDER = 'templates/runner';
 
@@ -16,7 +16,7 @@ export class TemplateRunnerService {
   constructor(
     private readonly testId: string,
     private readonly runId: string,
-    public readonly appLogger: pino.Logger,
+    public readonly appLogger: AppLogsService,
     private readonly logger: Logger,
   ) {
     const folder = path.join(
@@ -26,7 +26,10 @@ export class TemplateRunnerService {
     );
     if (existsSync(folder)) {
       logger.log(`Folder ${folder} already exists. deleting it`);
-      appLogger.info(`Folder ${folder} already exists. deleting it`);
+      appLogger.info(
+        this.runId,
+        `Folder ${folder} already exists. deleting it`,
+      );
       rmSync(folder, { recursive: true });
     }
   }
@@ -38,9 +41,9 @@ export class TemplateRunnerService {
       this.runId,
     );
     await fs.mkdir(folder, { recursive: true });
-    this.appLogger.info(`Created directory ${folder}`);
+    this.appLogger.info(this.runId, `Created directory ${folder}`);
     copyAsyncRecursive(TEMPLATE_FOLDER, folder);
-    this.appLogger.info(`Copied template to ${folder}`);
+    this.appLogger.info(this.runId, `Copied template to ${folder}`);
     this.initDirRun = true;
   }
 
@@ -64,14 +67,14 @@ export class TemplateRunnerService {
           if (error) {
             this.logger.error(`Error compiling template`);
             this.logger.error('STDOUT\n' + stdout.substring(0, 1000));
-            this.logger.error(stderr.substring(0, 1000));
-            this.appLogger.error(`Error compiling template`);
-            this.appLogger.error('STDOUT\n' + stdout.substring(0, 1000));
-            this.appLogger.error(stderr.substring(0, 1000));
+            this.logger.error(stderr);
+            this.appLogger.error(this.runId, `Error compiling template`);
+            this.appLogger.error(this.runId, 'STDOUT\n' + stdout);
+            this.appLogger.error(this.runId, stderr.substring(0, 1000));
             reject(error);
           } else {
             this.logger.log(`Template compiled`);
-            this.appLogger.info(`Template compiled`);
+            this.appLogger.info(this.runId, `Template compiled`);
             resolve();
             success = true;
           }
@@ -85,7 +88,7 @@ export class TemplateRunnerService {
 
   public async npmInstall(modules: string[]): Promise<boolean> {
     this.logger.log(`Installing modules ${modules.join(' ')}`);
-    this.appLogger.info(`Installing modules ${modules.join(' ')}`);
+    this.appLogger.info(this.runId, `Installing modules ${modules.join(' ')}`);
     if (!this.initDirRun) {
       await this.initDirectory();
     }
@@ -96,7 +99,6 @@ export class TemplateRunnerService {
       this.runId,
     );
     await new Promise<void>((resolve, reject) => {
-      this.appLogger.info(`Installing modules ${modules.join(' ')}`);
       exec(
         `npm install ${modules.join(' ')}`,
         { cwd: templateFolder },
@@ -105,15 +107,18 @@ export class TemplateRunnerService {
             console.log('error', error, stdout, stderr);
             this.logger.error(`Error installing module ${module}`, error);
             if (stdout) {
-              this.appLogger.info(stdout);
+              this.appLogger.info(this.runId, stdout);
             }
             if (stderr) {
-              this.appLogger.error(stderr);
+              this.appLogger.error(this.runId, stderr);
             }
             reject(error);
           } else {
-            this.appLogger.info(stdout);
-            this.appLogger.info(`Modules installed ${modules.join(' ')}`);
+            this.appLogger.info(this.runId, stdout);
+            this.appLogger.info(
+              this.runId,
+              `Modules installed ${modules.join(' ')}`,
+            );
 
             resolve();
             success = true;
@@ -135,7 +140,7 @@ export class TemplateRunnerService {
   }
 
   public startRunner(): Promise<void> {
-    this.appLogger.info(`Starting runner`);
+    this.appLogger.info(this.runId, `Starting runner`);
     const folder = path.join(
       this.RUNNER_TEMPLATE_FOLDER,
       this.testId,
@@ -156,17 +161,17 @@ export class TemplateRunnerService {
       },
     });
 
-    runner.stdout?.on('data', (data) => {
-      this.appLogger.info(data.toString());
+    runner.stdout?.on('data', async (data) => {
+      await this.appLogger.info(this.runId, data.toString());
     });
-    runner.stderr?.on('data', (data) => {
-      this.appLogger.error(data.toString());
+    runner.stderr?.on('data', async (data) => {
+      await this.appLogger.error(this.runId, data.toString());
     });
 
     return new Promise<void>((resolve) => {
       runner.on('close', (code) => {
         this.logger.log(`Runner exited with code ${code}`);
-        this.appLogger.info(`Runner exited with code ${code}`);
+        this.appLogger.info(this.runId, `Runner exited with code ${code}`);
         resolve();
       });
     });
@@ -174,7 +179,7 @@ export class TemplateRunnerService {
 
   public async cleanup() {
     this.logger.log(`Cleaning up`);
-    this.appLogger.info(`Cleaning up`);
+    this.appLogger.info(this.runId, `Cleaning up`);
     const folder = path.join(
       this.RUNNER_TEMPLATE_FOLDER,
       this.testId,

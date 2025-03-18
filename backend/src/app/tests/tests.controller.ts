@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { TestsService } from './tests.service';
 import { TestDefinitions } from '../dto/TestDefinitions';
+import { Test } from '../mysql/Test';
 
 @Controller('tests')
 export class TestsController {
@@ -25,11 +26,11 @@ export class TestsController {
   }
 
   @Post()
-  public async addTest(@Body() body: TestDefinitions) {
-    if (await this.testService.getTest(body.id)) {
-      throw new Error('Test already exists');
+  public async addTest(@Body() body: TestDefinitions): Promise<Test> {
+    if (body.id) {
+      throw new Error('Test id should not be provided');
     }
-    return this.testService.saveTest(body);
+    return await this.testService.addTest(body);
   }
 
   @Put()
@@ -37,7 +38,7 @@ export class TestsController {
     if (!this.testService.getTest(body.id)) {
       throw new Error('Test does not exist');
     }
-    return this.testService.saveTest(body);
+    return this.testService.updateTest(body);
   }
 
   @Delete(':id')

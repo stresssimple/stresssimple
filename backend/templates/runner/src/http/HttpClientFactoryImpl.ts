@@ -17,7 +17,7 @@ export class HttpClientFactoryImpl implements HttpClientFactory {
       baseURL: this._baseUrl,
       headers: this._headers,
     });
-    client.interceptors.request.use((config) => {
+    client.interceptors.request.use((config: any) => {
       config.headers['X-Test-Id'] = ctx.testId;
       config.headers['X-Run-Id'] = ctx.testId;
       config.headers['X-Request-Id'] = v7();

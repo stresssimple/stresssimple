@@ -2,9 +2,11 @@ import { Logger, Module } from '@nestjs/common';
 import { TestsService } from './tests.service';
 import { TestsController } from './tests.controller';
 import { INQUIRER } from '@nestjs/core';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Test } from '../mysql/Test';
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forFeature([Test])],
   controllers: [TestsController],
   providers: [
     {

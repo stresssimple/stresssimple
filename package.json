@@ -6,7 +6,11 @@
   "scripts": {
     "install": "cd backend && pnpm install && cd ../front && pnpm install",
     "start:backend": "cd backend && npm run start:dev",
-    "start:frontend": "cd front && npm run dev"
+    "start:frontend": "cd front && npm run dev",
+    "compose:build": "docker compose -f docker-compose.yaml build",
+    "compose:up": "docker compose -f docker-compose.yaml up -d",
+    "compose:down": "docker compose -f docker-compose.yaml down",
+    "compose:delete": "docker compose -f docker-compose.yaml down -v"
   },
   "repository": {
     "type": "git",

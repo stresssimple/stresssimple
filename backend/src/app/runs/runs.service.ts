@@ -1,102 +1,73 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as uuid from 'uuid';
-import { RunState } from '../dto/runs/Run';
+import { TestExecution } from '../mysql/TestExecution';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { generateId } from '../utils/id';
 
 @Injectable()
 export class RunsService {
-  private readonly RUNS_FOLDER = process.env['RUNS_FOLDER']; //'tmp/runs';
-  constructor(private logger: Logger) {
-    this.logger.log(`Runs folder: ${this.RUNS_FOLDER}`);
-    if (!fs.existsSync(this.RUNS_FOLDER)) {
-      fs.mkdirSync(this.RUNS_FOLDER);
-      this.logger.log(`Created runs folder: ${this.RUNS_FOLDER}`);
-    }
-  }
+  constructor(
+    @InjectRepository(TestExecution)
+    private usersRepository: Repository<TestExecution>,
+    private logger: Logger,
+  ) {}
 
   public async createRun(
     testId: string,
     durationMinutes: number,
     rampUpMinutes: number,
     users: number,
-  ): Promise<string> {
-    const runId = uuid.v7();
-    const testFolder = path.join(this.RUNS_FOLDER, testId);
-    if (!fs.existsSync(testFolder)) {
-      fs.mkdirSync(testFolder);
-    }
-    const runFolder = path.join(this.RUNS_FOLDER, testId, runId);
-    fs.mkdirSync(runFolder);
-    fs.writeFileSync(
-      path.join(runFolder, 'run.json'),
-      JSON.stringify(<RunState>{
-        testId,
-        durationMinutes,
-        rampUpMinutes,
-        users,
-        startTime: new Date(),
-        lastUpdated: new Date(),
-        status: 'created',
-        runId,
-      }),
-    );
-    return runId;
+  ): Promise<TestExecution> {
+    const runId = generateId();
+    const testExecution = new TestExecution({
+      id: runId,
+      status: 'created',
+      startTime: new Date(),
+      lastUpdated: new Date(),
+      testId: testId,
+      durationMinutes,
+      rampUpMinutes,
+      numberOfUsers: users,
+    });
+    await this.usersRepository.insert(testExecution);
+    return testExecution;
   }
 
-  public async cancelRun(testId: string, runId: string) {
-    await this.updateRun(testId, runId, 'cancelled', true);
+  public async cancelRun(runId: string) {
+    await this.updateRun(runId, 'cancelled', true);
   }
 
-  public deleteRun(testId: string, runId: string): void | PromiseLike<void> {
-    const runFolder = path.join(this.RUNS_FOLDER, testId, runId);
-    fs.rmSync(runFolder, { recursive: true });
+  public async deleteRun(runId: string): Promise<void | PromiseLike<void>> {
+    await this.updateRun(runId, 'deleted', true);
   }
 
-  public async getRuns(testId: string): Promise<string[]> {
-    const pathToFolder = path.join(this.RUNS_FOLDER, testId);
-    if (!fs.existsSync(pathToFolder)) {
-      return [];
-    }
-    return fs.readdirSync(pathToFolder);
+  public async getRuns(testId: string): Promise<TestExecution[]> {
+    return this.usersRepository.find({ where: { testId: testId } });
   }
 
-  public async getRun(testId: string, runId: string): Promise<RunState> {
-    const runFolder = path.join(this.RUNS_FOLDER, testId, runId);
-    const runFile = path.join(runFolder, 'run.json');
-    if (!fs.existsSync(runFile)) {
-      return null;
-    }
-    return JSON.parse(fs.readFileSync(runFile).toString());
+  public async getRun(runId: string): Promise<TestExecution> {
+    return this.usersRepository.findOne({
+      where: { id: runId },
+      // relations: ['test'],
+    });
   }
-  public async getRunStatus(testId: string, runId: string): Promise<string> {
-    const run = await this.getRun(testId, runId);
+
+  public async getRunStatus(runId: string): Promise<string> {
+    const run = await this.getRun(runId);
     return run.status;
   }
 
   public async updateRun(
-    testId: string,
     runId: string,
     status: string,
     completed = false,
   ): Promise<void> {
-    const runFolder = path.join(this.RUNS_FOLDER, testId, runId);
-    const runFile = path.join(runFolder, 'run.json');
-    if (!fs.existsSync(runFile)) {
-      this.logger.error(`Run file not found: ${runFile}`);
-      return;
-    }
-    const run = <RunState>JSON.parse(fs.readFileSync(runFile).toString());
+    const run = await this.getRun(runId);
     run.status = status;
     run.lastUpdated = new Date();
-    run.isFinal = completed;
     if (completed) {
       run.endTime = new Date();
     }
-    fs.writeFileSync(runFile, JSON.stringify(run));
-  }
-
-  public getFolder(testId: string, runId: string): string {
-    return path.join(this.RUNS_FOLDER, testId, runId);
+    await this.usersRepository.save(run);
   }
 }

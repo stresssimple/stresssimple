@@ -22,6 +22,9 @@ const redisPub = new Redis({
   host: process.env['REDIS_HOST'] || 'localhost',
   port: Number.parseInt(process.env['REDIS_PORT'] ?? '6379'),
 });
+
+ctx.redis = redisPub;
+
 redisSub.on('connect', () => {
   console.log('Connected to Redis');
 });

@@ -1,54 +1,72 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as fs from 'fs';
-import * as path from 'path';
 import { TestDefinitions } from '../dto/TestDefinitions';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Test } from '../mysql/Test';
+import { Repository } from 'typeorm';
+import { generateId } from '../utils/id';
 
 @Injectable()
 export class TestsService {
-  private readonly TESTS_FOLDER = process.env['TESTS_FOLDER']; // 'tmp/tests';
-  constructor(private logger: Logger) {
-    this.logger.log(`Tests folder: ${this.TESTS_FOLDER}`);
-    if (!fs.existsSync(this.TESTS_FOLDER)) {
-      fs.mkdirSync(this.TESTS_FOLDER, { recursive: true });
-      this.logger.log(`Created tests folder: ${this.TESTS_FOLDER}`);
-    }
+  constructor(
+    @InjectRepository(Test)
+    private usersRepository: Repository<Test>,
+    private logger: Logger,
+  ) {}
+
+  public async getTests(): Promise<TestDefinitions[]> {
+    const tests = await this.usersRepository.find();
+    return tests.map((test) => ({
+      id: test.id,
+      name: test.name,
+      description: test.description,
+      modules: test.modules.split(',').filter((m) => m?.length > 0),
+      source: test.source,
+    }));
   }
 
-  public getTests(): TestDefinitions[] {
-    const tests: TestDefinitions[] = [];
-    const files = fs.readdirSync(this.TESTS_FOLDER);
-    files.forEach((file) => {
-      const filePath = path.join(this.TESTS_FOLDER, file);
-      const content = fs.readFileSync(filePath, 'utf8');
-      const test = JSON.parse(content);
-      tests.push({ modules: [], ...test });
-    });
-    return tests;
-  }
-
-  public getTest(id: string): TestDefinitions | undefined {
+  public async getTest(id: string): Promise<TestDefinitions | undefined> {
     if (!id) {
       throw new Error('Invalid test id');
     }
-    const filePath = path.join(this.TESTS_FOLDER, id);
-    try {
-      const content = fs.readFileSync(filePath + '.json', 'utf8');
-      const test = JSON.parse(content);
-      return { modules: [], ...test };
-    } catch (e) {
+    const test = await this.usersRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!test) {
       return undefined;
     }
+    return {
+      id: test.id,
+      name: test.name,
+      description: test.description,
+      modules: test.modules.split(',').filter((m) => m?.length > 0),
+      source: test.source,
+    };
   }
 
-  public saveTest(test: TestDefinitions) {
-    const filePath = path.join(this.TESTS_FOLDER, test.id);
-    const content = JSON.stringify(test, null, 2);
-    fs.writeFileSync(filePath + '.json', content);
+  public async addTest(test: TestDefinitions): Promise<Test> {
+    const record = new Test();
+    record.id = generateId();
+    record.name = test.name;
+    record.description = test.description;
+    record.modules = test.modules.join(',');
+    record.source = test.source;
+    await this.usersRepository.insert({ ...record });
+    return record;
+  }
+
+  public async updateTest(test: TestDefinitions) {
+    const record = new Test();
+    record.id = test.id;
+    record.name = test.name;
+    record.description = test.description;
+    record.modules = test.modules.join(',');
+    record.source = test.source;
+    return await this.usersRepository.update({ id: test.id }, { ...record });
   }
 
   public deleteTest(id: string) {
-    this.logger.log(`Deleting test ${id}`);
-    const filePath = path.join(this.TESTS_FOLDER, id);
-    fs.rmSync(filePath + '.json');
+    this.usersRepository.delete(id);
   }
 }

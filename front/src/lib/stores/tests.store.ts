@@ -16,18 +16,19 @@ function createTestsStore() {
 
 	return {
 		subscribe,
-		addTest: (test: any) => {
-			update((tests) => [...tests, test]);
-			axios.post(`${PUBLIC_API_URL}/tests`, test);
+		addTest: async (test: any) => {
+			test = await axios.post(`${PUBLIC_API_URL}/tests`, test);
+			console.log(test);
+			update((tests) => [...tests, test.data]);
 		},
 		deleteTest: async (id: string) => {
 			await axios.delete(`${PUBLIC_API_URL}/tests/${id}`);
 
 			update((tests) => tests.filter((test) => test.id !== id));
 		},
-		save: (test: any) => {
+		save: async (test: any) => {
 			update((tests) => tests.map((t) => (t.id === test.id ? test : t)));
-			axios.put(`${PUBLIC_API_URL}/tests`, test);
+			await axios.put(`${PUBLIC_API_URL}/tests`, test);
 		}
 	};
 }

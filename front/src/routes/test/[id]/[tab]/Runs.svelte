@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { PUBLIC_API_URL } from '$env/static/public';
-
 	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { runsStore } from '$lib/stores/runs.store';
 	import axios from 'axios';
 
 	import { onDestroy, onMount } from 'svelte';
-	import { activeTest, toHumanDate, toHumanTime } from '$lib';
+	import { activeTest, runStore, toHumanDate, toHumanTime } from '$lib';
 	import {
 		Label,
 		Select,
@@ -25,25 +23,17 @@
 	let duration = $state(0.5);
 	let users = $state(1);
 	let rampUp = $state(0);
-	let auditType = $state('');
-	let auditPercentage = $state(0);
 
 	let timerInterval: number;
 
 	async function run() {
-		console.log({ duration, users, rampUp });
-		await axios.post(`${PUBLIC_API_URL}/runs`, {
-			durationMinutes: duration,
-			users,
-			rampUpMinutes: rampUp,
-			testId: page.params.id,
-			auditType,
-			auditPercentage
-		});
+		await runsStore.start(page.params.id, duration, users, rampUp);
 	}
+
 	afterNavigate(() => {
 		runsStore.clear();
 	});
+
 	onMount(() => {
 		runsStore.load(page.params.id);
 		timerInterval = setInterval(() => {
@@ -57,13 +47,14 @@
 
 	async function StopRun(e: Event, runId: string): Promise<void> {
 		e.stopPropagation();
-		await axios.post(`${PUBLIC_API_URL}/runs/` + page.params.id + '/' + runId + '/stop');
+		await runsStore.stop(runId);
+		await runsStore.load(page.params.id);
 	}
 
 	async function DeleteRun(e: Event, runId: string): Promise<void> {
 		e.stopPropagation();
-		await axios.delete(`${PUBLIC_API_URL}/runs/` + page.params.id + '/' + runId);
-		runsStore.load(page.params.id);
+		await runsStore.delete(runId);
+		await runsStore.load(page.params.id);
 	}
 </script>
 
@@ -136,7 +127,7 @@
 		</TableHead>
 		<TableBody>
 			{#each $runsStore as run}
-				<TableBodyRow on:click={() => goto('runs/' + run.runId)} class="cursor-pointer">
+				<TableBodyRow on:click={() => goto('runs/' + run.id)} class="cursor-pointer">
 					<TableBodyCell>{run.users}</TableBodyCell>
 					<TableBodyCell>{run.durationMinutes}min</TableBodyCell>
 					<TableBodyCell>{run.rampUpMinutes == 0 ? '-' : run.rampUpMinutes + 'min'}</TableBodyCell>
@@ -149,11 +140,11 @@
 					<TableBodyCell>{run.error}</TableBodyCell>
 					<TableBodyCell>
 						{#if run.status === 'running'}
-							<Button size="xs" color="yellow" on:click={(e) => StopRun(e, run.runId)}>
+							<Button size="xs" color="yellow" on:click={(e) => StopRun(e, run.id)}>
 								<StopOutline size="xs" />
 							</Button>
 						{:else}
-							<Button size="xs" color="red" on:click={(e) => DeleteRun(e, run.runId)}>
+							<Button size="xs" color="red" on:click={(e) => DeleteRun(e, run.id)}>
 								<DeleteRowOutline size="xs" />
 							</Button>
 						{/if}

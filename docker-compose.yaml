@@ -19,6 +19,18 @@ services:
     container_name: redis
     ports:
       - "16379:6379"
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=securepassword
+      - MYSQL_DATABASE=stressjs
+      - MYSQL_USER=stressjs
+      - MYSQL_PASSWORD=securepassword
+    volumes:
+      - mysql_data:/var/lib/mysql
 
   frontend:
     build:
@@ -53,10 +65,11 @@ services:
       - INFLUXDB_BUCKET=test-runs
       - CONTAINER=true
     ports:
-      - "3000:3000"
+      - "3030:3000"
     depends_on:
       - influxdb
       - redis
 volumes:
   influxdb_data:
+  mysql_data:
   tests_data:

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { TestsService } from '../tests/tests.service';
 import { RunsService } from './runs.service';
 import { TemplateRunnerSvcFactory } from '../template-runner/TemplateRunnerFactory';
@@ -21,57 +21,54 @@ export class RunScheduler {
     rampUp: number,
     users: number,
   ) {
-    const runId = await this.runsService.createRun(
+    let run = await this.runsService.createRun(
       testId,
       durationMinutes,
       rampUp,
       users,
     );
-
     const testDefinitions = await this.testService.getTest(testId);
     if (!testDefinitions) {
-      await this.runsService.updateRun(testId, runId, 'failed');
+      await this.runsService.updateRun(run.id, 'failed', true);
       throw new Error('Test not found');
     }
 
-    const templateRunner = this.factory.getRunnerSvc(
-      testId,
-      runId,
-      this.runsService.getFolder(testId, runId),
-    );
+    const templateRunner = this.factory.getRunnerSvc(testId, run.id);
 
     await templateRunner.initDirectory();
     const deps = await templateRunner.npmInstall(testDefinitions.modules);
     if (!deps) {
-      await this.runsService.updateRun(testId, runId, 'failed');
+      await this.runsService.updateRun(run.id, 'failed', true);
       throw new Error('Failed to install dependencies');
     }
 
     const cmpl = await templateRunner.compileTemplate(testDefinitions.source);
     if (!cmpl) {
-      await this.runsService.updateRun(testId, runId, 'failed');
+      await this.runsService.updateRun(run.id, 'failed', true);
       throw new Error('Failed to compile template');
     }
 
     const runner = templateRunner.startRunner();
 
-    await this.runsManager.waitForRunner(runId);
-    await this.runsService.updateRun(testId, runId, 'running');
+    await this.runsManager.waitForRunner(run.id);
+    await this.runsService.updateRun(run.id, 'running');
 
     const userRampUpDelay = Math.floor((rampUp * 60 * 1000) / users);
     const testStart = new Date();
     let userIndex = 0;
-    let run = await this.runsService.getRun(testId, runId);
+    run = await this.runsService.getRun(run.id);
     // Ramp up users
+    console.log('Ramping up users', users, userRampUpDelay);
     while (userIndex < users && run.status === 'running') {
+      console.log('Starting user', userIndex + 1);
       await this.redis.publish(
-        'runner:' + runId,
+        'runner:' + run.id,
         JSON.stringify({ type: 'startUser', userId: userIndex + 1 }),
       );
       await new Promise((resolve) => setTimeout(resolve, userRampUpDelay));
       userIndex++;
-      run = await this.runsService.getRun(testId, runId);
-      await this.runsService.updateRun(testId, runId, 'running');
+      run = await this.runsService.getRun(run.id);
+      await this.runsService.updateRun(run.id, run.status);
     }
 
     // Wait for the test to finish
@@ -81,16 +78,16 @@ export class RunScheduler {
       run.status === 'running'
     ) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      run = await this.runsService.getRun(testId, runId);
-      await this.runsService.updateRun(testId, runId, 'running');
+      run = await this.runsService.getRun(run.id);
+      await this.runsService.updateRun(run.id, run.status);
     }
     await this.redis.publish(
-      'runner:' + runId,
+      'runner:' + run.id,
       JSON.stringify({ type: 'stopAllUsers' }),
     );
 
     await runner;
-    await this.runsService.updateRun(testId, runId, 'completed', true);
+    await this.runsService.updateRun(run.id, 'completed', true);
     await templateRunner.cleanup();
   }
 }

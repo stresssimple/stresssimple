@@ -11,9 +11,8 @@ import {
 } from '@nestjs/common';
 import { RunsService } from './runs.service';
 import { RunScheduler } from './run.scheduler';
-import * as fs from 'fs/promises';
 import { CreateRunRequest } from '../dto/runs/CreateRunRequest';
-import { RunState } from '../dto/runs/Run';
+import { TestExecution } from '../mysql/TestExecution';
 
 @Controller('runs')
 export class RunsController {
@@ -34,62 +33,29 @@ export class RunsController {
   }
 
   @Get(':testId')
-  public async getRuns(@Param('testId') testId: string): Promise<RunState[]> {
-    const runIds = await this.runsService.getRuns(testId);
-    const tasks = runIds.map((runId) => this.runsService.getRun(testId, runId));
-    return await Promise.all(tasks);
+  public async getRuns(
+    @Param('testId') testId: string,
+    @Query('deleted') deleted: boolean = false,
+  ): Promise<TestExecution[]> {
+    const runs = await this.runsService.getRuns(testId);
+    if (deleted) return runs;
+    return runs.filter((run) => run.status !== 'deleted');
   }
 
-  @Get(':testId/:runId')
-  public async getRun(
-    @Param('testId') testId: string,
-    @Param('runId') runId: string,
-  ): Promise<RunState> {
-    const run = await this.runsService.getRun(testId, runId);
+  @Get('run/:runId')
+  public async getRun(@Param('runId') runId: string): Promise<TestExecution> {
+    const run = await this.runsService.getRun(runId);
     return run;
   }
 
-  @Get(':testId/:runId/logs')
-  public async getRunLogs(
-    @Param('testId') testId: string,
-    @Param('runId') runId: string,
-    @Query('page') page: number = 1,
-    @Query('pageSize') pageSize: number = 100,
-  ): Promise<unknown> {
-    const folder = this.runsService.getFolder(testId, runId);
-    const filePath = `${folder}/app.log`;
-    try {
-      const logs = await fs.readFile(filePath, 'utf-8');
-      const run = await this.runsService.getRun(testId, runId);
-      const lines = logs.split('\n');
-      return {
-        isFinal: run.isFinal,
-        total: lines.length,
-        logs: lines.slice((page - 1) * pageSize, page * pageSize),
-      };
-    } catch (e) {
-      this.logger.error(e);
-      throw new NotFoundException(
-        `No logs found for run ${runId}, test ${testId}`,
-      );
-    }
+  @Delete(':runId')
+  public async deleteRun(@Param('runId') runId: string): Promise<void> {
+    this.logger.log(`Deleting run ${runId}`);
+    return this.runsService.deleteRun(runId);
   }
 
-  @Delete(':testId/:runId')
-  public async deleteRun(
-    @Param('testId') testId: string,
-    @Param('runId') runId: string,
-  ): Promise<void> {
-    this.logger.debug('Deleting run', testId, runId);
-    return this.runsService.deleteRun(testId, runId);
-  }
-
-  @Post(':testId/:runId/stop')
-  public async stopRun(
-    @Param('testId') testId: string,
-    @Param('runId') runId: string,
-  ): Promise<void> {
-    this.logger.debug('Stopping run', testId, runId);
-    return this.runsService.cancelRun(testId, runId);
+  @Post(':runId/stop')
+  public async stopRun(@Param('runId') runId: string): Promise<void> {
+    return this.runsService.cancelRun(runId);
   }
 }

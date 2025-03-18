@@ -11,6 +11,7 @@ export class RunManager {
   constructor(private readonly test: StressTest) {}
 
   public startUser(userId: string): void {
+    console.log(`Starting user ${userId}`);
     if (this.users[userId]) {
       console.error(`User ${userId} is already running`);
       return;
@@ -20,6 +21,7 @@ export class RunManager {
   }
 
   public stopUser(userId: string): void {
+    console.log(`Stopping user ${userId}`);
     if (!this.users[userId]) {
       console.error(`User ${userId} is not running`);
       return;

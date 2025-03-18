@@ -1,6 +1,3 @@
-import * as fs from 'fs/promises';
-import * as fsSync from 'fs';
-import * as path from 'path';
 import { AxiosError, AxiosInstance } from 'axios';
 import { InfluxService } from '../influx/influx.service.js';
 import { HttpRequestFactory } from './HttpRequestFactory.js';
@@ -14,20 +11,11 @@ export class HttpRequestFactoryImpl implements HttpRequestFactory {
   private _name?: string;
   private _successOn: number[] = [];
   private _failOn: number[] = [];
-  private auditFolder: string;
-
-  private readonly AUDIT_FOLDER = process.env['AUDIT_FOLDER'] || 'audit';
 
   constructor(
     private client: AxiosInstance,
     private influx: InfluxService,
-  ) {
-    this.auditFolder = path.join(this.AUDIT_FOLDER, ctx.testId, ctx.runId);
-    if (!fsSync.existsSync(this.auditFolder)) {
-      fsSync.mkdirSync(this.auditFolder, { recursive: true });
-      console.log(`Created audit folder ${this.auditFolder}`);
-    }
-  }
+  ) {}
 
   public get(url: string): HttpRequestFactory {
     this._url = url;
@@ -98,6 +86,9 @@ export class HttpRequestFactoryImpl implements HttpRequestFactory {
           if (response.status) {
             result.status = response.status;
           }
+          if (response.statusText) {
+            result.statusText = response.statusText;
+          }
           if (response.data) {
             result.body = response.data;
           }
@@ -129,7 +120,7 @@ export class HttpRequestFactoryImpl implements HttpRequestFactory {
         const duration = Number(end - start) / 1e9;
 
         await this.trace(duration, isSuccessful, result.status);
-        await this.audit(request, result, isSuccessful, duration);
+        await this.audit(request, result, duration, isSuccessful);
       }
     } catch (error) {
       console.log(error);
@@ -144,24 +135,25 @@ export class HttpRequestFactoryImpl implements HttpRequestFactory {
       data: unknown;
     },
     result: HttpResponse,
-    isSuccessful: boolean,
     duration: number,
+    success: boolean,
   ) {
     const record = {
+      runId: ctx.runId,
+      baseUrl: this.client.defaults.baseURL,
       name: this._name ?? 'No name',
-      request: {
-        ...request,
-        host: this.client.defaults.baseURL,
-        headers: this.client.defaults.headers.common,
-      },
-      response: result,
-      success: isSuccessful,
       duration,
+      path: request.url,
+      method: request.method,
+      requestBody: request.data?.toString(),
+      responseBody: result.body?.toString(),
+      requestHeaders: JSON.stringify(this.client.defaults.headers.common),
+      responseHeaders: JSON.stringify(result.headers),
+      status: result.status ?? 0,
+      statusDescription: result.statusText ?? '',
+      success,
     };
-    const auditFileName = `${this.auditFolder}/T${new Date().getTime()}-${
-      this._name
-    }.json`;
-    await fs.writeFile(auditFileName, JSON.stringify(record));
+    ctx.redis.publish('audit', JSON.stringify(record));
   }
 
   private trace(

@@ -1,9 +1,10 @@
 import { Logger, Module } from '@nestjs/common';
 import { INQUIRER } from '@nestjs/core';
 import { TemplateRunnerSvcFactory } from './TemplateRunnerFactory';
+import { AppLogsModule } from '../appLogs/AppLogs.module';
 
 @Module({
-  imports: [],
+  imports: [AppLogsModule],
   providers: [
     TemplateRunnerSvcFactory,
     {

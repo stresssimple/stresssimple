@@ -32,7 +32,21 @@ function createRunsStore() {
 		load: async (testId: string) => {
 			await load(testId);
 		},
-		clear: () => set([])
+		clear: () => set([]),
+		start: async (testId: string, duration: number, users: number, rampUp: number) => {
+			await axios.post(`${PUBLIC_API_URL}/runs`, {
+				durationMinutes: duration,
+				users,
+				rampUpMinutes: rampUp,
+				testId
+			});
+		},
+		stop: async (runId: string) => {
+			await axios.post(`${PUBLIC_API_URL}/runs/${runId}/stop`);
+		},
+		delete: async (runId: string) => {
+			await axios.delete(`${PUBLIC_API_URL}/runs/${runId}`);
+		}
 	};
 }
 
