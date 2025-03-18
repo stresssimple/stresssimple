@@ -2,7 +2,7 @@
 	import { afterNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { runsStore } from '$lib/stores/runs.store';
-	import axios from 'axios';
+	import { fade } from 'svelte/transition';
 
 	import { onDestroy, onMount } from 'svelte';
 	import { activeTest, runStore, toHumanDate, toHumanTime } from '$lib';
@@ -112,48 +112,51 @@
 	{/if} -->
 </div>
 
-<div>
-	<Table shadow border={3} frame={true} hoverable={true} class="mt-6">
-		<TableHead>
-			<TableHeadCell>Users</TableHeadCell>
-			<TableHeadCell>Duration</TableHeadCell>
-			<TableHeadCell>Ramp up</TableHeadCell>
-			<TableHeadCell>Start time</TableHeadCell>
-			<TableHeadCell>Run time</TableHeadCell>
-			<TableHeadCell>Status</TableHeadCell>
-			<TableHeadCell>Last updated</TableHeadCell>
-			<TableHeadCell>Error</TableHeadCell>
-			<TableHeadCell></TableHeadCell>
-		</TableHead>
-		<TableBody>
-			{#each $runsStore as run}
-				<TableBodyRow on:click={() => goto('runs/' + run.id)} class="cursor-pointer">
-					<TableBodyCell>{run.users}</TableBodyCell>
-					<TableBodyCell>{run.durationMinutes}min</TableBodyCell>
-					<TableBodyCell>{run.rampUpMinutes == 0 ? '-' : run.rampUpMinutes + 'min'}</TableBodyCell>
-					<TableBodyCell>{toHumanDate(run.startTime)}</TableBodyCell>
-					<TableBodyCell
-						>{toHumanTime(run.lastUpdated.getTime() - run.startTime.getTime())}</TableBodyCell
-					>
-					<TableBodyCell>{run.status}</TableBodyCell>
-					<TableBodyCell>{toHumanDate(run.lastUpdated)}</TableBodyCell>
-					<TableBodyCell>{run.error}</TableBodyCell>
-					<TableBodyCell>
-						{#if run.status === 'running' || run.status === 'created'}
-							<Button size="xs" color="yellow" on:click={(e) => StopRun(e, run.id)}>
-								<StopOutline size="xs" />
-							</Button>
-						{:else}
-							<Button size="xs" color="red" on:click={(e) => DeleteRun(e, run.id)}>
-								<DeleteRowOutline size="xs" />
-							</Button>
-						{/if}
-					</TableBodyCell>
-				</TableBodyRow>
-			{/each}
-		</TableBody>
-	</Table>
-</div>
+{#if $runsStore.length > 0}
+	<div transition:fade>
+		<Table shadow border={3} frame={true} hoverable={true} class="mt-6">
+			<TableHead>
+				<TableHeadCell>Users</TableHeadCell>
+				<TableHeadCell>Duration</TableHeadCell>
+				<TableHeadCell>Ramp up</TableHeadCell>
+				<TableHeadCell>Start time</TableHeadCell>
+				<TableHeadCell>Run time</TableHeadCell>
+				<TableHeadCell>Status</TableHeadCell>
+				<TableHeadCell>Last updated</TableHeadCell>
+				<TableHeadCell>Error</TableHeadCell>
+				<TableHeadCell></TableHeadCell>
+			</TableHead>
+			<TableBody>
+				{#each $runsStore as run}
+					<TableBodyRow on:click={() => goto('runs/' + run.id)} class="cursor-pointer">
+						<TableBodyCell>{run.users}</TableBodyCell>
+						<TableBodyCell>{run.durationMinutes}min</TableBodyCell>
+						<TableBodyCell>{run.rampUpMinutes == 0 ? '-' : run.rampUpMinutes + 'min'}</TableBodyCell
+						>
+						<TableBodyCell>{toHumanDate(run.startTime)}</TableBodyCell>
+						<TableBodyCell
+							>{toHumanTime(run.lastUpdated.getTime() - run.startTime.getTime())}</TableBodyCell
+						>
+						<TableBodyCell>{run.status}</TableBodyCell>
+						<TableBodyCell>{toHumanDate(run.lastUpdated)}</TableBodyCell>
+						<TableBodyCell>{run.error}</TableBodyCell>
+						<TableBodyCell>
+							{#if run.status === 'running' || run.status === 'created'}
+								<Button size="xs" color="yellow" on:click={(e) => StopRun(e, run.id)}>
+									<StopOutline size="xs" />
+								</Button>
+							{:else}
+								<Button size="xs" color="red" on:click={(e) => DeleteRun(e, run.id)}>
+									<DeleteRowOutline size="xs" />
+								</Button>
+							{/if}
+						</TableBodyCell>
+					</TableBodyRow>
+				{/each}
+			</TableBody>
+		</Table>
+	</div>
+{/if}
 
 <style lang="postcss">
 	@reference 'tailwindcss';
