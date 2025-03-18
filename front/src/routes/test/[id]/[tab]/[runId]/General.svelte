@@ -5,6 +5,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { writable } from 'svelte/store';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import ScatterChart from '$lib/components/ScatterChart.svelte';
 
 	let usersLabels = writable<string[]>([]);
 	let usersData = writable<Record<string, number[]>>({});
@@ -12,7 +13,7 @@
 	let httpData = writable<Record<string, number[]>>({});
 	let rpsLabels = writable<string[]>([]);
 	let rpsData = writable<Record<string, number[]>>({});
-
+	let durVsRpsData = writable<Record<string, { x: number; y: number }[]>>({});
 	function getData() {
 		axios
 			.get(`${PUBLIC_API_URL}/runs/report/${page.params.runId}`)
@@ -27,6 +28,7 @@
 				rpsData.set(data.rps.data);
 				rpsLabels.set(data.rps.labels);
 				// rpsLabels.set(data.rps.labels.map((label: Date) => toHumanDate(new Date(label))));
+				durVsRpsData.set(data.durationVsRps);
 			});
 	}
 
@@ -142,6 +144,45 @@
 				},
 				scales: {
 					y: {
+						beginAtZero: true,
+						title: {
+							display: true,
+							text: 'Requests per second'
+						}
+					}
+				}
+			}}
+			dataOptions={{}}
+		/>
+	</div>
+	<div class="container col-span-2 h-64">
+		<ScatterChart
+			data={$durVsRpsData}
+			options={{
+				maintainAspectRatio: false,
+				plugins: {
+					legend: {
+						position: 'bottom'
+					},
+					title: {
+						display: true,
+						text: 'Duration vs RPS'
+					},
+					subtitle: {
+						display: true,
+						text: 'Request duration vs Requests per second',
+						padding: 4
+					}
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						title: {
+							display: true,
+							text: 'Duration (seconds)'
+						}
+					},
+					x: {
 						beginAtZero: true,
 						title: {
 							display: true,

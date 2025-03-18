@@ -34,7 +34,7 @@ export class RunReportController {
     endTime = times.maxTime;
     endTime.setMilliseconds(0);
 
-    return {
+    const result = {
       users: await this.usersData(runId, startTime, endTime, windowPeriod),
       http: await this.httpDurationData(
         runId,
@@ -44,6 +44,20 @@ export class RunReportController {
       ),
       rps: await this.rpsData(runId, startTime, endTime, windowPeriod),
     };
+
+    const durationVsRps: Record<string, { x: number; y: number }[]> = {};
+    for (const key of Object.keys(result.http.data)) {
+      durationVsRps[key] = [];
+      for (let i = 0; i < result.http.data[key].length; i++) {
+        durationVsRps[key].push({
+          y: result.http.data[key][i],
+          x: result.rps.data[key][i],
+        });
+      }
+    }
+
+    result['durationVsRps'] = durationVsRps;
+    return result;
   }
 
   private async rpsData(
