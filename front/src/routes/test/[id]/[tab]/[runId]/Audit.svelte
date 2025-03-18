@@ -59,6 +59,7 @@
 			<TableHeadCell>Method</TableHeadCell>
 			<TableHeadCell>Path</TableHeadCell>
 			<TableHeadCell>Status</TableHeadCell>
+			<TableHeadCell>Duration</TableHeadCell>
 			<TableHeadCell>Actions</TableHeadCell>
 		</TableHead>
 		<TableBody>
@@ -69,6 +70,7 @@
 					<TableBodyCell>{file.method}</TableBodyCell>
 					<TableBodyCell>{file.path}</TableBodyCell>
 					<TableBodyCell>{file.status}</TableBodyCell>
+					<TableBodyCell>{(file.duration as number).toFixed(4)}sec</TableBodyCell>
 					<TableBodyCell>
 						<Button size={'xs'} on:click={() => showFileModal(file.id)}>View</Button>
 					</TableBodyCell>
@@ -103,7 +105,24 @@
 	</div>
 	{#if auditRecord.requestHeaders}
 		<h3>Headers</h3>
-		<pre>{JSON.stringify(auditRecord.requestHeaders, null, 2)}</pre>
+		<table class="border border-gray-200">
+			<tbody>
+				{#each Object.entries(auditRecord.requestHeaders) as [key, value]}
+					<tr>
+						<td class="border border-gray-200">
+							<span class="mr-2">
+								{key}
+							</span>
+						</td>
+						<td class="border border-gray-200">
+							<span class="mr-2">
+								{value}
+							</span>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
 	{/if}
 	{#if auditRecord.requestBody}
 		<h3>Body</h3>
@@ -119,7 +138,24 @@
 	</div>
 	{#if auditRecord.responseHeaders}
 		<h3>Headers</h3>
-		<pre>{JSON.stringify(auditRecord.responseHeaders, null, 2)}</pre>
+		<table class="border border-gray-200">
+			<tbody>
+				{#each Object.entries(auditRecord.responseHeaders) as [key, value]}
+					<tr>
+						<td class="border border-gray-200">
+							<span class="mr-2">
+								{key}
+							</span>
+						</td>
+						<td class="border border-gray-200">
+							<span class="mr-2">
+								{value}
+							</span>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
 	{/if}
 	<h3>Body</h3>
 	<pre>{auditRecord?.responseBody}</pre>
