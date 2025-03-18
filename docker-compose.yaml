@@ -3,7 +3,9 @@ services:
     image: influxdb:latest
     container_name: influxdb
     ports:
-      - "8086:8086"
+      - "8086:8086" # InfluxDB API
+      - "8083:8083" # InfluxQL API (Optional)
+      - "8082:8082" # Flight SQL API (Optional)
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_USERNAME=admin
@@ -11,8 +13,11 @@ services:
       - DOCKER_INFLUXDB_INIT_ORG=my-org
       - DOCKER_INFLUXDB_INIT_BUCKET=test-runs
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-secret-token
+      - INFLUXDB_ENGINE=iox # Important for InfluxDB 3.0
+      - INFLUXDB_STORAGE_DIR=/var/lib/influxdb3
+
     volumes:
-      - influxdb_data:/var/lib/influxdb
+      - influxdb_data:/var/lib/influxdb3
 
   redis:
     image: redis:latest
@@ -72,6 +77,16 @@ services:
     depends_on:
       - influxdb
       - redis
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3300:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=securepassword
+    depends_on:
+      - influxdb
 volumes:
   influxdb_data:
   mysql_data:

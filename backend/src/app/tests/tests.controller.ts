@@ -33,6 +33,11 @@ export class TestsController {
     return await this.testService.addTest(body);
   }
 
+  @Post(':id/clone')
+  public async cloneTest(@Param('id') id: string) {
+    await this.testService.cloneTest(id);
+  }
+
   @Put()
   public async updateTest(@Body() body: TestDefinitions) {
     if (!this.testService.getTest(body.id)) {

@@ -5,12 +5,12 @@ import { ctx } from './run.context.js';
 
 const args = process.argv.slice(2);
 if (args.length !== 2) {
-  console.error('Usage: node src/index.ts testId runId');
+  console.error('Client Usage: node src/index.ts testId runId');
   process.exit(1);
 }
 const testId = args[0];
 const runId = args[1];
-console.log(`Test ID: ${testId}, Run ID: ${runId}`);
+console.log(`Client Test ID: ${testId}, Run ID: ${runId}`);
 ctx.testId = testId;
 ctx.runId = runId;
 
@@ -26,11 +26,11 @@ const redisPub = new Redis({
 ctx.redis = redisPub;
 
 redisSub.on('connect', () => {
-  console.log('Connected to Redis');
+  console.log('Client Connected to Redis');
 });
 
 redisSub.subscribe('runner:' + runId, (err, count) => {
-  console.log(`Subscribed to runner:${runId}. Count: ${count}`);
+  console.log(`Client subscribed to runner:${runId}. Count: ${count}`);
   if (err) {
     console.error(err);
   }
@@ -51,12 +51,12 @@ redisSub.on('message', (channel: string, message: string) => {
       runManager.stopAllUsers();
       break;
     default:
-      console.error('Unknown message type', data.type);
+      console.error('Client Unknown message type', data.type);
   }
 });
 
 while (redisPub.status !== 'ready' || redisSub.status !== 'ready') {
-  console.log('Waiting for Redis to be ready');
+  console.log('Client Waiting for Redis to be ready');
   await new Promise((resolve) => setTimeout(resolve, 1000));
 }
 
@@ -64,11 +64,11 @@ await redisPub.publish(
   'runners',
   JSON.stringify({ type: 'runnerStarted', runId }),
 );
-console.log('Runner started');
+console.log('Client Runner started');
 try {
   await runManager.run();
 } catch (e) {
-  console.error(e);
+  console.error('Client Exception in runner', e);
 } finally {
   await redisPub.publish(
     'runners',
@@ -77,5 +77,5 @@ try {
 }
 redisSub.disconnect();
 redisPub.disconnect();
-console.log('Runner stopped');
+console.log('Client Runner stopped');
 process.exit(0);

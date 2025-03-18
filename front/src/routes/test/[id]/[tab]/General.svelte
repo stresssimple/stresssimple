@@ -59,7 +59,12 @@
 	async function deleteTest(id: string | undefined) {
 		if (!id) return;
 		await tests.deleteTest(id);
+		goto('/');
 	}
+
+	const clone = () => {
+		tests.clone($activeTest.id);
+	};
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -68,6 +73,7 @@
 		<ButtonGroup class="mb-4" size="sm">
 			<Button disabled={!isDirty()} on:click={save}>Save</Button>
 			<Button disabled={!isDirty()} on:click={discard}>Discard</Button>
+			<Button on:click={clone}>Clone</Button>
 			<Button
 				color="red"
 				on:click={() => deleteConfirmDialog.openDeleteModal($activeTest.name, $activeTest.id)}

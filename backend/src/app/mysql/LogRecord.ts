@@ -14,8 +14,8 @@ export class LogRecord {
   @Column()
   runId: string;
 
-  @Column({ type: 'timestamp' })
-  timestamp: Date;
+  @Column({ type: 'bigint' })
+  timestamp: number;
 
   @Column({ length: 10 })
   level: string;

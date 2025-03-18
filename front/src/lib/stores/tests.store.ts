@@ -8,27 +8,32 @@ import { browser } from '$app/environment';
 function createTestsStore() {
 	const { subscribe, update } = writable<any[]>([]);
 
-	if (browser) {
-		axios.get<any[]>(`${PUBLIC_API_URL}/tests`).then((response) => {
-			update(() => response.data);
-		});
+	function fetchTests() {
+		if (browser) {
+			axios.get<any[]>(`${PUBLIC_API_URL}/tests`).then((response) => {
+				update(() => response.data);
+			});
+		}
 	}
+	fetchTests();
 
 	return {
 		subscribe,
 		addTest: async (test: any) => {
-			test = await axios.post(`${PUBLIC_API_URL}/tests`, test);
-			console.log(test);
-			update((tests) => [...tests, test.data]);
+			await axios.post(`${PUBLIC_API_URL}/tests`, test);
+			fetchTests();
 		},
 		deleteTest: async (id: string) => {
 			await axios.delete(`${PUBLIC_API_URL}/tests/${id}`);
-
-			update((tests) => tests.filter((test) => test.id !== id));
+			fetchTests();
 		},
 		save: async (test: any) => {
-			update((tests) => tests.map((t) => (t.id === test.id ? test : t)));
 			await axios.put(`${PUBLIC_API_URL}/tests`, test);
+			fetchTests();
+		},
+		clone: async (id: string) => {
+			await axios.post(`${PUBLIC_API_URL}/tests/${id}/clone`);
+			fetchTests();
 		}
 	};
 }

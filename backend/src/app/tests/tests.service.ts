@@ -66,6 +66,21 @@ export class TestsService {
     return await this.usersRepository.update({ id: test.id }, { ...record });
   }
 
+  public async cloneTest(id: string) {
+    const test = await this.getTest(id);
+    if (!test) {
+      throw new Error('Test not found');
+    }
+    const record = new Test();
+    record.id = generateId();
+    record.name = test.name + ' (clone)';
+    record.description = test.description;
+    record.modules = test.modules.join(',');
+    record.source = test.source;
+    await this.usersRepository.insert({ ...record });
+    return record;
+  }
+
   public deleteTest(id: string) {
     this.usersRepository.delete(id);
   }

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { toHumanDate } from '$lib';
 	import LineChart from '$lib/components/LineChart.svelte';
 	import axios from 'axios';
 	import { onDestroy, onMount } from 'svelte';
@@ -20,11 +19,14 @@
 			.then((res) => res.data)
 			.then((data) => {
 				usersData.set(data.users.data);
-				usersLabels.set(data.users.labels.map((label: Date) => toHumanDate(new Date(label))));
+				usersLabels.set(data.users.labels);
+				// usersLabels.set(data.users.labels.map((label: Date) => toHumanDate(new Date(label))));
 				httpData.set(data.http.data);
-				httpLabels.set(data.http.labels.map((label: Date) => toHumanDate(new Date(label))));
+				httpLabels.set(data.http.labels);
+				// httpLabels.set(data.http.labels.map((label: Date) => toHumanDate(new Date(label))));
 				rpsData.set(data.rps.data);
-				rpsLabels.set(data.rps.labels.map((label: Date) => toHumanDate(new Date(label))));
+				rpsLabels.set(data.rps.labels);
+				// rpsLabels.set(data.rps.labels.map((label: Date) => toHumanDate(new Date(label))));
 			});
 	}
 

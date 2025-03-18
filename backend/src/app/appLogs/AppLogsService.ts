@@ -20,7 +20,7 @@ export class AppLogsService {
   }
 
   public async create(logRecord: Partial<LogRecord>): Promise<LogRecord> {
-    const record = new LogRecord({ timestamp: new Date(), ...logRecord });
+    const record = new LogRecord({ timestamp: Date.now(), ...logRecord });
     return this.logRecordRepository.save(record);
   }
 

@@ -16,11 +16,9 @@
 			.then((data) => {
 				total = data.total;
 				rows = data.logs
-					.map((line: string) => {
+					.map((line: any) => {
 						try {
-							if (!line || line?.length === 0) {
-								return null;
-							}
+							line.timestamp = new Date(Number(line.timestamp));
 							return line;
 						} catch (e) {
 							console.error('failed to parse >' + line + '<');

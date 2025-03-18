@@ -139,7 +139,7 @@
 					<TableBodyCell>{toHumanDate(run.lastUpdated)}</TableBodyCell>
 					<TableBodyCell>{run.error}</TableBodyCell>
 					<TableBodyCell>
-						{#if run.status === 'running'}
+						{#if run.status === 'running' || run.status === 'created'}
 							<Button size="xs" color="yellow" on:click={(e) => StopRun(e, run.id)}>
 								<StopOutline size="xs" />
 							</Button>

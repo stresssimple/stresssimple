@@ -15,13 +15,13 @@ export class TestExecution {
   @Column()
   status: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   startTime: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   endTime?: Date;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   lastUpdated: Date;
 
   @Column({ type: 'float' })
