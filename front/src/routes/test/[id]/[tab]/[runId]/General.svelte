@@ -16,7 +16,7 @@
 
 	function getData() {
 		axios
-			.get(`${PUBLIC_API_URL}/runs/report/${page.params.id}/${page.params.runId}`)
+			.get(`${PUBLIC_API_URL}/runs/report/${page.params.runId}`)
 			.then((res) => res.data)
 			.then((data) => {
 				usersData.set(data.users.data);

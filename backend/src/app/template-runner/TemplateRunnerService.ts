@@ -81,6 +81,8 @@ export class TemplateRunnerService {
         });
       });
     } catch (error) {
+      this.appLogger.error(this.runId, `Error compiling template`);
+      this.appLogger.error(this.runId, error.toString());
       this.logger.error(`Error compiling template`, error);
     }
     return success;

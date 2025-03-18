@@ -16,6 +16,15 @@ export function toHumanDate(date?: Date, exact: boolean = false) {
 	const hours = Math.floor(absDelta / (1000 * 60 * 60));
 	const minutes = Math.floor((absDelta % (1000 * 60 * 60)) / (1000 * 60));
 	const seconds = Math.floor((absDelta % (1000 * 60)) / 1000);
+
+	if (hours >= 2) {
+		if (hours < 12) {
+			return date.toLocaleTimeString();
+		} else {
+			return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+		}
+	}
+
 	let result = '';
 	if (delta < 0) {
 		result += 'in ';

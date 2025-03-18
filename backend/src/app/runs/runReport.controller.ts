@@ -9,7 +9,7 @@ export class RunReportController {
     private runs: RunsService,
   ) {}
 
-  @Get(':testId/:runId')
+  @Get(':runId')
   async getRunReport(@Param('runId') runId: string) {
     const run = await this.runs.getRun(runId);
     if (!run) {

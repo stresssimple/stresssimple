@@ -138,21 +138,31 @@ export class HttpRequestFactoryImpl implements HttpRequestFactory {
     duration: number,
     success: boolean,
   ) {
-    const record = {
+    const record: any = {
       runId: ctx.runId,
       baseUrl: this.client.defaults.baseURL,
       name: this._name ?? 'No name',
       duration,
       path: request.url,
       method: request.method,
-      requestBody: request.data?.toString(),
-      responseBody: result.body?.toString(),
       requestHeaders: JSON.stringify(this.client.defaults.headers.common),
       responseHeaders: JSON.stringify(result.headers),
       status: result.status ?? 0,
       statusDescription: result.statusText ?? '',
       success,
     };
+    if (typeof request.data === 'object') {
+      record.requestBody = JSON.stringify(request.data);
+    } else {
+      record.requestBody = request.data?.toString();
+    }
+
+    if (typeof result.body === 'object') {
+      record.responseBody = JSON.stringify(result.body);
+    } else {
+      record.responseBody = result.body?.toString();
+    }
+
     ctx.redis.publish('audit', JSON.stringify(record));
   }
 

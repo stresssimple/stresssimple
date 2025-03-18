@@ -24,12 +24,19 @@ export class RunsController {
 
   @Post()
   public createRun(@Body() request: CreateRunRequest): void {
-    this.scheduler.scheduleRun(
-      request.testId,
-      request.durationMinutes,
-      request.rampUpMinutes,
-      request.users,
-    );
+    try {
+      this.logger.log(
+        `Scheduling run for test ${request.testId} with ${request.users} users`,
+      );
+      this.scheduler.scheduleRun(
+        request.testId,
+        request.durationMinutes,
+        request.rampUpMinutes,
+        request.users,
+      );
+    } catch (e) {
+      this.logger.error(`Failed to schedule run: ${e.message}`);
+    }
   }
 
   @Get(':testId')

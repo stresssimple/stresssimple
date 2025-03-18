@@ -30,7 +30,7 @@ export class RunScheduler {
     const testDefinitions = await this.testService.getTest(testId);
     if (!testDefinitions) {
       await this.runsService.updateRun(run.id, 'failed', true);
-      throw new Error('Test not found');
+      return;
     }
 
     const templateRunner = this.factory.getRunnerSvc(testId, run.id);
@@ -39,13 +39,13 @@ export class RunScheduler {
     const deps = await templateRunner.npmInstall(testDefinitions.modules);
     if (!deps) {
       await this.runsService.updateRun(run.id, 'failed', true);
-      throw new Error('Failed to install dependencies');
+      return;
     }
 
     const cmpl = await templateRunner.compileTemplate(testDefinitions.source);
     if (!cmpl) {
       await this.runsService.updateRun(run.id, 'failed', true);
-      throw new Error('Failed to compile template');
+      return;
     }
 
     const runner = templateRunner.startRunner();
@@ -58,9 +58,7 @@ export class RunScheduler {
     let userIndex = 0;
     run = await this.runsService.getRun(run.id);
     // Ramp up users
-    console.log('Ramping up users', users, userRampUpDelay);
     while (userIndex < users && run.status === 'running') {
-      console.log('Starting user', userIndex + 1);
       await this.redis.publish(
         'runner:' + run.id,
         JSON.stringify({ type: 'startUser', userId: userIndex + 1 }),

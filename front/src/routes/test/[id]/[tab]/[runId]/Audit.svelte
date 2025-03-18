@@ -1,56 +1,110 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import {
-		Badge,
 		Button,
-		Modal,
+		Label,
+		MultiSelect,
 		Pagination,
 		Table,
 		TableBody,
 		TableBodyCell,
 		TableBodyRow,
 		TableHead,
-		TableHeadCell
+		TableHeadCell,
+		type SelectOptionType
 	} from 'flowbite-svelte';
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import axios from 'axios';
-	import type { AuditRecord } from './a';
+	import AuditModal from './AuditModal.svelte';
 
-	let records: AuditRecord[] = $state<AuditRecord[]>([]);
+	let records: any[] = $state<any[]>([]);
 	let total: number = $state<number>(0);
+	let values = $state<Record<string, SelectOptionType<string>[]>>({});
+	let auditRecord = $state<any>({});
 	let fileModalVisible = $state<boolean>(false);
-	let openFilename = $state<string>('');
-	let auditRecord = $state<Partial<AuditRecord>>({});
+
+	let filterNames = $state<string[]>([]);
+	let filterPaths = $state<string[]>([]);
+	let filterMethods = $state<string[]>([]);
+	let filterStatuses = $state<string[]>([]);
+	let filterSuccesses = $state<string[]>([]);
+	let filterBaseUrls = $state<string[]>([]);
+
+	async function updateRecords() {
+		const params: Record<string, any> = {
+			page: 1,
+			pageSize: 10
+		};
+
+		if (filterNames.length > 0) params.name = filterNames.join(',');
+		if (filterPaths.length > 0) params.path = filterPaths.join(',');
+		if (filterMethods.length > 0) params.method = filterMethods.join(',');
+		if (filterStatuses.length > 0) params.status = filterStatuses.join(',');
+		if (filterSuccesses.length > 0) params.success = filterSuccesses.join(',');
+		if (filterBaseUrls.length > 0) params.baseUrl = filterBaseUrls.join(',');
+
+		const response = await axios.get(`${PUBLIC_API_URL}/audit/` + page.params.runId + '/audit', {
+			params
+		});
+		const data = await response.data;
+		records = data.audits as any[];
+		total = data.total;
+	}
 
 	onMount(async () => {
-		const response = await axios.get(`${PUBLIC_API_URL}/audit/` + page.params.runId + '/audit');
-		const data = await response.data;
-		records = data.audits as AuditRecord[];
-		total = data.total;
+		const valuesResult = await axios.get(
+			`${PUBLIC_API_URL}/audit/` + page.params.runId + '/audit/values'
+		);
+		const converted: Record<string, SelectOptionType<string>[]> = {};
+		for (const [key, value] of Object.entries(valuesResult.data)) {
+			const arr = value as string[];
+			converted[key] = arr.map((v: string) => ({ name: v, value: v }));
+		}
+		values = converted;
+		await updateRecords();
 	});
 
 	async function showFileModal(id: string) {
 		const fileResponse = await axios.get(
 			`${PUBLIC_API_URL}/audit/` + page.params.runId + '/audit/' + id
 		);
-		auditRecord = fileResponse.data as AuditRecord;
+		auditRecord = fileResponse.data as any;
 		if (auditRecord.requestHeaders)
 			auditRecord.requestHeaders = JSON.parse(auditRecord.requestHeaders);
 		if (auditRecord.responseHeaders)
 			auditRecord.responseHeaders = JSON.parse(auditRecord.responseHeaders);
 		fileModalVisible = true;
 	}
-
-	function joinUrls(baseUrl: string, ...paths: string[]) {
-		const url = new URL(baseUrl);
-		for (const path of paths) {
-			url.pathname = new URL(path, url).pathname;
-		}
-		return url.href;
-	}
 </script>
 
+<h1 class="text-xl">Filter</h1>
+<div class="grid grid-cols-3 gap-3 p-4">
+	<div>
+		<Label>Path</Label>
+		<MultiSelect items={values['path']} bind:value={filterPaths} on:change={updateRecords} />
+	</div>
+	<div>
+		<Label>Method</Label>
+		<MultiSelect items={values['method']} bind:value={filterMethods} on:change={updateRecords} />
+	</div>
+	<div>
+		<Label>Status</Label>
+		<MultiSelect items={values['status']} bind:value={filterStatuses} on:change={updateRecords} />
+	</div>
+	<div>
+		<Label>Name</Label>
+		<MultiSelect items={values['name']} bind:value={filterNames} on:change={updateRecords} />
+	</div>
+	<div>
+		<Label>Success</Label>
+		<MultiSelect items={values['success']} bind:value={filterSuccesses} on:change={updateRecords} />
+	</div>
+	<div>
+		<Label>Base url</Label>
+		<MultiSelect items={values['baseUrl']} bind:value={filterBaseUrls} on:change={updateRecords} />
+	</div>
+</div>
 <div class="flex h-full w-full flex-col">
 	<Table>
 		<TableHead>
@@ -82,81 +136,4 @@
 	<Pagination pages={[{ name: '1' }]} table></Pagination>
 </div>
 
-<Modal
-	size="lg"
-	title="File {openFilename}"
-	open={fileModalVisible}
-	outsideclose
-	autoclose
-	on:close={() => (fileModalVisible = false)}
->
-	<div class="flex flex-row gap-3">
-		<h1 class="text-xl">{auditRecord.name}</h1>
-		<Badge color={auditRecord.success ? 'green' : 'red'}
-			>{auditRecord.success ? 'Success' : 'Failed'}</Badge
-		>
-		<Badge color="blue">{(auditRecord.duration as number).toFixed(4)}sec</Badge>
-	</div>
-
-	<div class="flex flex-row gap-3 bg-gray-200 p-2">
-		<h2>Request</h2>
-		<Badge color="blue">{auditRecord.method}</Badge>
-		<pre>{joinUrls(auditRecord.baseUrl, auditRecord.path)}</pre>
-	</div>
-	{#if auditRecord.requestHeaders}
-		<h3>Headers</h3>
-		<table class="border border-gray-200">
-			<tbody>
-				{#each Object.entries(auditRecord.requestHeaders) as [key, value]}
-					<tr>
-						<td class="border border-gray-200">
-							<span class="mr-2">
-								{key}
-							</span>
-						</td>
-						<td class="border border-gray-200">
-							<span class="mr-2">
-								{value}
-							</span>
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	{/if}
-	{#if auditRecord.requestBody}
-		<h3>Body</h3>
-		<pre>{auditRecord.requestBody}</pre>
-	{/if}
-
-	<div class="flex flex-row gap-3 bg-gray-200 p-2">
-		<h2>Response</h2>
-		{#if auditRecord.status}
-			<Badge color={auditRecord.status >= 300 ? 'red' : 'blue'}>{auditRecord.status}</Badge>
-			<span>{auditRecord.statusDescription}</span>
-		{/if}
-	</div>
-	{#if auditRecord.responseHeaders}
-		<h3>Headers</h3>
-		<table class="border border-gray-200">
-			<tbody>
-				{#each Object.entries(auditRecord.responseHeaders) as [key, value]}
-					<tr>
-						<td class="border border-gray-200">
-							<span class="mr-2">
-								{key}
-							</span>
-						</td>
-						<td class="border border-gray-200">
-							<span class="mr-2">
-								{value}
-							</span>
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	{/if}
-	<h3>Body</h3>
-	<pre>{auditRecord?.responseBody}</pre>
-</Modal>
+<AuditModal bind:open={fileModalVisible} {auditRecord} />
