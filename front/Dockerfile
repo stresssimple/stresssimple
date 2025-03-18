@@ -1,6 +1,6 @@
 # Use the official Node.js image as the base image
 FROM node:latest AS builder
-
+ENV PUBLIC_API_URL=http://127.0.0.1:3030
 
 # Set the working directory
 WORKDIR /app
@@ -13,7 +13,7 @@ RUN pnpm install
 
 COPY . .
 
-RUN PUBLIC_API_URL=http://127.0.0.1:3000 pnpm run build
+RUN PUBLIC_API_URL=${PUBLIC_API_URL} pnpm run build
 
 FROM node:latest AS runner
 WORKDIR /app
