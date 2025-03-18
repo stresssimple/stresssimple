@@ -17,11 +17,11 @@ jobs:
       - name: Build and push the Docker image
         run: |
           TIMESTAMP=$(date +%s)
-          IMAGE_NAME=ghcr.io/hananmil/stressjs/backend
+          IMAGE_NAME=ghcr.io/hananmil/stressjs/front
 
           # Build the image with the timestamp tag
-          docker build backend/ --file backend/Dockerfile --tag backend:$TIMESTAMP
-          docker tag backend:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
+          docker build front/ --file front/Dockerfile --tag front:$TIMESTAMP
+          docker tag front:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
 
           # Login to GitHub Container Registry
           docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
@@ -32,7 +32,7 @@ jobs:
           # Check if the current branch is master
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             # Tag and push as 'latest'
-            docker tag backend:$TIMESTAMP $IMAGE_NAME:latest
+            docker tag front:$TIMESTAMP $IMAGE_NAME:latest
             docker push $IMAGE_NAME:latest
             echo "Image tagged and pushed as latest"
           fi
