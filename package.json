@@ -7,10 +7,13 @@
     "install": "cd backend && pnpm install && cd ../front && pnpm install",
     "start:backend": "cd backend && npm run start:dev",
     "start:frontend": "cd front && npm run dev",
-    "compose:build": "docker compose -f docker-compose.yaml build",
-    "compose:up": "docker compose -f docker-compose.yaml up -d",
-    "compose:down": "docker compose -f docker-compose.yaml down",
-    "compose:delete": "docker compose -f docker-compose.yaml down -v"
+    "compose:build": "docker compose -f docker-compose.dev.yaml build",
+    "compose:up": "docker compose -f docker-compose.dev.yaml up -d",
+    "compose:down": "docker compose -f docker-compose.dev.yaml down",
+    "compose:delete": "docker compose -f docker-compose.dev.yaml down -v",
+    "compose:up:prod": "docker compose -f docker-compose.prod.yaml up -d",
+    "compose:down:prod": "docker compose -f docker-compose.prod.yaml down",
+    "compose:delete:prod": "docker compose -f docker-compose.prod.yaml down -v"
   },
   "repository": {
     "type": "git",

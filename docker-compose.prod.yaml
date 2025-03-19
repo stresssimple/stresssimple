@@ -1,0 +1,78 @@
+services:
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    ports:
+      - "8086:8086" # InfluxDB API
+      - "8083:8083" # InfluxQL API (Optional)
+      - "8082:8082" # Flight SQL API (Optional)
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=securepassword
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=test-runs
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-secret-token
+      - INFLUXDB_ENGINE=iox # Important for InfluxDB 3.0
+      - INFLUXDB_STORAGE_DIR=/var/lib/influxdb3
+
+    volumes:
+      - influxdb_data:/var/lib/influxdb3
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "16379:6379"
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=securepassword
+      - MYSQL_DATABASE=stressjs
+      - MYSQL_USER=stressjs
+      - MYSQL_PASSWORD=securepassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  frontend:
+    image: ghcr.io/hananmil/stressjs/front:latest
+    container_name: frontend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - PUBLIC_API_URL=http://localhost:3030
+    depends_on:
+      - backend
+  backend:
+    image: ghcr.io/hananmil/stressjs/backend:latest
+    container_name: backend
+    volumes:
+      - tests_data:/app/tmp
+    environment:
+      - RUNNER_TEMPLATE_FOLDER=tmp/runner_templates
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=my-secret-token
+      - INFLUXDB_ORG=my-org
+      - INFLUXDB_BUCKET=test-runs
+      - MYSQL_DATABASE=stressjs
+      - MYSQL_USER=stressjs
+      - MYSQL_PASSWORD=securepassword
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - CONTAINER=true
+    ports:
+      - "3030:3000"
+    depends_on:
+      - influxdb
+      - redis
+
+volumes:
+  influxdb_data:
+  mysql_data:
+  tests_data:

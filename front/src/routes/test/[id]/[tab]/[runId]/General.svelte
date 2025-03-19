@@ -55,7 +55,7 @@
 </script>
 
 <div class="grid grid-cols-2 gap-4 p-4">
-	<div class="container h-64">
+	<div class="container h-60">
 		<LineChart
 			labels={$usersLabels}
 			data={$usersData}
@@ -89,7 +89,7 @@
 			dataOptions={{}}
 		/>
 	</div>
-	<div class="container h-64">
+	<div class="container h-60">
 		<LineChart
 			labels={$httpLabels}
 			data={$httpData}
@@ -122,7 +122,7 @@
 			dataOptions={{}}
 		/>
 	</div>
-	<div class="container col-span-2 h-64">
+	<div class="container col-span-2 h-60">
 		<LineChart
 			labels={$rpsLabels}
 			data={$rpsData}
@@ -155,7 +155,7 @@
 			dataOptions={{}}
 		/>
 	</div>
-	<div class="container col-span-2 h-64">
+	<div class="container col-span-2 h-60">
 		<ScatterChart
 			data={$durVsRpsData}
 			options={{

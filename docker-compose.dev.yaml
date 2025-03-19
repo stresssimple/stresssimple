@@ -78,15 +78,6 @@ services:
       - influxdb
       - redis
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    ports:
-      - "3300:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=securepassword
-    depends_on:
-      - influxdb
 volumes:
   influxdb_data:
   mysql_data:
