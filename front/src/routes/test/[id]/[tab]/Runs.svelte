@@ -62,7 +62,7 @@
 	<div class="flex w-full flex-row justify-between">
 		<div class="text-2xl">{$activeTest.name}</div>
 		<ButtonGroup>
-			<Button on:click={run}>Run</Button>
+			<Button class="w-24" on:click={run}>Run</Button>
 		</ButtonGroup>
 	</div>
 </div>

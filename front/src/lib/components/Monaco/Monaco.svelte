@@ -35,11 +35,9 @@
 				module.typeDefinitions,
 				module.name
 			);
-			console.log('extraModules', module.name);
 		});
 
 		for (let file of extraFiles) {
-			console.log('extraFiles', file.fileName);
 			monacoInstance.languages.typescript.typescriptDefaults.addExtraLib(
 				file.content,
 				file.fileName
@@ -50,7 +48,6 @@
 	onMount(async () => {
 		self.MonacoEnvironment = {
 			getWorker: function (_moduleId: any, label: string) {
-				console.log('getWorker', label);
 				if (label === 'typescript' || label === 'javascript') {
 					var worker = new tsWorker();
 					return worker;

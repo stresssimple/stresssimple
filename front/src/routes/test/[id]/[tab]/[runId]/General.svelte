@@ -17,19 +17,25 @@
 	function getData() {
 		axios
 			.get(`${PUBLIC_API_URL}/runs/report/${page.params.runId}`)
-			.then((res) => res.data)
-			.then((data) => {
-				usersData.set(data.users.data);
-				usersLabels.set(data.users.labels);
-				// usersLabels.set(data.users.labels.map((label: Date) => toHumanDate(new Date(label))));
-				httpData.set(data.http.data);
-				httpLabels.set(data.http.labels);
-				// httpLabels.set(data.http.labels.map((label: Date) => toHumanDate(new Date(label))));
-				rpsData.set(data.rps.data);
-				rpsLabels.set(data.rps.labels);
-				// rpsLabels.set(data.rps.labels.map((label: Date) => toHumanDate(new Date(label))));
-				durVsRpsData.set(data.durationVsRps);
-			});
+			.then((res) => {
+				const data = res.data;
+				if (data?.users) {
+					usersData.set(data.users.data);
+					usersLabels.set(data.users.labels);
+				}
+				if (data?.http) {
+					httpData.set(data.http.data);
+					httpLabels.set(data.http.labels);
+				}
+				if (data?.rps) {
+					rpsData.set(data.rps.data);
+					rpsLabels.set(data.rps.labels);
+				}
+				if (data?.durationVsRps) {
+					durVsRpsData.set(data.durationVsRps);
+				}
+			})
+			.catch((err) => {});
 	}
 
 	let interval: number;

@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import axios from 'axios';
 	import { page } from '$app/state';
 	import { runStore } from '$lib/stores/run.store';
 	import { TabItem, Tabs } from 'flowbite-svelte';
 	import General from './General.svelte';
-	import { runsStore, toHumanDate, toHumanTime } from '$lib';
+	import { toHumanDate, toHumanTime } from '$lib';
 	import Logs from './Logs.svelte';
 	import Audit from './Audit.svelte';
 
@@ -20,7 +19,6 @@
 		const end = $runStore.endTime ?? $runStore.lastUpdated;
 		return end.getTime() - $runStore.startTime.getTime();
 	});
-	$inspect($runStore);
 </script>
 
 {#if $runStore && $runStore.id === page.params.runId}

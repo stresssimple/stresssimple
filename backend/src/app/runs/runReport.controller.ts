@@ -1,4 +1,10 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { InfluxService } from '../influxdb/influx.service';
 import { RunsService } from './runs.service';
 
@@ -21,18 +27,22 @@ export class RunReportController {
     run.startTime = new Date(run.startTime);
     run.endTime = run.endTime ? new Date(run.endTime) : null;
     run.lastUpdated = new Date(run.lastUpdated);
-    let startTime = new Date(run.startTime.getTime() - 10000);
+    let startTime = new Date(run.startTime.getTime() - 1000 * 60 * 60 * 24);
 
-    let endTime = new Date((run.endTime ?? run.lastUpdated).getTime() + 10000);
-
-    const duration = endTime.getTime() - startTime.getTime();
-    const windowPeriod = Math.ceil(duration / 1000 / dataPoints) + 's';
+    let endTime = new Date(
+      (run.endTime ?? run.lastUpdated).getTime() + 1000 * 60 * 60 * 24,
+    );
 
     const times = await this.getMinMaxTime(runId, startTime, endTime);
+    if (!times) {
+      return {};
+    }
     startTime = times.minTime;
     startTime.setMilliseconds(0);
     endTime = times.maxTime;
     endTime.setMilliseconds(0);
+    const duration = endTime.getTime() - startTime.getTime();
+    const windowPeriod = Math.ceil(duration / 1000 / dataPoints) + 's';
 
     const result = {
       users: await this.usersData(runId, startTime, endTime, windowPeriod),
@@ -198,6 +208,10 @@ max_time = from(bucket: "test-runs")
 
 union(tables: [min_time, max_time])`;
     const result = await this.influx.queryApi.collectRows<any>(query);
+    if (result.length === 0) {
+      return null;
+    }
+
     const r = {
       minTime: new Date(result[1].min_time ?? result[0].min_time),
       maxTime: new Date(result[0].max_time ?? result[1].max_time),
