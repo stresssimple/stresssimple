@@ -12,6 +12,8 @@
 	let deleteConfirmDialog: DeleteConfirmation;
 
 	let editName = $state(false);
+	let nameInput: HTMLInputElement | null = $state(null);
+
 	let test = $state($activeTest);
 	let originalTest = '';
 	let extraModules: ExtraModule[] = $state([]);
@@ -85,10 +87,22 @@
 	<div class="flex w-full flex-row justify-between">
 		<div class="text-2xl">
 			{#if editName}
-				<Input bind:value={test.name} on:blur={() => (editName = !editName)} />
+				<input
+					bind:value={test.name}
+					bind:this={nameInput}
+					onblur={() => (editName = !editName)}
+					class="rounded"
+				/>
 			{:else}
 				<span>{test.name}</span>
-				<Button size="xs" color="none" on:click={() => (editName = !editName)}>
+				<Button
+					size="xs"
+					color="none"
+					on:click={() => {
+						editName = !editName;
+						setTimeout(() => nameInput?.focus(), 10);
+					}}
+				>
 					<EditOutline size="sm" color="blue" />
 				</Button>
 			{/if}
