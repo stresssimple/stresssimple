@@ -5,6 +5,7 @@ import { swaggerSetup } from './app/swagger';
 import * as express from 'express';
 import { AllExceptionsFilter } from './globalErrorHandler';
 import { config } from 'dotenv';
+import { spawn } from 'node:child_process';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(

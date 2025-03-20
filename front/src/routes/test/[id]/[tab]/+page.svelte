@@ -9,7 +9,9 @@
 	const id = $derived(page.params.id);
 	const tab = $derived(page.params.tab);
 	$effect(() => activeTab.set(tab));
-	$effect(() => activeTest.setActiveById(id));
+	$effect(() => {
+		activeTest.setActiveById(id);
+	});
 </script>
 
 <div class="h-full w-full">

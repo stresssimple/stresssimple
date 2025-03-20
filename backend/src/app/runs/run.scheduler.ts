@@ -33,10 +33,14 @@ export class RunScheduler {
       return;
     }
 
-    const templateRunner = this.factory.getRunnerSvc(testId, run.id);
+    const templateRunner = this.factory.getRunnerSvc(
+      testId,
+      run.id,
+      testDefinitions.language,
+    );
 
     await templateRunner.initDirectory();
-    const deps = await templateRunner.npmInstall(testDefinitions.modules);
+    const deps = await templateRunner.packagesInstall(testDefinitions.modules);
     if (!deps) {
       await this.runsService.updateRun(run.id, 'failed', true);
       return;
@@ -87,5 +91,6 @@ export class RunScheduler {
     await runner;
     await this.runsService.updateRun(run.id, 'completed', true);
     await templateRunner.cleanup();
+    await this.factory.removeRunnerSvc(testId, run.id);
   }
 }

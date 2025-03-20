@@ -21,7 +21,7 @@ export class TestsController {
   }
 
   @Get(':id')
-  public getTest(id: string) {
+  public getTest(@Param('id') id: string) {
     return this.testService.getTest(id);
   }
 

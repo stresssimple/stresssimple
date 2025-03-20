@@ -2,11 +2,13 @@
 	import { v7 } from 'uuid';
 	import { activeTest, tests } from '$lib/stores/tests.store';
 	import { page } from '$app/state';
-	import { Button } from 'flowbite-svelte';
+	import { Badge, Button, ButtonGroup, Modal } from 'flowbite-svelte';
 	import { PlusOutline } from 'flowbite-svelte-icons';
 	import { activeTab } from '$lib/stores/activeTab.store';
 
-	const defaultTestSource = `import { StressTest } from './StressTest.js';
+	let addDialogOpen = $state(false);
+
+	const typescriptTestSource = `import { StressTest } from './StressTest.js';
 
 export class Test extends StressTest {
     private request:number = 1;
@@ -27,15 +29,69 @@ export class Test extends StressTest {
     }
 }`;
 
+	const pythonDefaultTestSource = `import random
+
+class StressTest:
+    def __init__(self, base_url: str):
+        self.base_url = base_url
+    
+    def create_client(self):
+        return requests
+
+class Test(StressTest):
+    def __init__(self):
+        super().__init__("https://google.com")
+        self.request = 1
+        self.google_client = self.create_client()
+
+    # Test function
+    async def test(self, user_id: str):
+        print(f"Test with {user_id} request number {self.request}")
+        self.request += 1
+
+        # Send request to google and wait for response
+        google_response = self.google_client.get(self.base_url)
+        # You can process google_response here as needed
+    
+    # Optional interval between tests in milliseconds
+    def interval(self):
+        return random.random() * 1000
+`;
+
 	function addTest() {
-		let id: string = v7();
+		addDialogOpen = true;
+	}
+
+	function addPythonTest() {
 		tests.addTest({
-			name: 'New Test ' + $tests.length,
+			name: 'New Python Test ' + $tests.length,
 			description: 'This is a new test',
-			source: defaultTestSource,
-			modules: []
+			source: pythonDefaultTestSource,
+			modules: [],
+			language: 'python'
 		});
-		activeTest.setActiveById(id);
+		addDialogOpen = false;
+	}
+
+	function addTypescriptTest() {
+		tests.addTest({
+			name: 'New Typescript Test ' + $tests.length,
+			description: 'This is a new test',
+			source: typescriptTestSource,
+			modules: [],
+			language: 'typescript'
+		});
+		addDialogOpen = false;
+	}
+
+	function languageShort(language: string) {
+		if (language === 'typescript') {
+			return 'TS';
+		}
+		if (language === 'python') {
+			return 'PY';
+		}
+		return language;
 	}
 </script>
 
@@ -44,13 +100,18 @@ export class Test extends StressTest {
 	<div>
 		{#each $tests as test}
 			<a
-				class="block w-full rounded p-2 hover:bg-gray-200"
+				class="flex w-full flex-row items-center justify-between rounded p-2 hover:bg-gray-200"
 				class:active={page.params.id == test.id}
 				href="/test/{test.id}/{$activeTab}"
 			>
-				<span class:italic={page.params.id == test.id} class:font-bold={page.params.id == test.id}
-					>{test.name}</span
+				<span class:italic={page.params.id == test.id} class:font-bold={page.params.id == test.id}>
+					{test.name}
+				</span>
+				<span
+					class="flex h-4 w-4 items-center justify-center rounded bg-gray-700 p-1 text-center text-[0.5rem] text-green-300"
 				>
+					{languageShort(test.language)}
+				</span>
 			</a>
 		{/each}
 	</div>
@@ -58,6 +119,17 @@ export class Test extends StressTest {
 		<Button size="xs" on:click={addTest}><PlusOutline class="me-2 h-4 w-4" />Add</Button>
 	</div>
 </div>
+
+<Modal bind:open={addDialogOpen}>
+	<div slot="header">Create a new stress test definition.</div>
+	<div>Please select your preferred programming language for the test code.</div>
+	<div slot="footer" class="flex w-full justify-end">
+		<ButtonGroup>
+			<Button on:click={addPythonTest}>Python</Button>
+			<Button on:click={addTypescriptTest}>Typescript</Button>
+		</ButtonGroup>
+	</div>
+</Modal>
 
 <style lang="postcss">
 	@reference "../../app.css";

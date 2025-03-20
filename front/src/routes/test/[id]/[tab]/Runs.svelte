@@ -5,7 +5,7 @@
 	import { fade } from 'svelte/transition';
 
 	import { onDestroy, onMount } from 'svelte';
-	import { activeTest, runStore, toHumanDate, toHumanTime } from '$lib';
+	import { activeTest, toHumanDate, toHumanTime } from '$lib';
 	import {
 		Label,
 		Select,
@@ -19,8 +19,8 @@
 		Range,
 		ButtonGroup
 	} from 'flowbite-svelte';
-	import { StopOutline, DeleteRowOutline, GlobeOutline } from 'flowbite-svelte-icons';
-	let duration = $state(0.5);
+
+	let duration = $state(1);
 	let users = $state(1);
 	let rampUp = $state(0);
 
@@ -88,33 +88,11 @@
 			<span>{users}</span>
 		</div>
 	</div>
-	<!-- <div>
-		<Label>Audit type</Label>
-		<div>
-			<Select bind:value={auditType}>
-				<option value="">None</option>
-				<option value="SomeErrors">Some errors</option>
-				<option value="AllErrors">All errors</option>
-				<option value="AllErrorAndSomeRequests">All errors and some requests</option>
-				<option value="SomeRequests">Some requests</option>
-				<option value="AllRequests">All requests</option>
-			</Select>
-		</div>
-	</div>
-	{#if auditType && (auditType === 'SomeErrors' || auditType === 'SomeRequests')}
-		<div>
-			<Label>Audit percentage</Label>
-			<div>
-				<Range min="0" max="100" step="1" bind:value={auditPercentage} />
-				<span>{auditPercentage}%</span>
-			</div>
-		</div>
-	{/if} -->
 </div>
 
 {#if $runsStore.length > 0}
 	<div transition:fade>
-		<Table shadow border={3} frame={true} hoverable={true} class="mt-6">
+		<Table hoverable={true} class="mt-6" noborder={true}>
 			<TableHead>
 				<TableHeadCell>Users</TableHeadCell>
 				<TableHeadCell>Duration</TableHeadCell>
@@ -142,13 +120,13 @@
 						<TableBodyCell>{run.error}</TableBodyCell>
 						<TableBodyCell>
 							{#if run.status === 'running' || run.status === 'created'}
-								<Button size="xs" color="yellow" on:click={(e) => StopRun(e, run.id)}>
-									<StopOutline size="xs" />
-								</Button>
+								<Button class="h-6 w-6" size="xs" color="none" on:click={(e) => StopRun(e, run.id)}
+									>🚫</Button
+								>
 							{:else}
-								<Button size="xs" color="red" on:click={(e) => DeleteRun(e, run.id)}>
-									<DeleteRowOutline size="xs" />
-								</Button>
+								<Button class="h-6 w-6" size="xs" color="red" on:click={(e) => DeleteRun(e, run.id)}
+									>✕</Button
+								>
 							{/if}
 						</TableBodyCell>
 					</TableBodyRow>

@@ -51,7 +51,6 @@
 
 	const save = () => {
 		tests.save(test);
-		activeTest.setActiveById(test.id);
 		if (navigating) {
 			saveModal = false;
 			goto(navigating);
@@ -124,7 +123,12 @@
 	</div>
 	<div>
 		<Modules bind:modules={extraModules} testId={page.params.id} />
-		<Monaco bind:source={test.source} modules={extraModules} onSave={save} />
+		<Monaco
+			bind:source={test.source}
+			modules={extraModules}
+			onSave={save}
+			language={test.language}
+		/>
 	</div>
 </div>
 

@@ -23,6 +23,9 @@ export class Test {
   @Column({ type: 'text' })
   source: string;
 
+  @Column({ length: 50 })
+  language: string;
+
   @OneToMany(() => TestExecution, (testExecution) => testExecution.testId)
   testExecutions: TestExecution[];
 }
