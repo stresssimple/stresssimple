@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TestDefinitions } from '../dto/TestDefinitions';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Test } from '../mysql/Test';
+import { Test } from '../mysql/Entities/Test';
 import { Repository } from 'typeorm';
 import { generateId } from '../utils/id';
 

@@ -16,15 +16,18 @@ class RunManager:
         self.should_stop = False
         self.test = test
         self.redis_sub = redis_sub
-        redis_sub.pubsub().subscribe(f'runner:{run_id}')
+        self.pubsub = redis_sub.pubsub()  # Create the pubsub instance
+        self.pubsub.subscribe(f'runner:{run_id}')
         self.influx = InfluxService()
         print(f"Client subscribed to runner:{run_id}")
-        self.thread = thread = threading.Thread(
-            target=self.listen, daemon=True)
+        self.thread = threading.Thread(target=self.listen, daemon=True)
         self.thread.start()
 
     def listen(self):
-        for message in self.redis_sub.pubsub().listen():
+        print("Client Listening for messages", flush=True)
+        self.start_user("1")
+        for message in self.pubsub.listen():  # Listen using the created pubsub instance
+            print(f"Client Received message: {message}", flush=True)
             if message["type"] != "message":
                 continue
             if not self.message_handler(message["data"]):

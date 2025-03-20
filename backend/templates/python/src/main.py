@@ -26,7 +26,7 @@ async def main():
         host=redis_host, port=redis_port, decode_responses=True)
     redis_pub = redis.Redis(
         host=redis_host, port=redis_port, decode_responses=True)
-
+    
     ctx.redis_pub = redis_pub.pubsub()
 
     print("Client Connected to Redis", flush=True)

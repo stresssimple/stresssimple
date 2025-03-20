@@ -17,6 +17,7 @@ class HttpClientFactory:
         session.headers['X-Test-Id'] = ctx.test_id
         session.headers['X-Run-Id'] = ctx.test_id
         session.headers['X-Request-Id'] = str(uuid.uuid1())
+        session.base_url = self._base_url
         return HttpRequestFactory(session, self.influx)
 
     def base_url(self, url):

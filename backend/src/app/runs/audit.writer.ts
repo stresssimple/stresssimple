@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 import { Repository } from 'typeorm';
-import { AuditRecord } from '../mysql/AuditRecord';
+import { AuditRecord } from '../mysql/Entities/AuditRecord';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()

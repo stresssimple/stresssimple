@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LogRecord } from '../mysql/LogRecord';
+import { LogRecord } from '../mysql/Entities/LogRecord';
 import { AppLogsService } from './AppLogsService';
-import { AuditRecord } from '../mysql/AuditRecord';
+import { AuditRecord } from '../mysql/Entities/AuditRecord';
 import { AuditService } from './AuditService';
 import { AuditController } from './controller';
 

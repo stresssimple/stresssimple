@@ -19,7 +19,6 @@
 		Range,
 		ButtonGroup
 	} from 'flowbite-svelte';
-
 	let duration = $state(1);
 	let users = $state(1);
 	let rampUp = $state(0);
@@ -107,7 +106,7 @@
 			<TableBody>
 				{#each $runsStore as run}
 					<TableBodyRow on:click={() => goto('runs/' + run.id)} class="cursor-pointer">
-						<TableBodyCell>{run.users}</TableBodyCell>
+						<TableBodyCell>{run.numberOfUsers}</TableBodyCell>
 						<TableBodyCell>{run.durationMinutes}min</TableBodyCell>
 						<TableBodyCell>{run.rampUpMinutes == 0 ? '-' : run.rampUpMinutes + 'min'}</TableBodyCell
 						>

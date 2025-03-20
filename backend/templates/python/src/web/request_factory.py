@@ -54,7 +54,7 @@ class HttpRequestFactory:
         self._fail_on.append(status)
         return self
 
-    def send(self, success_check=None):
+    async def send(self, success_check=None):
         result = {}
         try:
             if not self._method:
@@ -68,7 +68,7 @@ class HttpRequestFactory:
             }
 
             try:
-                response = self.client.request(**request_data)
+                response = await self.client.request(**request_data)
                 result.update({
                     "status": response.status_code,
                     "statusText": response.reason,
@@ -84,7 +84,7 @@ class HttpRequestFactory:
                 is_successful = success_check(result)
 
             duration = time.time() - start
-            self.trace(duration, is_successful, result.get("status"))
+            await self.trace(duration, is_successful, result.get("status"))
             self.audit(request_data, result, duration, is_successful)
         except Exception as e:
             print(e)
@@ -108,8 +108,7 @@ class HttpRequestFactory:
         }
         ctx.redis_pub.publish("audit", json.dumps(record))
 
-    def trace(self, duration, is_successful, status):
-        api: WriteApi = self.influx.write_api()
+    async def trace(self, duration, is_successful, status):
         data = {
             "measurement": "http_request",
             "tags": {
@@ -119,11 +118,11 @@ class HttpRequestFactory:
                 "name": self._name or "No name"
             },
             "fields": {
-                "duration": duration,
-                "success": 1 if is_successful else 0
+                "duration": float(duration),
+                "success": float(1 if is_successful else 0)
             }
         }
-        api.write("my-bucket", "my-org", data)
+        await self.influx.write(data['measurement'], data['fields'], data['tags'])
 
     def base_url(self, url: str):
         self.client.base_url = url

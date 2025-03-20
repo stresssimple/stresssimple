@@ -11,7 +11,7 @@ import {
 import { RunsService } from './runs.service';
 import { RunScheduler } from './run.scheduler';
 import { CreateRunRequest } from '../dto/runs/CreateRunRequest';
-import { TestExecution } from '../mysql/TestExecution';
+import { TestExecution } from '../mysql/Entities/TestExecution';
 
 @Controller('runs')
 export class RunsController {

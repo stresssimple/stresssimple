@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.env.*
+*.venv
+venv/
+build/
+dist/
+*.egg-info/
+.eggs/
+*.log
+*.sqlite3
+
+# TypeScript
+node_modules/
+dist/
+*.tsbuildinfo
+*.d.ts
+*.js.map
+*.js
+*.env
+.env.*
+.idea/
+.vscode/

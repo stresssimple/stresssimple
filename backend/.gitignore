@@ -36,3 +36,8 @@ tmp/**
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+__pycache__
+*.pyc
+*.pyo
+*.pyd

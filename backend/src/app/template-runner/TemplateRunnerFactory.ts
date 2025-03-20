@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TypescriptTemplateRunnerService } from './TypescriptTemplateRunnerService';
+import { TypescriptTemplateRunnerService } from './typescript/TypescriptTemplateRunnerService';
 import { AppLogsService } from '../appLogs/AppLogsService';
 import { TemplateRunnerService } from './TemplateRunnerService';
-import { PythonTemplateRunnerService } from './PythonTemplateRunnerService';
+import { PythonTemplateRunnerService } from './python/PythonTemplateRunnerService';
 
 @Injectable()
 export class TemplateRunnerSvcFactory {
@@ -10,39 +10,39 @@ export class TemplateRunnerSvcFactory {
     string,
     TemplateRunnerService
   >();
+  private basePath: string = process.env['RUNNER_TEMPLATE_FOLDER'] || '/tmp';
 
   constructor(
     private appLogsSvc: AppLogsService,
     private logger: Logger,
   ) {}
-  getRunnerSvc(
+  async getRunnerSvc(
     testId: string,
     runId: string,
+    envId: string,
     language: string,
-  ): TemplateRunnerService {
-    if (!this.services.has(testId + '-' + runId)) {
-      this.logger.log(`Creating new TemplateRunnerService for runId: ${runId}`);
-
-      this.appLogsSvc.info(
-        runId,
-        `Creating new TemplateRunnerService for runId: ${runId}`,
-      );
+  ): Promise<TemplateRunnerService> {
+    if (!this.services.has(envId)) {
+      this.logger.log(`Creating new TemplateRunnerService for runId: ${envId}`);
+      const envPath = `${this.basePath}/${envId}`;
       if (language === 'typescript') {
         this.services.set(
-          testId + '-' + runId,
+          envId,
           new TypescriptTemplateRunnerService(
             testId,
             runId,
+            envPath,
             this.appLogsSvc,
             this.logger,
           ),
         );
       } else {
         this.services.set(
-          testId + '-' + runId,
+          envId,
           new PythonTemplateRunnerService(
             testId,
             runId,
+            envPath,
             this.appLogsSvc,
             this.logger,
           ),
@@ -50,18 +50,14 @@ export class TemplateRunnerSvcFactory {
       }
     } else {
       this.logger.log(
-        `TemplateRunnerService already exists for runId: ${runId}`,
+        `TemplateRunnerService already exists for runId: ${envId}`,
       );
     }
-    return this.services.get(testId + '-' + runId);
+    return this.services.get(envId);
   }
 
-  public removeRunnerSvc(testId: string, runId: string): void {
-    this.logger.log(`Removing TemplateRunnerService for runId: ${runId}`);
-    this.appLogsSvc.info(
-      runId,
-      `Removing TemplateRunnerService for runId: ${runId}`,
-    );
-    this.services.delete(testId + '-' + runId);
+  public removeRunnerSvc(envId: string): void {
+    this.logger.log(`Removing TemplateRunnerService for runId: ${envId}`);
+    this.services.delete(envId);
   }
 }

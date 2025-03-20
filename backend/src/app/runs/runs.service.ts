@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TestExecution } from '../mysql/TestExecution';
+import { TestExecution } from '../mysql/Entities/TestExecution';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { generateId } from '../utils/id';

@@ -3,6 +3,7 @@ import time
 from influx.influx_service import InfluxService
 from run_context import ctx
 from stress_test import StressTest
+import threading
 
 
 class UserRunner:
@@ -20,18 +21,31 @@ class UserRunner:
 
     def stop(self):
         self.status = self.STOPPING
+        if self.task:
+            self.task.cancel()
+        self.task = None
 
     def start(self):
         self.status = self.RUNNING
         if self.task:
             print('Task already running')
             return
-        self.task = self.run()
+        # Create and start the thread to run the async method
+        self.task = threading.Thread(
+            target=self._start_async_task, daemon=True)
+        self.task.start()
+
+    def _start_async_task(self):
+        # Create a new event loop for this thread and set it as the current event loop
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(self.run())
 
     async def run(self):
         while self.status != self.STOPPING:
             start_time = time.time()
             try:
+                print(f'User {self.user_id} running', flush=True)
                 await self.test.test(self.user_id)
             except Exception as e:
                 print('Test threw an exception.', e)

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { TestsService } from './tests.service';
 import { TestDefinitions } from '../dto/TestDefinitions';
-import { Test } from '../mysql/Test';
+import { Test } from '../mysql/Entities/Test';
 
 @Controller('tests')
 export class TestsController {
