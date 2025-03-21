@@ -21,13 +21,14 @@ RUN npm run build
 FROM node:latest AS production
 WORKDIR /app
 RUN npm install -g pnpm typescript
-RUN apt update && apt install -y python3 python3-pip python3.11-venv
+RUN apt update && apt install -y python3 python3-pip python3.11-venv dos2unix
 
 
 # Copy the build output from the previous stage
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package*.json ./
 COPY templates ./templates
+RUN dos2unix ./templates/*
 RUN pnpm install --prod
 
 # Expose the port the app runs on
