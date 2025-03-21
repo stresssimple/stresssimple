@@ -29,7 +29,7 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/package*.json ./
 COPY templates ./templates
 RUN dos2unix ./templates/*
-RUN chmod +x ./templates/*
+RUN chmod -R +x ./templates/*
 RUN pnpm install --prod
 
 # Expose the port the app runs on
