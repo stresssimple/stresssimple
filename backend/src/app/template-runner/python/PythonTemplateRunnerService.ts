@@ -39,41 +39,52 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
     await new Promise<void>((resolve, reject) => {
       const activateCommand = this.activateCommand();
 
-      const commands = [
-        'python -m venv venv',
-        activateCommand,
-        'pip install -r requirements.txt',
-      ];
-      if (modules.length > 0) {
-        commands.push(`pip install ${modules.join(' ')}`);
+      let cmd: string;
+      const platform = os.platform();
+      if (platform === 'win32') {
+        const commands = [
+          'python -m venv venv',
+          activateCommand,
+          'pip install -r requirements.txt',
+        ];
+        if (modules.length > 0) {
+          commands.push(`pip install ${modules.join(' ')}`);
+        }
+        cmd = commands.join(' && ');
+      } else {
+        const commands = [
+          'python3 -m venv venv',
+          activateCommand,
+          'pip install -r requirements.txt',
+        ];
+        if (modules.length > 0) {
+          commands.push(`pip install ${modules.join(' ')}`);
+        }
+        cmd = `bash -c '${commands.join(' && ')}'`;
       }
 
-      exec(
-        commands.join(' && '),
-        { cwd: this.envPath },
-        (error, stdout, stderr) => {
-          if (error) {
-            console.log('error', error, stdout, stderr);
-            this.logger.error(`Error installing module ${module}`, error);
-            if (stdout) {
-              this.appLogger.info(this.runId, stdout);
-            }
-            if (stderr) {
-              this.appLogger.error(this.runId, stderr);
-            }
-            reject(error);
-          } else {
+      exec(cmd, { cwd: this.envPath }, (error, stdout, stderr) => {
+        if (error) {
+          console.log('error', error, stdout, stderr);
+          this.logger.error(`Error installing module ${module}`, error);
+          if (stdout) {
             this.appLogger.info(this.runId, stdout);
-            this.appLogger.info(
-              this.runId,
-              `Modules installed ${modules.join(' ')}`,
-            );
-
-            resolve();
-            success = true;
           }
-        },
-      );
+          if (stderr) {
+            this.appLogger.error(this.runId, stderr);
+          }
+          reject(error);
+        } else {
+          this.appLogger.info(this.runId, stdout);
+          this.appLogger.info(
+            this.runId,
+            `Modules installed ${modules.join(' ')}`,
+          );
+
+          resolve();
+          success = true;
+        }
+      });
     });
     return success;
   }
@@ -82,10 +93,18 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
     this.appLogger.info(this.runId, `Starting runner`);
 
     try {
-      const activateCommand = this.activateCommand();
-      const commands = [activateCommand, 'python src/test.py'];
+      let cmd: string;
+      let args: string[];
+      const platform = os.platform();
+      if (platform === 'win32') {
+        cmd = 'cmd.exe';
+        args = ['/c', `1.bat ${this.testId} ${this.runId} && exit`];
+      } else {
+        cmd = 'bash';
+        args = ['-c', `'1.sh ${this.testId} ${this.runId}' && exit`];
+      }
 
-      const runner = spawn('cmd', ['/c', '1.bat', this.testId, this.runId], {
+      const runner = spawn(cmd, args, {
         cwd: this.envPath,
         stdio: ['pipe', 'pipe', 'pipe'],
         shell: true,
@@ -99,9 +118,6 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
           REDIS_PORT: process.env['REDIS_PORT'],
         },
       });
-
-      runner.stdin?.write(commands.join(' && '));
-      runner.stdin?.end();
 
       runner.stdout?.on('data', async (data) => {
         await this.appLogger.info(this.runId, data.toString());

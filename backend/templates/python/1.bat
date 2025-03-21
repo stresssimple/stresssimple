@@ -52,5 +52,4 @@ if errorlevel 1 (
 )
 
 echo Script completed successfully.
-pause
 exit /b 0
