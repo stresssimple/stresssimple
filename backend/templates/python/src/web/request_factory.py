@@ -89,7 +89,7 @@ class HttpRequestFactory:
 
             duration = time.time() - start
             await self.trace(duration, is_successful, result.get("status"))
-            # self.audit(request_data, result, duration, is_successful)
+            self.audit(request_data, result, duration, is_successful)
         except Exception as e:
             print(e)
         return result
@@ -97,7 +97,7 @@ class HttpRequestFactory:
     def audit(self, request, result, duration, success):
         record = {
             "runId": ctx.run_id,
-            "baseUrl": self.base_url,
+            "baseUrl": self._base_url,
             "name": self._name or "No name",
             "duration": duration,
             "path": request["url"],

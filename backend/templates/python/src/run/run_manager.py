@@ -26,14 +26,12 @@ class RunManager:
     def listen(self):
         print("Client Listening for messages", flush=True)
         for message in self.pubsub.listen():  # Listen using the created pubsub instance
-            print(f"Client Received message: {message}", flush=True)
             if message["type"] != "message":
                 continue
             if not self.message_handler(message["data"]):
                 return
 
     def message_handler(self, message):
-        print(f"Client Received message: {message}", flush=True)
         data = json.loads(message)
         if data["type"] == "startUser":
             self.start_user(data["userId"])

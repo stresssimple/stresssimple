@@ -20,14 +20,12 @@ class UserRunner:
         self.influx = InfluxService()
 
     def stop(self):
-        print(f'Stopping user {self.user_id}')
         self.status = self.STOPPING
         if self._thread:
             self._thread.join()
         self._thread = None
 
     def start(self):
-        print(f'Starting user {self.user_id}')
         self.status = self.RUNNING
         if self._thread:
             print('Task already running')
