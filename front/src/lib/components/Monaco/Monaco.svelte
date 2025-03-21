@@ -10,9 +10,10 @@
 
 	let {
 		source = $bindable<string>(),
+		language,
 		modules = $bindable<ExtraModule[]>([]),
 		onSave = $bindable<() => void>()
-	}: { source: string; modules: ExtraModule[]; onSave: () => void } = $props();
+	}: { source: string; modules: ExtraModule[]; language: string; onSave: () => void } = $props();
 
 	$effect(() => {
 		const s = source;
@@ -48,6 +49,7 @@
 	onMount(async () => {
 		self.MonacoEnvironment = {
 			getWorker: function (_moduleId: any, label: string) {
+				console.log('getWorker', label);
 				if (label === 'typescript' || label === 'javascript') {
 					var worker = new tsWorker();
 					return worker;
@@ -72,7 +74,7 @@
 		editorInstance = monacoInstance.editor.create(document.getElementById('editor')!, {
 			value: source,
 			automaticLayout: true,
-			language: 'typescript',
+			language,
 			theme: 'vs-dark'
 		});
 		editorInstance.addCommand(monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyS, () => {

@@ -1,3 +1,4 @@
+import * as os from 'os';
 import { Logger, ShutdownSignal } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
@@ -23,7 +24,10 @@ async function bootstrap() {
   });
   app.use(express.text());
   await app.listen(3000);
-  Logger.log(`🚀 Application is running...`, 'Bootstrap');
+  Logger.log(
+    `🚀 Application is running on port 3000... ` + os.platform(),
+    'Bootstrap',
+  );
 }
 config();
 

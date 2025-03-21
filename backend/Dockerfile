@@ -21,6 +21,8 @@ RUN npm run build
 FROM node:latest AS production
 WORKDIR /app
 RUN npm install -g pnpm typescript
+RUN apt update && apt install -y python3 python3-pip python3.11-venv
+
 
 # Copy the build output from the previous stage
 COPY --from=build /app/dist ./dist

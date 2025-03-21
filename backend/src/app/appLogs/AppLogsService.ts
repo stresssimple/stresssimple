@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { LogRecord } from '../mysql/LogRecord';
+import { LogRecord } from '../mysql/Entities/LogRecord';
 
 @Injectable()
 export class AppLogsService {

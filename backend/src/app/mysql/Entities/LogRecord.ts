@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
-import { generateId } from '../utils/id';
+import { generateId } from '../../utils/id';
 
 @Entity()
 export class LogRecord {

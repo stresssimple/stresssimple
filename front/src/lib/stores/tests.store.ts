@@ -45,15 +45,10 @@ function createActiveTestStore() {
 
 	return {
 		subscribe,
-		setActiveById: (id: string) => {
-			tests.subscribe((tests) => {
-				const test = tests.find((t) => t.id === id);
-				if (test) {
-					set(test);
-				} else {
-					set(null);
-				}
-			});
+		setActiveById: async (id: string) => {
+			const response = await axios.get<any>(`${PUBLIC_API_URL}/tests/${id}`);
+			const test = response.data;
+			set(test);
 		}
 	};
 }

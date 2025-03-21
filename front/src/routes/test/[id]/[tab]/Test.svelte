@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { activeTest, tests } from '$lib/stores/tests.store';
-	import { Button, ButtonGroup, Input, Label, Modal, Textarea } from 'flowbite-svelte';
+	import { Button, ButtonGroup, Modal, Textarea } from 'flowbite-svelte';
 	import { EditOutline } from 'flowbite-svelte-icons';
 
 	import Monaco from '$lib/components/Monaco/Monaco.svelte';
-	import Modules from '$lib/components/Monaco/Modules.svelte';
+	import Modules from '$lib/components/Modules.svelte';
 	import { ExtraModule } from '$lib/components/Monaco/ExtraModule';
 	import { page } from '$app/state';
 	import DeleteConfirmation from '$lib/components/DeleteConfirmation.svelte';
@@ -51,7 +51,6 @@
 
 	const save = () => {
 		tests.save(test);
-		activeTest.setActiveById(test.id);
 		if (navigating) {
 			saveModal = false;
 			goto(navigating);
@@ -123,8 +122,13 @@
 		<Textarea id="description" rows={1} bind:value={test.description} />
 	</div>
 	<div>
-		<Modules bind:modules={extraModules} testId={page.params.id} />
-		<Monaco bind:source={test.source} modules={extraModules} onSave={save} />
+		<Modules bind:modules={extraModules} language={test.language} />
+		<Monaco
+			bind:source={test.source}
+			modules={extraModules}
+			onSave={save}
+			language={test.language}
+		/>
 	</div>
 </div>
 

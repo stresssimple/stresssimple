@@ -4,6 +4,7 @@ import { RunsService } from './runs.service';
 import { TemplateRunnerSvcFactory } from '../template-runner/TemplateRunnerFactory';
 import Redis from 'ioredis';
 import { RunnersManager } from './runners.manager';
+import { TestEnvironmentService } from '../mysql/TestEnvironment.service';
 
 @Injectable()
 export class RunScheduler {
@@ -11,6 +12,7 @@ export class RunScheduler {
     private testService: TestsService,
     private runsService: RunsService,
     private factory: TemplateRunnerSvcFactory,
+    private envService: TestEnvironmentService,
     private runsManager: RunnersManager,
     private redis: Redis,
   ) {}
@@ -32,14 +34,27 @@ export class RunScheduler {
       await this.runsService.updateRun(run.id, 'failed', true);
       return;
     }
+    const env = await this.envService.getFreeEnvironment(
+      testDefinitions.language,
+      testDefinitions.modules,
+    );
+    const templateRunner = await this.factory.getRunnerSvc(
+      testId,
+      run.id,
+      env.id,
+      testDefinitions.language,
+    );
 
-    const templateRunner = this.factory.getRunnerSvc(testId, run.id);
+    const dirCreated = await templateRunner.initDirectory();
+    if (dirCreated) {
+      const deps = await templateRunner.packagesInstall(
+        testDefinitions.modules,
+      );
 
-    await templateRunner.initDirectory();
-    const deps = await templateRunner.npmInstall(testDefinitions.modules);
-    if (!deps) {
-      await this.runsService.updateRun(run.id, 'failed', true);
-      return;
+      if (!deps) {
+        await this.runsService.updateRun(run.id, 'failed', true);
+        return;
+      }
     }
 
     const cmpl = await templateRunner.compileTemplate(testDefinitions.source);
@@ -59,6 +74,7 @@ export class RunScheduler {
     run = await this.runsService.getRun(run.id);
     // Ramp up users
     while (userIndex < users && run.status === 'running') {
+      console.log('Starting user', userIndex + 1);
       await this.redis.publish(
         'runner:' + run.id,
         JSON.stringify({ type: 'startUser', userId: userIndex + 1 }),
@@ -86,6 +102,7 @@ export class RunScheduler {
 
     await runner;
     await this.runsService.updateRun(run.id, 'completed', true);
-    await templateRunner.cleanup();
+    await this.factory.removeRunnerSvc(env.id);
+    await this.envService.setEnvironmentFree(env.id);
   }
 }

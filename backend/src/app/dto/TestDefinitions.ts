@@ -4,4 +4,5 @@ export class TestDefinitions {
   public description?: string;
   public source?: string;
   public modules: string[] = [];
+  public language!: string;
 }

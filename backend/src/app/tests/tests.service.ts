@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TestDefinitions } from '../dto/TestDefinitions';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Test } from '../mysql/Test';
+import { Test } from '../mysql/Entities/Test';
 import { Repository } from 'typeorm';
 import { generateId } from '../utils/id';
 
@@ -13,14 +13,14 @@ export class TestsService {
     private logger: Logger,
   ) {}
 
-  public async getTests(): Promise<TestDefinitions[]> {
-    const tests = await this.usersRepository.find();
+  public async getTests(): Promise<any[]> {
+    const tests = await this.usersRepository.find({
+      select: ['id', 'name', 'language'],
+    });
     return tests.map((test) => ({
       id: test.id,
       name: test.name,
-      description: test.description,
-      modules: test.modules.split(',').filter((m) => m?.length > 0),
-      source: test.source,
+      language: test.language,
     }));
   }
 
@@ -42,6 +42,7 @@ export class TestsService {
       description: test.description,
       modules: test.modules.split(',').filter((m) => m?.length > 0),
       source: test.source,
+      language: test.language,
     };
   }
 
@@ -52,6 +53,7 @@ export class TestsService {
     record.description = test.description;
     record.modules = test.modules.join(',');
     record.source = test.source;
+    record.language = test.language;
     await this.usersRepository.insert({ ...record });
     return record;
   }

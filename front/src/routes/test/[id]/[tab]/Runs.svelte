@@ -5,7 +5,7 @@
 	import { fade } from 'svelte/transition';
 
 	import { onDestroy, onMount } from 'svelte';
-	import { activeTest, runStore, toHumanDate, toHumanTime } from '$lib';
+	import { activeTest, toHumanDate, toHumanTime } from '$lib';
 	import {
 		Label,
 		Select,
@@ -19,15 +19,14 @@
 		Range,
 		ButtonGroup
 	} from 'flowbite-svelte';
-	import { StopOutline, DeleteRowOutline, GlobeOutline } from 'flowbite-svelte-icons';
-	let duration = $state(0.5);
+	let duration = $state(10);
 	let users = $state(1);
 	let rampUp = $state(0);
 
 	let timerInterval: number;
 
 	async function run() {
-		await runsStore.start(page.params.id, duration, users, rampUp);
+		await runsStore.start(page.params.id, duration / 60, users, rampUp / 60);
 	}
 
 	afterNavigate(() => {
@@ -70,15 +69,15 @@
 	<div>
 		<Label>Duration</Label>
 		<div>
-			<Range min="0.5" max="30" step="0.5" bind:value={duration} />
-			<span>{duration} minutes</span>
+			<Range min="10" max="600" step="10" bind:value={duration} />
+			<span>{Math.floor(duration / 60)} min {Math.round(duration % 60)} sec</span>
 		</div>
 	</div>
 	<div>
 		<Label>Ramp up</Label>
 		<div>
-			<Range min="0" bind:max={duration} step="0.5" bind:value={rampUp} />
-			<span>{rampUp} minutes</span>
+			<Range min="0" bind:max={duration} step="10" bind:value={rampUp} />
+			<span>{Math.floor(rampUp / 60)} min {Math.round(rampUp % 60)} sec</span>
 		</div>
 	</div>
 	<div>
@@ -88,33 +87,11 @@
 			<span>{users}</span>
 		</div>
 	</div>
-	<!-- <div>
-		<Label>Audit type</Label>
-		<div>
-			<Select bind:value={auditType}>
-				<option value="">None</option>
-				<option value="SomeErrors">Some errors</option>
-				<option value="AllErrors">All errors</option>
-				<option value="AllErrorAndSomeRequests">All errors and some requests</option>
-				<option value="SomeRequests">Some requests</option>
-				<option value="AllRequests">All requests</option>
-			</Select>
-		</div>
-	</div>
-	{#if auditType && (auditType === 'SomeErrors' || auditType === 'SomeRequests')}
-		<div>
-			<Label>Audit percentage</Label>
-			<div>
-				<Range min="0" max="100" step="1" bind:value={auditPercentage} />
-				<span>{auditPercentage}%</span>
-			</div>
-		</div>
-	{/if} -->
 </div>
 
 {#if $runsStore.length > 0}
 	<div transition:fade>
-		<Table shadow border={3} frame={true} hoverable={true} class="mt-6">
+		<Table hoverable={true} class="mt-6" noborder={true}>
 			<TableHead>
 				<TableHeadCell>Users</TableHeadCell>
 				<TableHeadCell>Duration</TableHeadCell>
@@ -129,8 +106,12 @@
 			<TableBody>
 				{#each $runsStore as run}
 					<TableBodyRow on:click={() => goto('runs/' + run.id)} class="cursor-pointer">
-						<TableBodyCell>{run.users}</TableBodyCell>
-						<TableBodyCell>{run.durationMinutes}min</TableBodyCell>
+						<TableBodyCell>{run.numberOfUsers}</TableBodyCell>
+						<TableBodyCell
+							>{Math.floor((run.durationMinutes * 60) / 60)}min {Math.round(
+								(run.durationMinutes * 60) % 60
+							)}sec</TableBodyCell
+						>
 						<TableBodyCell>{run.rampUpMinutes == 0 ? '-' : run.rampUpMinutes + 'min'}</TableBodyCell
 						>
 						<TableBodyCell>{toHumanDate(run.startTime)}</TableBodyCell>
@@ -142,13 +123,13 @@
 						<TableBodyCell>{run.error}</TableBodyCell>
 						<TableBodyCell>
 							{#if run.status === 'running' || run.status === 'created'}
-								<Button size="xs" color="yellow" on:click={(e) => StopRun(e, run.id)}>
-									<StopOutline size="xs" />
-								</Button>
+								<Button class="h-6 w-6" size="xs" color="none" on:click={(e) => StopRun(e, run.id)}
+									>🚫</Button
+								>
 							{:else}
-								<Button size="xs" color="red" on:click={(e) => DeleteRun(e, run.id)}>
-									<DeleteRowOutline size="xs" />
-								</Button>
+								<Button class="h-6 w-6" size="xs" color="red" on:click={(e) => DeleteRun(e, run.id)}
+									>✕</Button
+								>
 							{/if}
 						</TableBodyCell>
 					</TableBodyRow>

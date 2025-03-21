@@ -2,7 +2,7 @@
 	import bg from '../bg.jpg';
 </script>
 
-<div style="background-image: url({bg})" class="bg-image h-screen w-full">
+<div style="background-image: url({bg})" class="bg-image">
 	<div class="container flex h-full w-full items-center justify-around">
 		<div
 			class="m-4 flex w-1/2 flex-col items-center rounded-lg border-2 bg-white/90 p-8 shadow-2xl"
@@ -16,6 +16,6 @@
 <style lang="postcss">
 	@reference "../app.css";
 	.bg-image {
-		@apply h-screen bg-cover bg-center;
+		@apply h-full w-full bg-cover bg-center;
 	}
 </style>

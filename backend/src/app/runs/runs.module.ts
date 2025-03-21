@@ -8,11 +8,11 @@ import { RunScheduler } from './run.scheduler';
 import { RunReportController } from './runReport.controller';
 import { TemplateRunnerModule } from '../template-runner/templateRunner.module';
 import { RunnersManager } from './runners.manager';
-import { TestExecution } from '../mysql/TestExecution';
+import { TestExecution } from '../mysql/Entities/TestExecution';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppLogsModule } from '../appLogs/AppLogs.module';
 import { AuditWriter } from './audit.writer';
-import { AuditRecord } from '../mysql/AuditRecord';
+import { AuditRecord } from '../mysql/Entities/AuditRecord';
 
 @Module({
   imports: [
