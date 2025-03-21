@@ -24,7 +24,10 @@ async function bootstrap() {
   });
   app.use(express.text());
   await app.listen(3000);
-  Logger.log(`🚀 Application is running... ` + os.platform(), 'Bootstrap');
+  Logger.log(
+    `🚀 Application is running on port 3000... ` + os.platform(),
+    'Bootstrap',
+  );
 }
 config();
 

@@ -1,26 +1,25 @@
 <script lang="ts">
 	import { Badge, Button, ButtonGroup, Input, InputAddon, Label, Modal } from 'flowbite-svelte';
 	import { CogOutline } from 'flowbite-svelte-icons';
-	import { fetchTypeDefinitions, type ExtraModule } from './ExtraModule';
-	import axios from 'axios';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { fetchTypeDefinitions, type ExtraModule } from './Monaco/ExtraModule';
 
-	let commonModules = [
+	let tsCommonModules = [
 		'axios',
 		'node-fetch',
 		'uuid',
 		'faker',
 		'p-limit',
 		'prom-client',
-		'chalk',
 		'commander',
 		'yargs'
 	];
+
+	let pyCommonModules = ['requests', 'flask', 'fastapi', 'pydantic', 'numpy', 'pandas'];
 	let {
 		modules = $bindable<ExtraModule[]>(),
-		testId
+		language
 	}: {
-		testId?: string;
+		language: string;
 		modules: ExtraModule[];
 	} = $props();
 
@@ -65,22 +64,13 @@
 	function removeModule(module: string) {
 		modules = modules.filter((m) => m.name !== module);
 	}
-
-	async function verifyDependencies(): Promise<void> {
-		return;
-		const result = await axios.post(
-			`http://${PUBLIC_API_URL}/template-runner/${testId}/noRun/dependencies`,
-			{ modules: modules.map((m) => m.name) }
-		);
-		console.log('dependencies', result.data);
-	}
 </script>
 
 <div class="flex items-center">
 	<Button
 		pill={true}
 		size="xs"
-		class="bg-transparent text-black hover:bg-gray-100"
+		class="m-2 bg-transparent text-black hover:bg-gray-100"
 		on:click={() => (isModalOpen = true)}
 	>
 		<CogOutline size="xs" class="h-4 w-4" color="blue" />
@@ -102,12 +92,7 @@
 	{/each}
 </div>
 
-<Modal
-	bind:open={isModalOpen}
-	title="Extra Modules"
-	outsideclose={true}
-	on:close={() => verifyDependencies()}
->
+<Modal bind:open={isModalOpen} title="Extra Modules" outsideclose={true}>
 	<div class="grid grid-cols-2">
 		<div>
 			<span>Loaded modules</span>
@@ -127,13 +112,23 @@
 		</div>
 		<div>
 			<span>Common packages</span>
-			{#each commonModules as module}
-				{#if !modules.some((m) => m.name == module)}
-					<Badge color="dark" class="m-2 rounded-2xl" onclick={() => addModule(module)}>
-						{module}
-					</Badge>
-				{/if}
-			{/each}
+			{#if language === 'python'}
+				{#each pyCommonModules as module}
+					{#if !modules.some((m) => m.name == module)}
+						<Badge color="dark" class="m-2 rounded-2xl" onclick={() => addModule(module)}>
+							{module}
+						</Badge>
+					{/if}
+				{/each}
+			{:else}
+				{#each tsCommonModules as module}
+					{#if !modules.some((m) => m.name == module)}
+						<Badge color="dark" class="m-2 rounded-2xl" onclick={() => addModule(module)}>
+							{module}
+						</Badge>
+					{/if}
+				{/each}
+			{/if}
 		</div>
 	</div>
 

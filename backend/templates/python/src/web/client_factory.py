@@ -12,13 +12,12 @@ class HttpClientFactory:
         self.influx = InfluxService()
 
     def create(self):
-        session = requests.Session()
+        session = requests.sessions.Session()
         session.headers.update(self._headers)
         session.headers['X-Test-Id'] = ctx.test_id
         session.headers['X-Run-Id'] = ctx.test_id
         session.headers['X-Request-Id'] = str(uuid.uuid1())
-        session.base_url = self._base_url
-        return HttpRequestFactory(session, self.influx)
+        return HttpRequestFactory(self._base_url, session, self.influx)
 
     def base_url(self, url):
         self._base_url = url

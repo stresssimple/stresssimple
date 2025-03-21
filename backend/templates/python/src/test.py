@@ -17,9 +17,9 @@ class Test(StressTest):
 
         # Send request to google and wait for response
         google_response = await self.google_client.get("").send()
-        print(f"Google response: {google_response.status_code}", flush=True)
+        # print(f"Google response: {google_response.status_code}", flush=True)
         # You can process google_response here as needed
 
     # Optional interval between tests in milliseconds
     def interval(self):
-        return random.random() * 1000
+        return 1

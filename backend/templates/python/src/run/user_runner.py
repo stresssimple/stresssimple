@@ -16,24 +16,26 @@ class UserRunner:
         self.user_id = user_id
         self.test = test
         self.status = self.STARTING
-        self.task = None
+        self._thread = None
         self.influx = InfluxService()
 
     def stop(self):
+        print(f'Stopping user {self.user_id}')
         self.status = self.STOPPING
-        if self.task:
-            self.task.cancel()
-        self.task = None
+        if self._thread:
+            self._thread.join()
+        self._thread = None
 
     def start(self):
+        print(f'Starting user {self.user_id}')
         self.status = self.RUNNING
-        if self.task:
+        if self._thread:
             print('Task already running')
             return
         # Create and start the thread to run the async method
-        self.task = threading.Thread(
+        self._thread = threading.Thread(
             target=self._start_async_task, daemon=True)
-        self.task.start()
+        self._thread.start()
 
     def _start_async_task(self):
         # Create a new event loop for this thread and set it as the current event loop
@@ -45,7 +47,6 @@ class UserRunner:
         while self.status != self.STOPPING:
             start_time = time.time()
             try:
-                print(f'User {self.user_id} running', flush=True)
                 await self.test.test(self.user_id)
             except Exception as e:
                 print('Test threw an exception.', e)
@@ -64,7 +65,7 @@ class UserRunner:
         print(f'User {self.user_id} stopped')
 
     async def wait_stopped(self):
-        await self.task
+        await self._thread
 
     async def _sleep(self, interval):
-        await asyncio.sleep(interval)
+        await asyncio.sleep(interval/1000.0)

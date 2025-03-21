@@ -26,15 +26,16 @@ async def main():
         host=redis_host, port=redis_port, decode_responses=True)
     redis_pub = redis.Redis(
         host=redis_host, port=redis_port, decode_responses=True)
-    
-    ctx.redis_pub = redis_pub.pubsub()
+
+    ctx.redis_pub = redis_pub
 
     print("Client Connected to Redis", flush=True)
 
     run_manager = RunManager(Test(), redis_sub, run_id)
 
     redis_pub.publish("runners", json.dumps(
-        {"type": "runnerStarted", "runId": run_id}))
+        {"type": "runnerStarted", "runId": run_id})
+    )
     print("Client Runner started", flush=True)
 
     try:

@@ -25,7 +25,6 @@ class RunManager:
 
     def listen(self):
         print("Client Listening for messages", flush=True)
-        self.start_user("1")
         for message in self.pubsub.listen():  # Listen using the created pubsub instance
             print(f"Client Received message: {message}", flush=True)
             if message["type"] != "message":

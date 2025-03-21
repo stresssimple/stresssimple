@@ -24,6 +24,7 @@ function createRunsStore() {
 					if (run.lastUpdated) run.lastUpdated = new Date(run.lastUpdated);
 					return run;
 				})
+				.sort((a, b) => (a.startTime > b.startTime ? -1 : 1))
 		);
 	}
 

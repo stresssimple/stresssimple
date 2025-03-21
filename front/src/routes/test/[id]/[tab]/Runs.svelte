@@ -19,14 +19,14 @@
 		Range,
 		ButtonGroup
 	} from 'flowbite-svelte';
-	let duration = $state(1);
+	let duration = $state(10);
 	let users = $state(1);
 	let rampUp = $state(0);
 
 	let timerInterval: number;
 
 	async function run() {
-		await runsStore.start(page.params.id, duration, users, rampUp);
+		await runsStore.start(page.params.id, duration / 60, users, rampUp / 60);
 	}
 
 	afterNavigate(() => {
@@ -69,15 +69,15 @@
 	<div>
 		<Label>Duration</Label>
 		<div>
-			<Range min="0.5" max="30" step="0.5" bind:value={duration} />
-			<span>{duration} minutes</span>
+			<Range min="10" max="600" step="10" bind:value={duration} />
+			<span>{Math.floor(duration / 60)} min {Math.round(duration % 60)} sec</span>
 		</div>
 	</div>
 	<div>
 		<Label>Ramp up</Label>
 		<div>
-			<Range min="0" bind:max={duration} step="0.5" bind:value={rampUp} />
-			<span>{rampUp} minutes</span>
+			<Range min="0" bind:max={duration} step="10" bind:value={rampUp} />
+			<span>{Math.floor(rampUp / 60)} min {Math.round(rampUp % 60)} sec</span>
 		</div>
 	</div>
 	<div>
@@ -107,7 +107,11 @@
 				{#each $runsStore as run}
 					<TableBodyRow on:click={() => goto('runs/' + run.id)} class="cursor-pointer">
 						<TableBodyCell>{run.numberOfUsers}</TableBodyCell>
-						<TableBodyCell>{run.durationMinutes}min</TableBodyCell>
+						<TableBodyCell
+							>{Math.floor((run.durationMinutes * 60) / 60)}min {Math.round(
+								(run.durationMinutes * 60) % 60
+							)}sec</TableBodyCell
+						>
 						<TableBodyCell>{run.rampUpMinutes == 0 ? '-' : run.rampUpMinutes + 'min'}</TableBodyCell
 						>
 						<TableBodyCell>{toHumanDate(run.startTime)}</TableBodyCell>
