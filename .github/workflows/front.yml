@@ -31,9 +31,6 @@ jobs:
           docker build front/ --file front/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
           docker tag front:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
 
-          # Login to GitHub Container Registry
-          docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
-
           # Push the timestamped image
           docker push $IMAGE_NAME:$TIMESTAMP
 
