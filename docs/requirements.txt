@@ -1,2 +1,7 @@
 mkdocs
 mkdocs-glightbox
+mkdocs-material
+mkdocs-material-extensions
+mkdocs-material[imaging]
+mkdocs-glightbox
+pymdown-extensions

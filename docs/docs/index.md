@@ -3,8 +3,8 @@
 It's a stress testing solution for your web applications. It's a simple and easy to use tool that allows you to test your web application's performance under heavy load. It's written in [TypeScript](http://typescriptlang.org/) and [Svelte](https://svelte.dev/) and runs on Node.js. It's open source and free to use.
 [![GitHub license](https://img.shields.io/github/license/hananmil/stressjs)]
 ## How it looks?
-![Test Overview](images/ScreenshotOverview.png){ width="45%" }
-![Audit Overview](images/ScreenshotAudit.png){ width="45%" }
+
+![Test Overview](images/ScreenshotOverview.png){: style="height:250px" }![Test Results](images/ScreenshotAudit.png){: style="height:250px" }
 
 ## How does it work?
 StressJs works by sending a large number of requests to your web application and measuring the response time. It can simulate hundreds or even thousands of users accessing your application simultaneously. This allows you to identify performance bottlenecks and optimize your application for better performance.

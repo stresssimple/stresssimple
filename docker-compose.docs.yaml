@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
 
     volumes:
-      - ./docs:/docs
-    command: serve -f /docs/mkdocs.yml -a 0.0.0.0:8000
+      - ./docs:/app/docs
+    command: bash -c "/app/run.sh"
     ports:
       - 8000:8000

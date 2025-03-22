@@ -3,13 +3,43 @@ site_url: https://docs.stressjs.org
 repo_name: stresssimnple
 repo_url: https://github.com/stresssimple/monorepo
 markdown_extensions:
+- admonition
+- codehilite
+- footnotes
+- meta
 - attr_list
 - md_in_html
 - pymdownx.blocks.caption
+- toc:
+    permalink: true
+- pymdownx.superfences
+extra_javascript:
+- https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js
+extra_css:
+- https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.css
+extra:
+  social:
+  - type: github
+    link: https://github.com/stresssimple/stresssimple.git
 plugins:
 - glightbox
+- search
 theme:
-  name: material
+  features:
+  - search.suggest
+  - content.tabs.link
+  - content.collapse
+  - content.collapse.link
+  - content.collapse.code
+  - content.collapse.code.link
+  - content.collapse.code.lang
+  - content.collapse.code.lang.link
+  - content.collapse.code.lang.tab
+  - content.collapse.code.lang.tab.link
+  - content.collapse.code.lang.tab.tab
+  - navigation.instant
+
+  name: mkdocs
   palette:
     primary: deep_orange
     accent: amber
