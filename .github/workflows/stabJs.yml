@@ -23,7 +23,7 @@ jobs:
       - name: Build and push the Docker image
         run: |
           TIMESTAMP=$(date +%s)
-          IMAGE_NAME=ghcr.io/stresssimple/stresssimple/stabjs
+          IMAGE_NAME=ghcr.io/stresssimple/stabjs
 
           echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
