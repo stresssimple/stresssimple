@@ -22,7 +22,7 @@ Once you have the application up and running, you can start creating tests and r
 
 **TL;DR Use** Go to 'http://localhost:5000' and run one of the sample tests.
 
-Core component of StressSimple is the stress script. It's a simple application, written in either TypeScript or Python, that defines the test scenario and runs the test against your web application. Check out the [stress script guide](stress-script-guide.md) for more details on how to create your own stress scripts.
+Core component of StressSimple is the stress script. It's a simple application, written in either TypeScript or Python, that defines the test scenario and runs the test against your web application. Check out the [user guide](user-guide.md) for more details on how to create your own stress scripts.
 
 *Have a look at the [stress script examples](https://github.com/hananmil/StressSimple/tree/master/backend/templates/bootstrap) to see some sample scripts in action.*
 
