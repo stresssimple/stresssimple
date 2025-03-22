@@ -30,6 +30,7 @@ jobs:
           IMAGE_NAME=ghcr.io/stresssimple/front
 
           echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+          docker login ghcr.io -u USERNAME -p ${{ secrets.GITHUB_TOKEN }}
 
           # Build the image with the timestamp tag
           docker build front/ --file front/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
