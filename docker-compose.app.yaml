@@ -34,7 +34,11 @@ services:
       - influxdb
       - redis
       - mysql
-
+  stubjs:
+    image: ghcr.io/hananmil/stressjs/stabjs:latest
+    container_name: stubjs
+    ports:
+      - "3333:3333"
 volumes:
   influxdb_data:
   mysql_data:
