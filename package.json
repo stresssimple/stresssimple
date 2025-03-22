@@ -1,5 +1,5 @@
 {
-  "name": "stressjs",
+  "name": "stresssimple",
   "version": "1.0.0",
   "description": "Running stress test on your server just became easier",
   "main": "index.js",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hananmil/stressjs.git"
+    "url": "git+https://github.com/hananmil/stresssimple.git"
   },
   "author": "Hanan Mil",
   "license": "ISC",
@@ -33,7 +33,7 @@
     "testing"
   ],
   "bugs": {
-    "url": "https://github.com/hananmil/stressjs/issues"
+    "url": "https://github.com/hananmil/stresssimple/issues"
   },
-  "homepage": "https://github.com/hananmil/stressjs#readme"
+  "homepage": "https://github.com/hananmil/stresssimple#readme"
 }

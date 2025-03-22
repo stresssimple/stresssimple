@@ -28,8 +28,8 @@ services:
       - INFLUXDB_TOKEN=my-secret-token
       - INFLUXDB_ORG=my-org
       - INFLUXDB_BUCKET=test-runs
-      - MYSQL_DATABASE=stressjs
-      - MYSQL_USER=stressjs
+      - MYSQL_DATABASE=stresssimple
+      - MYSQL_USER=stresssimple
       - MYSQL_PASSWORD=securepassword
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306

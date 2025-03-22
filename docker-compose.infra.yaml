@@ -30,8 +30,8 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=securepassword
-      - MYSQL_DATABASE=stressjs
-      - MYSQL_USER=stressjs
+      - MYSQL_DATABASE=stresssimple
+      - MYSQL_USER=stresssimple
       - MYSQL_PASSWORD=securepassword
     volumes:
       - mysql_data:/var/lib/mysql

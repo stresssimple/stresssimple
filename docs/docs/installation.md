@@ -1,53 +1,58 @@
-# Installation Guide
+# StressSimple Installation Guide
 
-## TL;DR
-Run the following commands to install StressJs:
+## Quick Start
 
-```bash
-    git clone https://github.com/your-repo/stressjs.git
-    cd stressjs
-    npm run compose:up:app
-```
-The above will clone the repository, navigate to the project directory, and start a few docker containers.
-
-After a few seconds, you should be able to access the StressJs dashboard at [http://localhost:5000](http://localhost:5000).
-
-## More in depth
-
-The repo contains 3 docker compose files:
-
-1. `docker-compose.infra.yml` - Infrastructure services like required for the application to run.
-    1. InfluxDB - A time-series database used to store the test results.
-    1. MySQL - A relational database used to store user data.
-    1. Redis - A key-value store used for cross process communication.
-1. `docker-compose.app.yml` - The StressJs application itself, using the latest release of the code. Images are from ghcr.io.
-1. `docker-compose.dev.yml` - Building and running docker containers from source.
-
-To start the application, run the following command:
+To install StressSimple, execute the following commands:
 
 ```bash
-    npm run compose:up:app 
-    #or
-    npm run compose:build # for development
-    npm run compose:up # for development
+git clone https://github.com/your-repo/stresssimple.git
+cd stresssimple
+npm run compose:up:app
 ```
 
-## Running the application locally
-1. Clone the repository
-1. Navigate to the project directory
-1. Run `npm install` to install dependencies
-1. Run `npm compose:up:infra` to start required services
-1. Run `npm start:backend` to start the application
-1. Run `npm start:front` to start the application
+This will clone the repository, navigate to the project directory, and initialize the necessary Docker containers.
 
-You should now be able to access the StressJs dashboard at [http://localhost:5173/](http://localhost:5173/).
+Once the setup is complete, you can access the StressSimple dashboard at [http://localhost:5000](http://localhost:5000).
 
+## Detailed Instructions
 
-## Removing the application
-To remove the application and all associated containers, run the following command:
+The repository includes three Docker Compose files:
+
+1. **`docker-compose.infra.yml`**: Manages infrastructure services required for the application:
+    - **InfluxDB**: A time-series database for storing test results.
+    - **MySQL**: A relational database for user data.
+    - **Redis**: A key-value store for inter-process communication.
+2. **`docker-compose.app.yml`**: Deploys the StressSimple application using pre-built images from `ghcr.io`.
+3. **`docker-compose.dev.yml`**: Builds and runs Docker containers directly from the source code.
+
+To start the application, use one of the following commands:
 
 ```bash
-    npm run compose:delete 
+npm run compose:up:app 
+# or for development
+npm run compose:build
+npm run compose:up
 ```
 
-**this will delete all data stored in the database.**
+## Local Development Setup
+
+Follow these steps to run the application locally:
+
+1. Clone the repository.
+2. Navigate to the project directory.
+3. Install dependencies using `npm install`.
+4. Start the required services with `npm run compose:up:infra`.
+5. Launch the backend with `npm start:backend`.
+6. Launch the frontend with `npm start:front`.
+
+The StressSimple dashboard will be available at [http://localhost:5173/](http://localhost:5173/).
+
+## Uninstalling StressSimple
+
+To remove the application and its associated containers, run:
+
+```bash
+npm run compose:delete
+```
+
+> **Warning**: This will permanently delete all data stored in the databases. Installation Guide

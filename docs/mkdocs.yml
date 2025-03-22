@@ -1,5 +1,5 @@
-site_name: StressJs Docs
-site_url: https://docs.stressjs.org
+site_name: StressSimple Docs
+site_url: https://docs.stresssimple.org
 repo_name: stresssimnple
 repo_url: https://github.com/stresssimple/monorepo
 markdown_extensions:
@@ -10,6 +10,9 @@ markdown_extensions:
 - attr_list
 - md_in_html
 - pymdownx.blocks.caption
+- pymdownx.superfences
+- pymdownx.tabbed:
+    alternate_style: true
 - toc:
     permalink: true
 - pymdownx.superfences
@@ -24,7 +27,26 @@ extra:
 plugins:
 - glightbox
 - search
+extra:
+  analytics: 
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >- 
+            Thanks for your feedback! Help us improve this page by
+            using our <a href="..." target="_blank" rel="noopener">feedback form</a>.
 theme:
+  palette:
+    primary: deep orange
+    accent: indigo
   features:
   - search.suggest
   - content.tabs.link
@@ -37,16 +59,14 @@ theme:
   - content.collapse.code.lang.tab
   - content.collapse.code.lang.tab.link
   - content.collapse.code.lang.tab.tab
+  - content.code.copy
+  - content.code.select
   - navigation.instant
-
-  name: mkdocs
-  palette:
-    primary: deep_orange
-    accent: amber
+  name: material
   font:
     text: Roboto
     code: Roboto Mono
   logo:
     icon: help
-    text: StressJs Docs
+    text: StressSimple Docs
   favicon: img/favicon.ico

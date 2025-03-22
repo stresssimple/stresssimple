@@ -1,24 +1,24 @@
 # User Guide
 
-Lets have a look at a full example of how to use the **StressSimple** application.
+This guide provides a comprehensive example of how to use the **StressSimple** application effectively.
 
+## How It Works
 
-## How it works in a bit more details.
+To perform stress testing, you need to create a class named `Test` that extends the `StressTest` base class. This class is responsible for sending HTTP requests during the stress test. The `Test` class must implement the `test` method, which defines the logic for sending HTTP requests. Optionally, you can implement the `interval` method to specify the time interval (in milliseconds) between consecutive tests.
 
-You need to create a class name `Test` that extends the `StressTest` class. This class will be used to perform stress testing by sending HTTP requests. The `Test` class must implement the `test` method, which sends an HTTP request to the server. The `interval` method specifies the interval between consecutive tests in milliseconds is optional.
-
-
-* The `test` method is called repeatedly by the application to send HTTP requests to the server.
-* The `interval` method is called to specify the interval between consecutive tests in milliseconds. If the method is not implemented, the default interval is 1000 milliseconds.
-* A test consider as failure if an Exception is thrown during the execution of the `test` method.
+### Key Points:
+- The `test` method is invoked repeatedly by the application to send HTTP requests to the server.
+- The `interval` method specifies the interval between consecutive tests in milliseconds. If not implemented, the default interval is 1000 milliseconds.
+- A test is considered a failure if an exception is thrown during the execution of the `test` method.
 
 ## Sample Test Script
-```typescript
+
+```typescript { .select }
 import { StressTest } from './StressTest.js';
 
 /**
- * Test class that extends the StressTest base class.
- * This class is used to perform stress testing by sending HTTP requests to a specified server.
+ * A sample test class that extends the StressTest base class.
+ * This class demonstrates how to perform stress testing by sending HTTP requests to a server.
  */
 export class Test extends StressTest {
   // Counter to track the number of requests made
@@ -27,7 +27,7 @@ export class Test extends StressTest {
   // HTTP client instance configured with the base URL
   private cli = this.http
     .baseUrl('http://localhost:3333') // Stub server URL
-    // .header('x-stub-delay', '100') // Uncomment this line to add a delay to all requests
+    // .header('x-stub-delay', '100') // Uncomment to add a delay to all requests
     .create();
 
   /**
@@ -38,10 +38,10 @@ export class Test extends StressTest {
     // Uncomment the following line for debugging purposes
     // console.log("Test with " + userId + ' request number ' + this.request++);
 
-    // Send an HTTP GET request to the server and wait for the response
+    // Send an HTTP GET request to the server
     await this.cli
       .get('/some-endpoint')
-      // Uncomment the following lines to send other types of requests
+      // Uncomment to send other types of requests
       // .post('Post request', { userId: userId })
       // .put('Put request', { userId: userId })
       .header('userId', userId)
@@ -57,33 +57,34 @@ export class Test extends StressTest {
     return 10;
   }
 }
-
 ```
 
 ## Test Execution
+
 ![Test execution](./images/ScreenshotRuns.png)
 
-### Test Execution - settings
-* **Number of users**: The number of users to simulate.
-* **Duration**: The duration of the test in seconds.
-* **Ramp-up time**: The time in seconds to ramp-up to the number of users.
+### Test Execution Settings
+- **Number of Users**: The number of users to simulate.
+- **Duration**: The duration of the test in seconds.
+- **Ramp-Up Time**: The time in seconds to gradually increase to the specified number of users.
 
-### Screen actions
-* Click on `Run` button to start a test execution.
-* Click on `Stop` button to stop the test execution for a running test to cancel the execution.
-* Click on `Delete` button to delete a test execution.
-* Click on a execution row to see the details of the test execution.
+### Screen Actions
+- Click the `Run` button to start a test execution.
+- Click the `Stop` button to cancel a running test execution.
+- Click the `Delete` button to remove a test execution.
+- Click on a test execution row to view detailed results.
 
-
-## Test results
+## Test Results
 
 ### Overview
 ![Test results](./images/ScreenshotOverview.png)
-* This screen shows graphical representation of the test results in real time.
+
+- This screen provides a real-time graphical representation of the test results.
 
 ### Logs
-Just open the tab. `console.log` messages or `print` messages are displayed here.
+- Open the "Logs" tab to view `console.log` or `print` messages generated during the test execution.
 
 ### Audit
 ![Audit](./images/ScreenshotAudit.png)
-* Details for the http requests sent during execution.
+
+- The "Audit" section displays detailed information about the HTTP requests sent during the test execution.
