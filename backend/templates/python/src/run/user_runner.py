@@ -64,8 +64,8 @@ class UserRunner:
                 self.status = self.STOPPED
                 print(f'User {self.user_id} stopped')
 
-                async def wait_stopped(self):
-                    await self._thread
+    async def wait_stopped(self):
+        await self._thread
 
-                    async def _sleep(self, interval):
-                    await asyncio.sleep(interval/1000.0)
+    async def _sleep(self, interval):
+        await asyncio.sleep(interval/1000.0)
