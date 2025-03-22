@@ -24,6 +24,7 @@ jobs:
         run: |
           TIMESTAMP=$(date +%s)
           IMAGE_NAME=ghcr.io/stresssimples/backend
+          echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
           # Build the image with the timestamp tag
           docker build backend/ --file backend/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
@@ -44,4 +45,4 @@ jobs:
 
           echo "::set-output name=image::$IMAGE_NAME:$TIMESTAMP"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
