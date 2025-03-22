@@ -11,13 +11,6 @@ on:
       - "front/**"
   # allow manual trigger
   workflow_dispatch:
-on:
-  push:
-    branches: ["master"]
-  pull_request:
-    branches: ["master"]
-  # allow manual trigger
-  workflow_dispatch:
 
 jobs:
   build:
