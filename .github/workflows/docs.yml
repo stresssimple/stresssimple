@@ -1,10 +1,17 @@
-name: ci
+name: Build and deploy documentation
 on:
-  workflow-dispatch:
   push:
-    branches:
-      - master
-      - main
+    branches: ["master"]
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    branches: ["master"]
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+  # allow manual trigger
+  workflow_dispatch:
 
 permissions:
   contents: write
