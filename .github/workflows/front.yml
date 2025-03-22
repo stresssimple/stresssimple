@@ -33,7 +33,6 @@ jobs:
 
           # Build the image with the timestamp tag
           docker build front/ --file front/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
-          docker tag front:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
 
           # Push the timestamped image
           docker push $IMAGE_NAME:$TIMESTAMP

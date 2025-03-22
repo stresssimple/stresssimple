@@ -19,8 +19,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
+      pages: write
     steps:
       - uses: actions/checkout@v4
       - name: Configure Git Credentials
