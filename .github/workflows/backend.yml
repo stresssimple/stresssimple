@@ -4,10 +4,12 @@ on:
     branches: ["master"]
     paths:
       - "backend/**"
+      - ".github/workflows/backend.yml"
   pull_request:
     branches: ["master"]
     paths:
       - "backend/**"
+      - ".github/workflows/backend.yml"
   # allow manual trigger
   workflow_dispatch:
 
@@ -21,11 +23,10 @@ jobs:
       - name: Build and push the Docker image
         run: |
           TIMESTAMP=$(date +%s)
-          IMAGE_NAME=ghcr.io/hananmil/stressjs/backend
+          IMAGE_NAME=ghcr.io/stresssimples/backend
 
           # Build the image with the timestamp tag
-          docker build backend/ --file backend/Dockerfile --tag backend:$TIMESTAMP
-          docker tag backend:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
+          docker build backend/ --file backend/Dockerfile --tag IMAGE_NAME:$TIMESTAMP
 
           # Login to GitHub Container Registry
           docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}

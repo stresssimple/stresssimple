@@ -5,10 +5,12 @@ on:
     branches: ["master"]
     paths:
       - "front/**"
+      - ".github/workflows/front.yml"
   pull_request:
     branches: ["master"]
     paths:
       - "front/**"
+      - ".github/workflows/front.yml"
   # allow manual trigger
   workflow_dispatch:
 
@@ -22,10 +24,10 @@ jobs:
       - name: Build and push the Docker image
         run: |
           TIMESTAMP=$(date +%s)
-          IMAGE_NAME=ghcr.io/hananmil/stressjs/front
+          IMAGE_NAME=ghcr.io/stresssimple/front
 
           # Build the image with the timestamp tag
-          docker build front/ --file front/Dockerfile --tag front:$TIMESTAMP
+          docker build front/ --file front/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
           docker tag front:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
 
           # Login to GitHub Container Registry

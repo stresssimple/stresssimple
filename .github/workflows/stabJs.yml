@@ -23,7 +23,7 @@ jobs:
       - name: Build and push the Docker image
         run: |
           TIMESTAMP=$(date +%s)
-          IMAGE_NAME=ghcr.io/hananmil/stressjs/stabjs
+          IMAGE_NAME=ghcr.io/stresssimple/stabjs
 
           # Build the image with the timestamp tag
           docker build stab-server/ --file stab-server/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
