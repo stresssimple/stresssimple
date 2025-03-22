@@ -4,10 +4,6 @@ on:
     branches:
       - master
       - main
-    paths:
-      - docs/**
-      - .github/workflows/docs.yml
-
 permissions:
   contents: write
 jobs:
@@ -29,5 +25,5 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: bash -c 'cd docs && build.sh'
-      - run: bash -c 'source /app/venv/Scrips/activate && mkdocs gh-deploy --force'
+      - run: pip install -r ./docs/requirements.txt
+      - run: mkdocs gh-deploy --force
