@@ -26,8 +26,8 @@ jobs:
           IMAGE_NAME=ghcr.io/hananmil/stressjs/stabjs
 
           # Build the image with the timestamp tag
-          docker build stab-server/ --file stab-server/Dockerfile --tag $IMAGE_SHORT:$TIMESTAMP
-          docker tag $IMAGE_SHORT:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
+          docker build stab-server/ --file stab-server/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
+          docker tag $IMAGE_NAME:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
 
           # Login to GitHub Container Registry
           docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
