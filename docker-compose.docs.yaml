@@ -1,0 +1,12 @@
+services:
+  mkdocs:
+    image: stresssimple/docs
+    build:
+      context: ./docs
+      dockerfile: Dockerfile
+
+    volumes:
+      - ./docs:/docs
+    command: serve -f /docs/mkdocs.yml -a 0.0.0.0:8000
+    ports:
+      - 8000:8000

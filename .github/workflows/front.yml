@@ -40,7 +40,6 @@ jobs:
           # Check if the current branch is master
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             # Tag and push as 'latest'
-            docker tag front:$TIMESTAMP $IMAGE_NAME:latest
             docker push $IMAGE_NAME:latest
             echo "Image tagged and pushed as latest"
           fi
