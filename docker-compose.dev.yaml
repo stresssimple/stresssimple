@@ -42,7 +42,7 @@ services:
       - mysql
   stubjs:
     build:
-      context: ./stabJs/.
+      context: ./stab-server/.
       dockerfile: ./Dockerfile
     image: stubjs:latest
     container_name: stubjs
