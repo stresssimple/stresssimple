@@ -4,10 +4,12 @@ on:
     branches: ["master"]
     paths:
       - "stab-server/**"
+      - ".github/workflows/stabJs.yml"
   pull_request:
     branches: ["master"]
     paths:
       - "stab-server/**"
+      - ".github/workflows/stabJs.yml"
   # allow manual trigger
   workflow_dispatch:
 
