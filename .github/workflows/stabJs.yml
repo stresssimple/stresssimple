@@ -29,6 +29,7 @@ jobs:
           IMAGE_NAME=ghcr.io/stresssimple/stabjs
 
           echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+          docker login ghcr.io -u USERNAME -p ${{ secrets.GITHUB_TOKEN }}
 
           # Build the image with the timestamp tag
           docker build stab-server/ --file stab-server/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
