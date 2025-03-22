@@ -36,6 +36,8 @@ extra:
       find what they're searching for. With your consent, you're helping us to
       make our documentation better.
   analytics: 
+    provider: google
+    property: G-Q36M8V5LLZ  
     feedback:
       title: Was this page helpful?
       ratings:
