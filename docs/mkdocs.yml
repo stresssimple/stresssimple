@@ -1,0 +1,19 @@
+site_name: StressJs Docs
+site_url: https://docs.stressjs.org
+repo_name: stresssimnple
+repo_url: https://github.com/stresssimple/monorepo
+markdown_extensions:
+- attr_list
+- md_in_html
+theme:
+  name: material
+  palette:
+    primary: deep_orange
+    accent: amber
+  font:
+    text: Roboto
+    code: Roboto Mono
+  logo:
+    icon: help
+    text: StressJs Docs
+  favicon: img/favicon.ico

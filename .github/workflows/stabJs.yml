@@ -45,4 +45,4 @@ jobs:
 
           echo "::set-output name=image::$IMAGE_NAME:$TIMESTAMP"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
