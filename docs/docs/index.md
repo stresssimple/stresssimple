@@ -26,29 +26,4 @@ Core component of StressSimple is the stress script. It's a simple application, 
 
 *Have a look at the [stress script examples](https://github.com/hananmil/StressSimple/tree/master/backend/templates/bootstrap) to see some sample scripts in action.*
 
-A sample test in TypeScript looks like this:
 
-```typescript
-import { StressTest } from './StressTest.js';
-
-export class Test extends StressTest {
-  // HTTP client instance configured with the base URL
-  private cli = this.http
-    .baseUrl('http://localhost:3333') // Stub server URL
-    .header('x-stub-delay', '100') // Uncomment this line to add a delay to all requests
-    .create();
-
-  public async test(userId: string): Promise<void> {
-    await this.cli
-      .get('/some-endpoint')
-      .header('userId', userId)
-      .name('stub server')
-      .send();
-
-  }
-
-public interval(): number {
-    return 10;
-  }
-}
-```

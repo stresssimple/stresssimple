@@ -30,6 +30,9 @@ jobs:
 
           echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
+          docker login ghcr.io -u USERNAME -p ${{ secrets.GITHUB_TOKsEN }}
+
+
           # Build the image with the timestamp tag
           docker build backend/ --file backend/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
 
