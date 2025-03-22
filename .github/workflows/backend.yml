@@ -26,7 +26,7 @@ jobs:
           IMAGE_NAME=ghcr.io/stresssimples/backend
 
           # Build the image with the timestamp tag
-          docker build backend/ --file backend/Dockerfile --tag IMAGE_NAME:$TIMESTAMP
+          docker build backend/ --file backend/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
 
           # Login to GitHub Container Registry
           docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
