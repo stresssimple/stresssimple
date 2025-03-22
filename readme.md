@@ -1,10 +1,15 @@
 ## Getting started
-### Installation
+### TL;DR; Installation with docker-compose
 ```bash
-docker compose -f ./docker-compose.yaml build
-docker compose -f ./docker-compose.yaml up
+git clone https://github.com/your-repo/stresssimple.git
+cd stresssimple
+npm run compose:up:app
 ```
 Open http://localhost:5000/ in your browser
+
+## Documentation
+   Please see the [documentation](https://docs.stresssimple.org) for more information.
+
 
 
 ## Simple stress test example
