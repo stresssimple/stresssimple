@@ -35,12 +35,14 @@ jobs:
           # Build the image with the timestamp tag
           docker build front/ --file front/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
 
+
           # Push the timestamped image
           docker push $IMAGE_NAME:$TIMESTAMP
 
           # Check if the current branch is master
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             # Tag and push as 'latest'
+            docker tag $IMAGE_NAME:$TIMESTAMP $IMAGE_NAME:latest
             docker push $IMAGE_NAME:latest
             echo "Image tagged and pushed as latest"
           fi
