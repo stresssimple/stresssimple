@@ -13,7 +13,9 @@
     "compose:delete": "docker compose -f docker-compose.dev.yaml down -v",
     "compose:up:prod": "docker compose -f docker-compose.prod.yaml up -d",
     "compose:down:prod": "docker compose -f docker-compose.prod.yaml down",
-    "compose:delete:prod": "docker compose -f docker-compose.prod.yaml down -v"
+    "compose:delete:prod": "docker compose -f docker-compose.prod.yaml down -v",
+    "docker:stbjs:build": "docker build -f ./stabJs/Dockerfile ./stabJs/ -t stabjs",
+    "docker:stbjs:run": "docker run -d -p 3333:3333 stabjs"
   },
   "repository": {
     "type": "git",

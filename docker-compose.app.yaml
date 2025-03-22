@@ -1,9 +1,6 @@
 services:
   frontend:
-    build:
-      context: ./Front/.
-      dockerfile: ./Dockerfile
-    image: frontend:latest
+    image: ghcr.io/hananmil/stressjs/front:latest
     container_name: frontend
     ports:
       - "5000:5000"
@@ -13,10 +10,7 @@ services:
     depends_on:
       - backend
   backend:
-    build:
-      context: ./Backend/.
-      dockerfile: ./Dockerfile
-    image: backend:latest
+    image: ghcr.io/hananmil/stressjs/backend:latest
     container_name: backend
     volumes:
       - tests_data:/app/tmp
@@ -40,13 +34,8 @@ services:
       - influxdb
       - redis
       - mysql
-  stubjs:
-    build:
-      context: ./stabJs/.
-      dockerfile: ./Dockerfile
-    image: stubjs:latest
-    container_name: stubjs
-    ports:
-      - "3333:3333"
+
 volumes:
+  influxdb_data:
+  mysql_data:
   tests_data:

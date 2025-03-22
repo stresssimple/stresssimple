@@ -44,26 +44,28 @@ class UserRunner:
     async def run(self):
         while self.status != self.STOPPING:
             start_time = time.time()
+            success = False
             try:
                 await self.test.test(self.user_id)
             except Exception as e:
+                success = False
                 print('Test threw an exception.', e)
             finally:
                 end_time = time.time()
                 duration = end_time - start_time
                 await self.influx.write(
-                    'test_duration',
-                    {'duration': duration},
+                    'test_run',
+                    {'duration': duration, 'success': 1.0 if success else 0.0},
                     {'testId': ctx.test_id, 'runId': ctx.run_id,
                         'userId': self.user_id},
                 )
-            await self._sleep(self.test.interval())
+                await self._sleep(self.test.interval())
 
-        self.status = self.STOPPED
-        print(f'User {self.user_id} stopped')
+                self.status = self.STOPPED
+                print(f'User {self.user_id} stopped')
 
-    async def wait_stopped(self):
-        await self._thread
+                async def wait_stopped(self):
+                    await self._thread
 
-    async def _sleep(self, interval):
-        await asyncio.sleep(interval/1000.0)
+                    async def _sleep(self, interval):
+                    await asyncio.sleep(interval/1000.0)

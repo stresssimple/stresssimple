@@ -100,7 +100,6 @@
 				<TableHeadCell>Run time</TableHeadCell>
 				<TableHeadCell>Status</TableHeadCell>
 				<TableHeadCell>Last updated</TableHeadCell>
-				<TableHeadCell>Error</TableHeadCell>
 				<TableHeadCell></TableHeadCell>
 			</TableHead>
 			<TableBody>
@@ -112,15 +111,21 @@
 								(run.durationMinutes * 60) % 60
 							)}sec</TableBodyCell
 						>
-						<TableBodyCell>{run.rampUpMinutes == 0 ? '-' : run.rampUpMinutes + 'min'}</TableBodyCell
-						>
+						<TableBodyCell>
+							{#if run.rampUpMinutes == 0}
+								-
+							{:else}
+								{Math.floor((run.rampUpMinutes * 60) / 60)}min {Math.round(
+									(run.rampUpMinutes * 60) % 60
+								)}sec
+							{/if}
+						</TableBodyCell>
 						<TableBodyCell>{toHumanDate(run.startTime)}</TableBodyCell>
 						<TableBodyCell
 							>{toHumanTime(run.lastUpdated.getTime() - run.startTime.getTime())}</TableBodyCell
 						>
 						<TableBodyCell>{run.status}</TableBodyCell>
 						<TableBodyCell>{toHumanDate(run.lastUpdated)}</TableBodyCell>
-						<TableBodyCell>{run.error}</TableBodyCell>
 						<TableBodyCell>
 							{#if run.status === 'running' || run.status === 'created'}
 								<Button class="h-6 w-6" size="xs" color="none" on:click={(e) => StopRun(e, run.id)}

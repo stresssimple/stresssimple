@@ -25,17 +25,20 @@ export class UserRunner {
   private async run(): Promise<void> {
     while (this.status !== 'stopping') {
       const startTime = process.hrtime.bigint();
+      let success = true;
       try {
         await this.test.test(this.userId);
       } catch (e) {
+        success = false;
         console.error('Test throw an exception.', e);
       } finally {
         const endTime = process.hrtime.bigint();
         const duration = Number(endTime - startTime) / 1e9;
         await this.influx.write(
-          'test_duration',
+          'test_run',
           {
             duration,
+            success: success ? 1.0 : 0.0,
           },
           {
             testId: ctx.testId,

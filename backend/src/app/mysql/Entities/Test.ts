@@ -1,10 +1,12 @@
 import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
 
 import { TestExecution } from './TestExecution';
+import { generateId } from 'src/app/utils/id';
 
 @Entity()
 export class Test {
   constructor(source: Partial<Test> = {}) {
+    this.id = generateId();
     Object.assign(this, source);
   }
 

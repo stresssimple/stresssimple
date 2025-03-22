@@ -1,4 +1,16 @@
 name: Build and push Frontend Docker image
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "front/**"
+  pull_request:
+    branches: ["master"]
+    paths:
+      - "front/**"
+  # allow manual trigger
+  workflow_dispatch:
 on:
   push:
     branches: ["master"]

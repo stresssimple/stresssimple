@@ -1,13 +1,13 @@
-name: Build and push Backend Docker image
+name: Build and push StubJs Docker image
 on:
   push:
     branches: ["master"]
     paths:
-      - "backend/**"
+      - "stubJs/**"
   pull_request:
     branches: ["master"]
     paths:
-      - "backend/**"
+      - "stubJs/**"
   # allow manual trigger
   workflow_dispatch:
 
@@ -21,10 +21,10 @@ jobs:
       - name: Build and push the Docker image
         run: |
           TIMESTAMP=$(date +%s)
-          IMAGE_NAME=ghcr.io/hananmil/stressjs/backend
+          IMAGE_NAME=ghcr.io/hananmil/stressjs/stubjs
 
           # Build the image with the timestamp tag
-          docker build backend/ --file backend/Dockerfile --tag backend:$TIMESTAMP
+          docker build stabJs/ --file stubJs/Dockerfile --tag stubjs:$TIMESTAMP
           docker tag backend:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
 
           # Login to GitHub Container Registry

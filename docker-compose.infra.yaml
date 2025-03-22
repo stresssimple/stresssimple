@@ -18,7 +18,6 @@ services:
 
     volumes:
       - influxdb_data:/var/lib/influxdb3
-
   redis:
     image: redis:latest
     container_name: redis
@@ -37,42 +36,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  frontend:
-    image: ghcr.io/hananmil/stressjs/front:latest
-    container_name: frontend
-    ports:
-      - "5000:5000"
-    environment:
-      - PORT=5000
-      - PUBLIC_API_URL=http://localhost:3030
-    depends_on:
-      - backend
-  backend:
-    image: ghcr.io/hananmil/stressjs/backend:latest
-    container_name: backend
-    volumes:
-      - tests_data:/app/tmp
-    environment:
-      - RUNNER_TEMPLATE_FOLDER=tmp/runner_templates
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - INFLUXDB_URL=http://influxdb:8086
-      - INFLUXDB_TOKEN=my-secret-token
-      - INFLUXDB_ORG=my-org
-      - INFLUXDB_BUCKET=test-runs
-      - MYSQL_DATABASE=stressjs
-      - MYSQL_USER=stressjs
-      - MYSQL_PASSWORD=securepassword
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
-      - CONTAINER=true
-    ports:
-      - "3030:3000"
-    depends_on:
-      - influxdb
-      - redis
-
 volumes:
   influxdb_data:
   mysql_data:
-  tests_data:

@@ -49,8 +49,16 @@
 		}
 	});
 
-	const save = () => {
-		tests.save(test);
+	const save = async () => {
+		await tests.save(test);
+		await activeTest.setActiveById(test.id);
+		test = $activeTest;
+		originalTest = $activeTest;
+		extraModules = $activeTest.modules.map((m: string) => {
+			return {
+				name: m
+			};
+		});
 		if (navigating) {
 			saveModal = false;
 			goto(navigating);

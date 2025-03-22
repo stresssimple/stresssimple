@@ -1,6 +1,7 @@
 import { Redis } from 'ioredis';
 import { Global, Logger, Module } from '@nestjs/common';
 import { INQUIRER } from '@nestjs/core';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Global()
 @Module({
