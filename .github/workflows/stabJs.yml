@@ -16,9 +16,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,10 +29,6 @@ jobs:
 
           # Build the image with the timestamp tag
           docker build stab-server/ --file stab-server/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
-          docker tag $IMAGE_NAME:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
-
-          # Login to GitHub Container Registry
-          docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
 
           # Push the timestamped image
           docker push $IMAGE_NAME:$TIMESTAMP
