@@ -25,6 +25,7 @@ jobs:
         run: |
           TIMESTAMP=$(date +%s)
           IMAGE_NAME=ghcr.io/stresssimple/front
+
           echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
           # Build the image with the timestamp tag
