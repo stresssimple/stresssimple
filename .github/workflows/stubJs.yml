@@ -3,11 +3,11 @@ on:
   push:
     branches: ["master"]
     paths:
-      - "stubJs/**"
+      - "stab-server/**"
   pull_request:
     branches: ["master"]
     paths:
-      - "stubJs/**"
+      - "stab-server/**"
   # allow manual trigger
   workflow_dispatch:
 
@@ -24,7 +24,7 @@ jobs:
           IMAGE_NAME=ghcr.io/hananmil/stressjs/stubjs
 
           # Build the image with the timestamp tag
-          docker build stabJs/ --file stubJs/Dockerfile --tag stubjs:$TIMESTAMP
+          docker build stab-server/ --file stab-server/Dockerfile --tag stubjs:$TIMESTAMP
           docker tag backend:$TIMESTAMP $IMAGE_NAME:$TIMESTAMP
 
           # Login to GitHub Container Registry
