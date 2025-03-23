@@ -2,6 +2,10 @@ site_name: StressSimple Docs
 site_url: https://docs.stresssimple.org
 repo_name: stresssimnple
 repo_url: https://github.com/stresssimple/monorepo
+copyright: Copyright © 2025 StressSimple
+site_author: StressSimple
+site_description: Documentation for StressSimple
+site_keywords: StressSimple, documentation, stress testing, performance testing, load testing
 markdown_extensions:
 - admonition
 - codehilite
@@ -75,7 +79,5 @@ theme:
   font:
     text: Roboto
     code: Roboto Mono
-  logo:
-    icon: help
-    text: StressSimple Docs
-  favicon: img/favicon.ico
+  logo: ./images/Logo.png
+  favicon:  ./images/Logo.png
