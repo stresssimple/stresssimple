@@ -1,11 +1,10 @@
 site_name: StressSimple Docs
 site_url: https://docs.stresssimple.org
 repo_name: stresssimnple
-repo_url: https://github.com/stresssimple/monorepo
+repo_url: https://github.com/stresssimple/stresssimple.git
 copyright: Copyright © 2025 StressSimple
 site_author: StressSimple
 site_description: Documentation for StressSimple
-site_keywords: StressSimple, documentation, stress testing, performance testing, load testing
 markdown_extensions:
 - admonition
 - codehilite
@@ -24,38 +23,38 @@ extra_javascript:
 - https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js
 extra_css:
 - https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.css
-extra:
-  social:
-  - type: github
-    link: https://github.com/stresssimple/stresssimple.git
 plugins:
 - glightbox
 - search
 extra:
+  generator: false
+  social:
+  - icon: fontawesome/brands/github
+    link: https://github.com/stresssimple/stresssimple.git
+  - icon: fontawesome/brands/linkedin
+    link: https://www.linkedin.com/in/hananmilman
+  - icon: fontawesome/brands/discord
+    link: https://discord.gg/XN6KHcrF
   consent:
     title: Cookie consent
-    description: >- 
-      We use cookies to recognize your repeated visits and preferences, as well
-      as to measure the effectiveness of our documentation and whether users
-      find what they're searching for. With your consent, you're helping us to
-      make our documentation better.
-  analytics: 
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well as to measure the effectiveness of our documentation and whether users find what they're searching for. With your consent, you're helping us to make our documentation better.
+  analytics:
     provider: google
-    property: G-Q36M8V5LLZ  
+    property: G-Q36M8V5LLZ
     feedback:
       title: Was this page helpful?
       ratings:
-        - icon: material/emoticon-happy-outline
-          name: This page was helpful
-          data: 1
-          note: >-
-            Thanks for your feedback!
-        - icon: material/emoticon-sad-outline
-          name: This page could be improved
-          data: 0
-          note: >- 
-            Thanks for your feedback! Help us improve this page by
-            using our <a href="..." target="_blank" rel="noopener">feedback form</a>.
+      - icon: material/emoticon-happy-outline
+        name: This page was helpful
+        data: 1
+        note: >-
+          Thanks for your feedback!
+      - icon: material/emoticon-sad-outline
+        name: This page could be improved
+        data: 0
+        note: >-
+          Thanks for your feedback! Help us improve this page by using our <a href="..." target="_blank" rel="noopener">feedback form</a>.
 theme:
   palette:
     primary: deep orange
@@ -80,4 +79,4 @@ theme:
     text: Roboto
     code: Roboto Mono
   logo: ./images/Logo.png
-  favicon:  ./images/Logo.png
+  favicon: ./images/Logo.png
