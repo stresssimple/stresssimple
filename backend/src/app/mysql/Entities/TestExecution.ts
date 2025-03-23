@@ -1,5 +1,13 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
+export type TestExecutionStatus =
+  | 'created'
+  | 'running'
+  | 'completed'
+  | 'cancelled'
+  | 'failed'
+  | 'deleted';
+
 @Entity()
 export class TestExecution {
   constructor(source: Partial<TestExecution> = {}) {
@@ -13,7 +21,7 @@ export class TestExecution {
   testId: string;
 
   @Column()
-  status: string;
+  status: TestExecutionStatus;
 
   @Column({ type: 'timestamp' })
   startTime: Date;
@@ -30,4 +38,7 @@ export class TestExecution {
   rampUpMinutes: number;
   @Column({ type: 'float' })
   numberOfUsers: number;
+
+  @Column()
+  processes: number;
 }

@@ -1,12 +1,6 @@
-import {
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Query,
-} from '@nestjs/common';
-import { InfluxService } from '../influxdb/influx.service';
-import { RunsService } from './runs.service';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { InfluxService } from './influx.service';
+import { RunsService } from '../runs/api/runs.service';
 
 @Controller('runs/report')
 export class RunReportController {

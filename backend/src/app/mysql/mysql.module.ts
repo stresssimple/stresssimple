@@ -21,18 +21,33 @@ const mySqlEntities = [
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({
-        type: 'mysql',
-        host: process.env['MYSQL_HOST'] || 'localhost',
-        port: process.env['MYSQL_PORT']
-          ? parseInt(process.env['MYSQL_PORT'])
-          : 3306,
-        username: process.env['MYSQL_USER'],
-        password: process.env['MYSQL_PASSWORD'],
-        database: process.env['MYSQL_DATABASE'],
-        entities: mySqlEntities,
-        synchronize: true,
-      }),
+      useFactory: () => {
+        const obj = {
+          type: 'mysql',
+          host: process.env['MYSQL_HOST'] || 'localhost',
+          port: process.env['MYSQL_PORT']
+            ? parseInt(process.env['MYSQL_PORT'])
+            : 3306,
+          username: process.env['MYSQL_USER'],
+          password: process.env['MYSQL_PASSWORD'],
+          database: process.env['MYSQL_DATABASE'],
+          entities: mySqlEntities,
+          synchronize: true,
+        };
+        console.log(obj);
+        return {
+          type: 'mysql',
+          host: process.env['MYSQL_HOST'] || 'localhost',
+          port: process.env['MYSQL_PORT']
+            ? parseInt(process.env['MYSQL_PORT'])
+            : 3306,
+          username: process.env['MYSQL_USER'],
+          password: process.env['MYSQL_PASSWORD'],
+          database: process.env['MYSQL_DATABASE'],
+          entities: mySqlEntities,
+          synchronize: true,
+        };
+      },
     }),
     TypeOrmModule.forFeature(mySqlEntities),
   ],

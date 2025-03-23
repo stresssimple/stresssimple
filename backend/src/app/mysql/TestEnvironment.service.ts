@@ -10,7 +10,13 @@ export class TestEnvironmentService {
     private readonly repository: Repository<TestEnvironment>,
   ) {}
 
+  public async getEnvironmentById(id: string): Promise<TestEnvironment> {
+    return this.repository.findOne({ where: { id } });
+  }
+
   public async getFreeEnvironment(
+    serverId: string,
+    runId: string,
     language: string,
     modules: string[],
   ): Promise<TestEnvironment> {
@@ -18,6 +24,10 @@ export class TestEnvironmentService {
       .createQueryBuilder('testEnvironment')
       .where('testEnvironment.language = :language', { language })
       .andWhere('testEnvironment.isFree = :isFree', { isFree: true })
+      .andWhere('testEnvironment.modules = :modules', {
+        modules: modules.join(','),
+      })
+      .andWhere('testEnvironment.serverId = :serverId', { serverId })
       .getOne();
 
     if (!environment) {
@@ -25,7 +35,8 @@ export class TestEnvironmentService {
       environment.language = language;
       environment.isFree = false;
       environment.modules = modules.join(',');
-
+      environment.serverId = serverId;
+      environment.runId = runId;
       await this.repository.save(environment);
     } else {
       environment.isFree = false;

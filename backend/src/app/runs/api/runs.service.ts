@@ -1,8 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TestExecution } from '../mysql/Entities/TestExecution';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { generateId } from '../utils/id';
+import { generateId } from 'src/app/utils/id';
+import {
+  TestExecution,
+  TestExecutionStatus,
+} from 'src/app/mysql/Entities/TestExecution';
 
 @Injectable()
 export class RunsService {
@@ -12,22 +15,14 @@ export class RunsService {
     private logger: Logger,
   ) {}
 
-  public async createRun(
-    testId: string,
-    durationMinutes: number,
-    rampUpMinutes: number,
-    users: number,
-  ): Promise<TestExecution> {
+  public async createRun(run: Partial<TestExecution>): Promise<TestExecution> {
     const runId = generateId();
     const testExecution = new TestExecution({
+      ...run,
       id: runId,
       status: 'created',
       startTime: new Date(),
       lastUpdated: new Date(),
-      testId: testId,
-      durationMinutes,
-      rampUpMinutes,
-      numberOfUsers: users,
     });
     await this.usersRepository.insert(testExecution);
     return testExecution;
@@ -59,7 +54,7 @@ export class RunsService {
 
   public async updateRun(
     runId: string,
-    status: string,
+    status: TestExecutionStatus,
     completed = false,
   ): Promise<void> {
     const run = await this.getRun(runId);

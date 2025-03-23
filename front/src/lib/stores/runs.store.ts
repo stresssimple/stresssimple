@@ -34,12 +34,19 @@ function createRunsStore() {
 			await load(testId);
 		},
 		clear: () => set([]),
-		start: async (testId: string, duration: number, users: number, rampUp: number) => {
+		start: async (
+			testId: string,
+			duration: number,
+			users: number,
+			rampUp: number,
+			processes: number
+		) => {
 			await axios.post(`${PUBLIC_API_URL}/runs`, {
 				durationMinutes: duration,
 				users,
 				rampUpMinutes: rampUp,
-				testId
+				testId,
+				processes
 			});
 		},
 		stop: async (runId: string) => {

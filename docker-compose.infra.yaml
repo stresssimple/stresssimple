@@ -35,7 +35,20 @@ services:
       - MYSQL_PASSWORD=securepassword
     volumes:
       - mysql_data:/var/lib/mysql
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    command: bash -c "rabbitmq-plugins enable --offline rabbitmq_shovel rabbitmq_shovel_management; rabbitmq-server"
 
 volumes:
   influxdb_data:
   mysql_data:
+  rabbitmq_data:

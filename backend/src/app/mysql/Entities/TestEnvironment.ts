@@ -11,6 +11,9 @@ export class TestEnvironment {
   @PrimaryColumn()
   id: string;
 
+  @Column()
+  serverId: string;
+
   @Column({ length: 50 })
   language: string;
 
@@ -19,4 +22,7 @@ export class TestEnvironment {
 
   @Column({ type: 'boolean' })
   isFree: boolean;
+
+  @Column()
+  runId: string;
 }

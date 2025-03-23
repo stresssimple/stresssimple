@@ -3,4 +3,5 @@ export class CreateRunRequest {
   public durationMinutes!: number;
   public rampUpMinutes!: number;
   public users!: number;
+  public processes!: number;
 }

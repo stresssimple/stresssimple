@@ -10,7 +10,7 @@
 	<Navbar let:hidden let:toggle class="shadow">
 		<NavBrand href="/">
 			<span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white"
-				>StressJS</span
+				>Stress Simple</span
 			>
 		</NavBrand>
 	</Navbar>

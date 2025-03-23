@@ -9,9 +9,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { RunsService } from './runs.service';
-import { RunScheduler } from './run.scheduler';
-import { CreateRunRequest } from '../dto/runs/CreateRunRequest';
-import { TestExecution } from '../mysql/Entities/TestExecution';
+import { RunScheduler } from '../run.scheduler';
+import { CreateRunRequest } from '../../dto/runs/CreateRunRequest';
+import { TestExecution } from '../../mysql/Entities/TestExecution';
+import { PublishBus } from 'src/app/rabbitmq/publish';
 
 @Controller('runs')
 export class RunsController {
@@ -19,20 +20,27 @@ export class RunsController {
     private scheduler: RunScheduler,
     private readonly runsService: RunsService,
     private readonly logger: Logger,
+    private readonly rabbitMq: PublishBus,
   ) {}
 
   @Post()
-  public createRun(@Body() request: CreateRunRequest): void {
+  public async createRun(@Body() request: CreateRunRequest): Promise<void> {
     try {
+      const run = await this.runsService.createRun({
+        durationMinutes: request.durationMinutes,
+        rampUpMinutes: request.rampUpMinutes,
+        numberOfUsers: request.users,
+        processes: request.processes,
+        testId: request.testId,
+      });
       this.logger.log(
-        `Scheduling run for test ${request.testId} with ${request.users} users`,
+        `Scheduling run for test ${request.testId} with ${request.users} users, ${request.processes} processes`,
       );
-      this.scheduler.scheduleRun(
-        request.testId,
-        request.durationMinutes,
-        request.rampUpMinutes,
-        request.users,
-      );
+      this.rabbitMq.publishAsync({
+        route: 'runs',
+        routingKey: 'execute',
+        ...run,
+      });
     } catch (e) {
       this.logger.error(`Failed to schedule run: ${e.message}`);
     }
