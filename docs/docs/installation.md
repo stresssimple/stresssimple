@@ -1,4 +1,7 @@
-# StressSimple Installation Guide
+---
+comments: true
+---
+# Installation Guide
 
 ## Quick Start
 

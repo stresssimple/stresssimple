@@ -1,7 +1,8 @@
 site_name: StressSimple Docs
 site_url: https://docs.stresssimple.org
 repo_name: stresssimnple
-repo_url: https://github.com/stresssimple/stresssimple.git
+repo_url: https://github.com/stresssimple/stresssimple
+edit_uri: edit/master/docs/docs
 copyright: Copyright © 2025 StressSimple
 site_author: StressSimple
 site_description: Documentation for StressSimple
@@ -56,6 +57,7 @@ extra:
         note: >-
           Thanks for your feedback! Help us improve this page by using our <a href="..." target="_blank" rel="noopener">feedback form</a>.
 theme:
+  custom_dir: overrides
   palette:
     primary: deep orange
     accent: indigo
@@ -71,12 +73,24 @@ theme:
   - content.collapse.code.lang.tab
   - content.collapse.code.lang.tab.link
   - content.collapse.code.lang.tab.tab
+  - content.action.edit
+
   - content.code.copy
   - content.code.select
   - navigation.instant
+  - navigation.tracking
+  - navigation.sections
+  - navigation.path
+  - navigation.prev_next
+  - navigation.prev_next.page
+  - navigation.prev_next.section
+
   name: material
   font:
     text: Roboto
     code: Roboto Mono
   logo: ./images/Logo.png
   favicon: ./images/Logo.png
+  icon:
+    favicon: ./images/Logo.png
+    repo: fontawesome/brands/github

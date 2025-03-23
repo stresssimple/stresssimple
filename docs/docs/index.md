@@ -1,3 +1,6 @@
+---
+comments: true
+---
 # Welcome to StressSimple
 
 ## What is StressSimple?

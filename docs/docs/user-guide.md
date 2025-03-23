@@ -1,3 +1,6 @@
+---
+comments: true
+---
 # User Guide
 
 This guide provides a comprehensive example of how to use the **StressSimple** application effectively.
