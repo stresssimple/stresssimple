@@ -1,4 +1,4 @@
-import { ServersService } from '@infra/infrastructure/servers.service';
+import { ServersService } from '@infra/infrastructure/mysql/servers.service';
 import { Controller, Get, Param } from '@nestjs/common';
 
 @Controller('servers')

@@ -1,9 +1,7 @@
 import json
 import sys
-import threading
 import time
 
-import redis
 from run_context import ctx
 from influx.influx_service import InfluxService
 from stress_test import StressTest
@@ -11,25 +9,11 @@ from run.user_runner import UserRunner
 
 
 class RunManager:
-    def __init__(self, test: StressTest, redis_sub: redis.Redis, run_id: str):
+    def __init__(self, test: StressTest,  run_id: str):
         self.users = {}
         self.should_stop = False
         self.test = test
-        self.redis_sub = redis_sub
-        self.pubsub = redis_sub.pubsub()  # Create the pubsub instance
-        self.pubsub.subscribe(f'runner:{run_id}')
         self.influx = InfluxService()
-        print(f"Client subscribed to runner:{run_id}")
-        self.thread = threading.Thread(target=self.listen, daemon=True)
-        self.thread.start()
-
-    def listen(self):
-        print("Client Listening for messages", flush=True)
-        for message in self.pubsub.listen():  # Listen using the created pubsub instance
-            if message["type"] != "message":
-                continue
-            if not self.message_handler(message["data"]):
-                return
 
     def message_handler(self, message):
         data = json.loads(message)

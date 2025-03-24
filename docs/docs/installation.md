@@ -24,7 +24,6 @@ The repository includes three Docker Compose files:
 1. **`docker-compose.infra.yml`**: Manages infrastructure services required for the application:
     - **InfluxDB**: A time-series database for storing test results.
     - **MySQL**: A relational database for user data.
-    - **Redis**: A key-value store for inter-process communication.
 2. **`docker-compose.app.yml`**: Deploys the StressSimple application using pre-built images from `ghcr.io`.
 3. **`docker-compose.dev.yml`**: Builds and runs Docker containers directly from the source code.
 

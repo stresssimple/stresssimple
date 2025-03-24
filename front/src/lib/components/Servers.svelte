@@ -3,13 +3,14 @@
 	import { serversStore } from '$lib/stores/servers.store';
 </script>
 
-<h2 class="m-2 text-lg font-semibold">Servers</h2>
 <div>
+	<h2 class="m-2 text-lg font-semibold">Servers</h2>
 	{#each $serversStore as server}
-		<pre class="m-4">{server.serverName}:{server.serverId}</pre>
-		<div class="m-4">
-			<Range min={0} value={server.activeProcesses} max={server.maxProcesses} disabled />
-			<div>{server.properties.activeProcesses}/{server.properties.maxProcesses}</div>
+		<div class="m-2 rounded-lg border border-gray-400 bg-gray-100 p-2">
+			<pre class="m-2">{server.name}:{server.id}</pre>
+			<div class="m-2">
+				<div>Processes {server.allocatedProcesses}/{server.maxProcesses}</div>
+			</div>
 		</div>
 	{/each}
 </div>

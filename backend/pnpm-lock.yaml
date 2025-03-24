@@ -41,9 +41,6 @@ importers:
       express:
         specifier: ^4.21.2
         version: 4.21.2
-      ioredis:
-        specifier: ^5.6.0
-        version: 5.6.0
       mysql2:
         specifier: ^3.13.0
         version: 3.13.0
@@ -3796,7 +3793,8 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.17.24
 
-  '@ioredis/commands@1.2.0': {}
+  '@ioredis/commands@1.2.0':
+    optional: true
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -4811,7 +4809,8 @@ snapshots:
 
   clone@1.0.4: {}
 
-  cluster-key-slot@1.1.2: {}
+  cluster-key-slot@1.1.2:
+    optional: true
 
   co@4.6.0: {}
 
@@ -5524,6 +5523,7 @@ snapshots:
       standard-as-callback: 2.1.0
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   ipaddr.js@1.9.1: {}
 
@@ -6002,9 +6002,11 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash.defaults@4.2.0: {}
+  lodash.defaults@4.2.0:
+    optional: true
 
-  lodash.isarguments@3.1.0: {}
+  lodash.isarguments@3.1.0:
+    optional: true
 
   lodash.memoize@4.1.2: {}
 
@@ -6402,11 +6404,13 @@ snapshots:
 
   real-require@0.2.0: {}
 
-  redis-errors@1.2.0: {}
+  redis-errors@1.2.0:
+    optional: true
 
   redis-parser@3.0.0:
     dependencies:
       redis-errors: 1.2.0
+    optional: true
 
   reflect-metadata@0.1.14: {}
 
@@ -6626,7 +6630,8 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
-  standard-as-callback@2.1.0: {}
+  standard-as-callback@2.1.0:
+    optional: true
 
   statuses@2.0.1: {}
 

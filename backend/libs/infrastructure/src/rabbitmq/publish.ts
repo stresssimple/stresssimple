@@ -10,6 +10,7 @@ export type RabbitRouting = { route: string; routingKey: string };
 export abstract class PublishBus {
   public abstract executeCommand<Rq extends RabbitRouting, Rs>(
     command: Rq,
+    timeoutMs?: number,
   ): Promise<Rs>;
   public abstract publishAsync<T extends RabbitRouting>(
     event: T,
@@ -23,12 +24,13 @@ export class RabbitMQPublishBus implements PublishBus {
 
   public async executeCommand<Rq extends RabbitRouting, Rs>(
     command: Rq,
+    timeoutMs: number = 10000,
   ): Promise<Rs> {
     const rs = await this.bus.request<Rs>({
       exchange: command.route,
       routingKey: command.routingKey,
       payload: command,
-      timeout: 10000,
+      timeout: timeoutMs,
     });
     return rs;
   }

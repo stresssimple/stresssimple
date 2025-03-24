@@ -2,21 +2,28 @@ resource "kubernetes_deployment" "backend_deployment" {
   metadata {
     name      = "backend-api"
     namespace = var.namespace
+    annotations = {
+      "app"       = var.app_name
+      "component" = "backend-api"
+    }
   }
 
+
   spec {
-    replicas = 1
+    replicas = var.backend-api-replicas
 
     selector {
       match_labels = {
-        app = "backend-api"
+        app       = var.app_name
+        component = "backend-api"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "backend-api"
+          app       = var.app_name
+          component = "backend-api"
         }
       }
 

@@ -16,7 +16,7 @@
 		</NavBrand>
 	</Navbar>
 	<div class="flex grow flex-row">
-		<div class="min-w-60 max-w-80 shadow-inner shadow-gray-200">
+		<div class="flex min-w-60 max-w-80 flex-col justify-between shadow-inner shadow-gray-200">
 			<Tests />
 			<Servers />
 		</div>

@@ -1,3 +1,4 @@
+import * as os from 'os';
 import { Injectable, Logger } from '@nestjs/common';
 import { RabbitRPC } from '@golevelup/nestjs-rabbitmq';
 import {
@@ -8,16 +9,7 @@ import {
 import { RunsService } from '@infra/infrastructure/mysql/runs.service';
 import { TestsService } from 'apps/application/src/app/tests/tests.service';
 import { TemplateRunnerSvcFactory } from '../template-runner/TemplateRunnerFactory';
-import { ServerInstance } from '@infra/infrastructure/servers.service';
-
-export class ServerRecord {
-  time: string;
-  startTime: string;
-  maxProcesses: number;
-  activeProcesses: number;
-  name: string;
-  runningRunIds: string[];
-}
+import { thisServer } from '@infra/infrastructure/mysql/servers.service';
 
 export class ProcessRecord {
   processId: string;
@@ -42,15 +34,17 @@ export class ProcessManagementService {
     private readonly factory: TemplateRunnerSvcFactory,
     private readonly logger: Logger,
   ) {
-    this.maxProcesses = parseInt(process.env.MAX_PROCESSES ?? '4');
-    ServerInstance.instance.properties['maxProcesses'] = this.maxProcesses;
-    ServerInstance.instance.properties['activeProcesses'] = 0;
+    this.maxProcesses = parseInt(
+      process.env.MAX_PROCESSES ?? os.cpus().length.toString(),
+    );
+    thisServer.maxProcesses = this.maxProcesses;
+    thisServer.allocatedProcesses = 0;
   }
 
   @RabbitRPC({
     exchange: 'servers:allocateProcess',
-    routingKey: 'allocateProcess:' + ServerInstance.instance.serverId,
-    queue: 'allocateProcess:' + ServerInstance.instance.serverId,
+    routingKey: 'allocateProcess:' + thisServer.id,
+    queue: 'allocateProcess:' + thisServer.id,
     queueOptions: {
       durable: false,
       autoDelete: true,
@@ -60,18 +54,18 @@ export class ProcessManagementService {
     if (Object.keys(this.processes).length >= this.maxProcesses) {
       return null;
     }
-    ServerInstance.instance.properties['activeProcesses']++;
+    thisServer.allocatedProcesses++;
 
     this.logger.log('Allocating process for ' + data.run.id);
     const testDefinitions = await this.testsService.getTest(data.run.testId);
     const proc: ProcessRecord = {
       processId: generateId(),
       runId: data.run.id,
-      serverId: ServerInstance.instance.serverId,
+      serverId: thisServer.id,
     };
     this.processes[proc.processId] = proc;
     const env = await this.envService.getFreeEnvironment(
-      ServerInstance.instance.serverId,
+      thisServer.id,
       data.run.id,
       testDefinitions.language,
       testDefinitions.modules,
@@ -81,9 +75,29 @@ export class ProcessManagementService {
   }
 
   @RabbitRPC({
+    exchange: 'servers:freeProcess',
+    routingKey: 'freeProcess:' + thisServer.id,
+    queue: 'freeProcess:' + thisServer.id,
+    queueOptions: {
+      durable: false,
+      autoDelete: true,
+    },
+  })
+  async freeProcess(data: any): Promise<boolean> {
+    this.logger.log('Freeing process ' + data.processId);
+    const proc = this.processes[data.processId];
+    if (proc) {
+      delete this.processes[data.processId];
+      thisServer.allocatedProcesses--;
+      return true;
+    }
+    return false;
+  }
+
+  @RabbitRPC({
     exchange: 'run',
-    routingKey: 'startApplication:' + ServerInstance.instance.serverId,
-    queue: 'startApplication:' + ServerInstance.instance.serverId,
+    routingKey: 'startApplication:' + thisServer.id,
+    queue: 'startApplication:' + thisServer.id,
     queueOptions: {
       durable: false,
       autoDelete: true,
@@ -151,7 +165,7 @@ export class ProcessManagementService {
       this.factory.removeRunnerSvc(proc.environmentId);
       await this.envService.setEnvironmentFree(proc.environmentId);
       this.logger.log('Process ended!!!!!');
-      ServerInstance.instance.properties['activeProcesses']--;
+      thisServer.allocatedProcesses--;
     });
     return true;
   }

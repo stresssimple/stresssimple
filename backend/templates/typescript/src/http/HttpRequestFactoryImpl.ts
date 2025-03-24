@@ -167,6 +167,7 @@ export class HttpRequestFactoryImpl implements HttpRequestFactory {
     await publisher.send(
       {
         exchange: 'audit',
+        routingKey: 'audit',
       },
       record,
     );

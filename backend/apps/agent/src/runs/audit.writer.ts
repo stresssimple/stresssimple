@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import Redis from 'ioredis';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuditRecord } from '@infra/infrastructure';
@@ -18,6 +17,6 @@ export class AuditWriter {
     queue: 'audit-writer',
   })
   public async handleAuditRecord(record: AuditRecord): Promise<void> {
-    await this.auditRepository.save(record);
+    await this.auditRepository.save(new AuditRecord(record));
   }
 }

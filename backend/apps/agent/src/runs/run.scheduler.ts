@@ -5,10 +5,8 @@ import { PublishBus, TestExecution } from '@infra/infrastructure';
 import { TestDefinitions } from 'apps/application/src/app/dto/TestDefinitions';
 import { TestsService } from 'apps/application/src/app/tests/tests.service';
 import { RunsService } from '@infra/infrastructure/mysql/runs.service';
-import {
-  ServerInstance,
-  ServersService,
-} from '@infra/infrastructure/servers.service';
+import { ServersService } from '@infra/infrastructure/mysql/servers.service';
+import { ServerRecord } from '@infra/infrastructure/mysql/Entities/Server';
 
 @Injectable()
 export class RunScheduler {
@@ -22,7 +20,7 @@ export class RunScheduler {
   ) {}
 
   async executeRun(runId: string) {
-    const run = await this.runsService.getRun(runId);
+    let run = await this.runsService.getRun(runId);
     const testDefinitions = await this.testService.getTest(run.testId);
     if (!testDefinitions) {
       await this.runsService.updateRun(run.id, 'failed', true);
@@ -30,6 +28,18 @@ export class RunScheduler {
     }
 
     const processes = await this.requireProcesses(run);
+    run = await this.runsService.getRun(run.id);
+    if (run.status !== 'created') {
+      this.logger.log('Run status changed, stopping run ' + run.status);
+      processes.forEach(async (p) => {
+        await this.publish.publishAsync({
+          route: 'servers:freeProcess',
+          routingKey: 'freeProcess:' + p.serverId,
+          processId: p.processId,
+        });
+      });
+      return;
+    }
     this.logger.log('Processes allocated successful: ' + processes.length);
     await this.runTest(testDefinitions, run, processes);
   }
@@ -37,7 +47,7 @@ export class RunScheduler {
   private async requireProcesses(run: TestExecution): Promise<ProcessRecord[]> {
     const processes: ProcessRecord[] = [];
 
-    let servers: ServerInstance[] = await this.serversService.getServers();
+    let servers: ServerRecord[] = await this.serversService.getServers();
 
     while (processes.length < run.processes && run.status === 'created') {
       run = await this.runsService.getRun(run.id);
@@ -50,7 +60,7 @@ export class RunScheduler {
 
       servers = await this.serversService.getServers();
       servers = servers.filter(
-        (s) => s.properties.activeProcesses < s.properties.maxProcesses,
+        (s) => s.type === 'agent' && s.allocatedProcesses < s.maxProcesses,
       );
       if (servers.length === 0) {
         this.logger.log('No servers available, waiting...');
@@ -63,13 +73,11 @@ export class RunScheduler {
         try {
           const process = (await this.publish.executeCommand({
             route: 'servers:allocateProcess',
-            routingKey: 'allocateProcess:' + server.serverId,
+            routingKey: 'allocateProcess:' + server.id,
             run: run,
           })) as ProcessRecord;
           if (!process) {
-            this.logger.log(
-              'No process allocated on server ' + server.serverId,
-            );
+            this.logger.log('No process allocated on server ' + server.id);
             continue;
           }
           processes.push(process);
@@ -88,16 +96,19 @@ export class RunScheduler {
   ) {
     const startApplicationTasks = processes.map(async (p) => {
       this.logger.log('Starting application on server ' + p.serverId);
-      const result = await this.publish.executeCommand({
-        route: 'run',
-        routingKey: 'startApplication:' + p.serverId,
-        payload: {
-          processId: p.processId,
-          testId: run.testId,
-          runId: run.id,
-          source: testDefinitions.source,
+      const result = await this.publish.executeCommand(
+        {
+          route: 'run',
+          routingKey: 'startApplication:' + p.serverId,
+          payload: {
+            processId: p.processId,
+            testId: run.testId,
+            runId: run.id,
+            source: testDefinitions.source,
+          },
         },
-      });
+        60000,
+      );
       return result as boolean;
     });
 

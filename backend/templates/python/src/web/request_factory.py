@@ -110,7 +110,7 @@ class HttpRequestFactory:
             "requestBody": json.dumps(request.get("body", {})),
             "responseBody": json.dumps(result.get("body", {}))
         }
-        ctx.redis_pub.publish("audit", json.dumps(record))
+        Exception("Audit record", record)
 
     async def trace(self, duration, is_successful, status):
         data = {

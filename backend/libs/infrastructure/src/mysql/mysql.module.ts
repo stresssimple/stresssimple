@@ -15,12 +15,15 @@ import { TestEnvironmentService } from './TestEnvironment.service';
 import { Repository } from 'typeorm';
 import * as path from 'path';
 import { RunsService } from './runs.service';
+import { ServerRecord } from './Entities/Server';
+import { ServersService } from './servers.service';
 export const mySqlEntities = [
   Test,
   TestExecution,
   LogRecord,
   AuditRecord,
   TestEnvironment,
+  ServerRecord,
 ];
 
 @Module({
@@ -43,8 +46,8 @@ export const mySqlEntities = [
     }),
     TypeOrmModule.forFeature(mySqlEntities),
   ],
-  providers: [TestEnvironmentService, RunsService],
-  exports: [TestEnvironmentService, RunsService],
+  providers: [TestEnvironmentService, RunsService, ServersService],
+  exports: [TestEnvironmentService, RunsService, ServersService],
 })
 export class MysqlModule implements OnApplicationBootstrap {
   constructor(

@@ -1,19 +1,25 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
-import { ServerInstance } from '@infra/infrastructure/servers.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { ProcessRecord } from './ProcessManagement.service';
+import {
+  ServersService,
+  thisServer,
+} from '@infra/infrastructure/mysql/servers.service';
 
 @Injectable()
 export class RunnersManager {
   private readonly runners = new Set<string>();
   private readonly waitingForRunners = new Map<string, () => void>();
   private readonly waitingForFinish = new Map<string, () => void>();
-  constructor(private readonly logger: Logger) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly servers: ServersService,
+  ) {}
 
   @RabbitSubscribe({
     exchange: 'run',
     routingKey: 'runnerStarted',
-    queue: 'runnerStarted:' + ServerInstance.instance.serverId,
+    queue: 'runnerStarted:' + thisServer.id,
     queueOptions: {
       autoDelete: true,
     },
@@ -34,7 +40,7 @@ export class RunnersManager {
   @RabbitSubscribe({
     exchange: 'run',
     routingKey: 'runnerStopped',
-    queue: 'runnerStopped:' + ServerInstance.instance.serverId,
+    queue: 'runnerStopped:' + thisServer.id,
     queueOptions: {
       autoDelete: true,
     },

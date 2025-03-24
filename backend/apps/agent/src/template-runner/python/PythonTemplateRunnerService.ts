@@ -5,6 +5,7 @@ import * as path from 'path';
 import { Logger } from '@nestjs/common';
 import { TemplateRunnerService } from '../TemplateRunnerService';
 import { AppLogsService } from '@infra/infrastructure';
+import { time } from 'console';
 
 const TEMPLATE_FOLDER = 'templates/python';
 
@@ -116,10 +117,16 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
       const platform = os.platform();
       if (platform === 'win32') {
         cmd = 'cmd.exe';
-        args = ['/c', `1.bat ${this.testId} ${this.runId} && exit`];
+        args = [
+          '/c',
+          `1.bat ${this.processId} ${this.testId} ${this.runId} && exit`,
+        ];
       } else {
         cmd = 'bash';
-        args = ['-c', `'1.sh ${this.testId} ${this.runId}' && exit`];
+        args = [
+          '-c',
+          `'1.sh ${this.processId} ${this.testId} ${this.runId}' && exit`,
+        ];
       }
 
       const runner = spawn(cmd, args, {
@@ -132,8 +139,6 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
           INFLUXDB_TOKEN: process.env['INFLUXDB_TOKEN'],
           INFLUXDB_ORG: process.env['INFLUXDB_ORG'],
           INFLUXDB_BUCKET: process.env['INFLUXDB_BUCKET'],
-          REDIS_HOST: process.env['REDIS_HOST'],
-          REDIS_PORT: process.env['REDIS_PORT'],
         },
       });
 

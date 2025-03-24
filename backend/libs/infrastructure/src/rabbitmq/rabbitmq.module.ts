@@ -9,6 +9,7 @@ const config = () => {
       { name: 'run', type: 'topic' },
       { name: 'servers', type: 'topic' },
       { name: 'servers:allocateProcess', type: 'topic' },
+      { name: 'servers:freeProcess', type: 'topic' },
       { name: 'audit', type: 'topic' },
       { name: 'process', type: 'topic', durable: true },
     ],
