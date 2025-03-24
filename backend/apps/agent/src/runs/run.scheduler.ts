@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RunnersManager } from './runners.manager';
-import { ProcessRecord } from './process/ProcessManagement.service';
+import { ProcessRecord } from './ProcessManagement.service';
 import { PublishBus, TestExecution } from '@infra/infrastructure';
 import { TestDefinitions } from 'apps/application/src/app/dto/TestDefinitions';
 import { TestsService } from 'apps/application/src/app/tests/tests.service';
@@ -101,12 +101,11 @@ export class RunScheduler {
       await this.runsService.updateRun(run.id, 'failed', true);
       return;
     }
-    console.log('Waiting for applications to start', processes);
+    this.logger.log('Waiting for applications to start');
     await this.runsManager.waitForRunners(processes.map((p) => p.processId));
-    console.log('All applications started');
+    this.logger.log('All applications started');
     await this.runsService.updateRun(run.id, 'running');
 
-    console.log('Starting test');
     const userRampUpDelay = Math.floor(
       (run.rampUpMinutes * 60 * 1000) / run.numberOfUsers,
     );
@@ -115,10 +114,9 @@ export class RunScheduler {
     run = await this.runsService.getRun(run.id);
     // Ramp up users
     while (userIndex < run.numberOfUsers && run.status === 'running') {
-      console.log('Sending start user ' + userIndex);
       await this.publish.publishAsync({
-        route: 'process',
-        routingKey: run.id,
+        route: 'run',
+        routingKey: 'runCommand:' + run.id,
         type: 'startUser',
         userId: userIndex + 1,
       });
@@ -138,14 +136,18 @@ export class RunScheduler {
       run = await this.runsService.getRun(run.id);
       await this.runsService.updateRun(run.id, run.status);
     }
-    console.log('Test finished');
-    await this.publish.publishAsync({
-      route: 'process',
-      routingKey: run.id,
-      type: 'stopAllUsers',
+    processes.forEach(async (p) => {
+      this.logger.log('Stopping all users on process ' + p.processId);
+      await this.publish.publishAsync({
+        route: 'process',
+        routingKey: 'runCommand:' + p.processId,
+        type: 'stopAllUsers',
+      });
     });
 
+    this.logger.log('Waiting for all users to stop');
     await this.runsManager.waitForFinishedRunners(processes);
+    this.logger.log('All users stopped');
     await this.runsService.updateRun(run.id, 'completed', true);
   }
 }

@@ -1,4 +1,4 @@
-import { ProcessManagementService } from './process/ProcessManagement.service';
+import { ProcessManagementService } from './ProcessManagement.service';
 import { ServersController } from '../../../application/src/app/api/ProcessManagement.controller';
 import { RunsManagementController } from './RunsManagment.controller';
 import { RunsController } from 'apps/application/src/app/api/runs.controller';

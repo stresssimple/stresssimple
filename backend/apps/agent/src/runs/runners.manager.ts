@@ -1,7 +1,7 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { ServerInstance } from '@infra/infrastructure/servers.service';
 import { Injectable, Logger } from '@nestjs/common';
-import { ProcessRecord } from './process/ProcessManagement.service';
+import { ProcessRecord } from './ProcessManagement.service';
 
 @Injectable()
 export class RunnersManager {

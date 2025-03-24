@@ -16,16 +16,28 @@ export abstract class TemplateRunnerService {
   ) {}
 
   public async initDirectory(): Promise<boolean> {
-    let created = false;
-    if (!existsSync(this.envPath)) {
-      created = true;
-      await fs.mkdir(this.envPath, { recursive: true });
-      this.appLogger.info(this.runId, `Created directory ${this.envPath}`);
+    try {
+      if (!existsSync(this.envPath)) {
+        await fs.mkdir(this.envPath, { recursive: true });
+        this.appLogger.info(
+          this.runId,
+          this.processId,
+          `Created directory ${this.envPath}`,
+        );
+      }
+
+      await copyAsyncRecursive(this.templateFolder, this.envPath);
+      this.appLogger.info(
+        this.runId,
+        this.processId,
+        `Copied template to ${this.envPath}`,
+      );
+    } catch (err) {
+      this.appLogger.error(this.runId, this.processId, err.message);
+      return false;
     }
 
-    await copyAsyncRecursive(this.templateFolder, this.envPath);
-    this.appLogger.info(this.runId, `Copied template to ${this.envPath}`);
-    return created;
+    return true;
   }
 
   public abstract packagesInstall(modules: string[]): Promise<boolean>;

@@ -11,12 +11,20 @@ export class AppLogsService {
     private readonly logger: Logger,
   ) {}
 
-  public async info(runId: string, message: string): Promise<void> {
-    await this.create({ runId, message, level: 'info' });
+  public async info(
+    runId: string,
+    processId: string,
+    message: string,
+  ): Promise<void> {
+    await this.create({ runId, message, processId, level: 'info' });
   }
 
-  public async error(runId: string, message: string): Promise<void> {
-    await this.create({ runId, message, level: 'error' });
+  public async error(
+    runId: string,
+    processId: string,
+    message: string,
+  ): Promise<void> {
+    await this.create({ runId, message, processId, level: 'error' });
   }
 
   public async create(logRecord: Partial<LogRecord>): Promise<LogRecord> {

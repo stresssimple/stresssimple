@@ -120,7 +120,7 @@ export class RunReportController {
   |> range(start: ${startTime.toISOString()}, stop: ${endTime.toISOString()})
   |> filter(fn: (r) => r["_measurement"] == "running_users")
   |> filter(fn: (r) => r["runId"] == "${runId}")
-  |> aggregateWindow(every: ${windowPeriod}, fn: mean, createEmpty: true)
+  |> aggregateWindow(every: ${windowPeriod}, fn: sum, createEmpty: true)
   |> yield(name: "median")`;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

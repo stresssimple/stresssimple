@@ -14,6 +14,6 @@ export class RunsManagementController {
     },
   })
   public async executeRun(data: any) {
-    this.scheduler.executeRun(data.id);
+    await this.scheduler.executeRun(data.id);
   }
 }

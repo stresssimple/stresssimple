@@ -1,17 +1,34 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, Logger } from '@nestjs/common';
 import { TestEnvironment } from './Entities/TestEnvironment';
-import { Repository } from 'typeorm';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { readFile, writeFile } from 'fs/promises';
 
 @Injectable()
 export class TestEnvironmentService {
+  private readonly fileName: string;
   constructor(
-    @InjectRepository(TestEnvironment)
-    private readonly repository: Repository<TestEnvironment>,
-  ) {}
+    // @InjectRepository(TestEnvironment)
+    // private readonly repository: Repository<TestEnvironment>,
+
+    private readonly logger: Logger,
+  ) {
+    const dir = process.env['RUNNER_TEMPLATE_FOLDER'] || '/tmp';
+    this.fileName = `${dir}/test-environment.json`;
+
+    if (!existsSync(dir)) {
+      this.logger.warn(`Directory ${dir} does not exist. Creating it`);
+      mkdirSync(dir);
+    }
+
+    if (!existsSync(this.fileName)) {
+      this.logger.warn(`File ${this.fileName} does not exist. Creating it`);
+      writeFileSync(this.fileName, '[]');
+    }
+  }
 
   public async getEnvironmentById(id: string): Promise<TestEnvironment> {
-    return this.repository.findOne({ where: { id } });
+    const envs = await this.getEnvironments();
+    return envs.find((env: TestEnvironment) => env.id === id);
   }
 
   public async getFreeEnvironment(
@@ -20,37 +37,61 @@ export class TestEnvironmentService {
     language: string,
     modules: string[],
   ): Promise<TestEnvironment> {
-    let environment = await this.repository
-      .createQueryBuilder('testEnvironment')
-      .where('testEnvironment.language = :language', { language })
-      .andWhere('testEnvironment.isFree = :isFree', { isFree: true })
-      .andWhere('testEnvironment.modules = :modules', {
-        modules: modules.join(','),
-      })
-      .andWhere('testEnvironment.serverId = :serverId', { serverId })
-      .getOne();
+    const envs = await this.getEnvironments();
+
+    let environment = envs.find(
+      (env: TestEnvironment) =>
+        env.isFree &&
+        env.language === language &&
+        env.modules === modules.join(','),
+    );
 
     if (!environment) {
+      this.logger.warn(`Not found free env. Creating new environment`);
       environment = new TestEnvironment();
       environment.language = language;
       environment.isFree = false;
       environment.modules = modules.join(',');
-      environment.serverId = serverId;
-      environment.runId = runId;
-      await this.repository.save(environment);
+      envs.push(environment);
     } else {
+      this.logger.log(`Found free env. Using it`);
       environment.isFree = false;
-      await this.repository.save(environment);
     }
-
+    environment.runId = runId;
+    await this.saveEnvironment(environment);
     return environment;
   }
 
   public async setEnvironmentFree(id: string): Promise<void> {
-    await this.repository.update({ id }, { isFree: true });
+    const envs = await this.getEnvironments();
+    const environment = envs.find((env: TestEnvironment) => env.id === id);
+    environment.isFree = true;
+    await this.saveEnvironment(environment);
   }
 
   public async removeEnvironment(id: string): Promise<void> {
-    await this.repository.delete({ id });
+    const envs = await this.getEnvironments();
+    const index = envs.findIndex((env: TestEnvironment) => env.id === id);
+    envs.splice(index, 1);
+    await writeFile(this.fileName, JSON.stringify(envs));
+  }
+
+  private async saveEnvironment(environment: TestEnvironment): Promise<void> {
+    const json = await readFile(this.fileName);
+    const envs = JSON.parse(json.toString());
+    const index = envs.findIndex(
+      (env: TestEnvironment) => env.id === environment.id,
+    );
+    if (index === -1) {
+      envs.push(environment);
+    } else {
+      envs[index] = environment;
+    }
+    await writeFile(this.fileName, JSON.stringify(envs));
+  }
+
+  private async getEnvironments(): Promise<TestEnvironment[]> {
+    const json = await readFile(this.fileName);
+    return JSON.parse(json.toString());
   }
 }

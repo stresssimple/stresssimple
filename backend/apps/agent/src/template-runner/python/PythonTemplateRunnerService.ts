@@ -34,8 +34,12 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
       const testPath = path.join(this.envPath, 'src', 'test.py');
       await fs.writeFile(testPath, source);
     } catch (error) {
-      this.appLogger.error(this.runId, `Error compiling template`);
-      this.appLogger.error(this.runId, error.toString());
+      this.appLogger.error(
+        this.runId,
+        this.processId,
+        `Error compiling template`,
+      );
+      this.appLogger.error(this.runId, this.processId, error.toString());
       this.logger.error(`Error compiling template`, error);
     }
     return success;
@@ -43,7 +47,11 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
 
   public async packagesInstall(modules: string[]): Promise<boolean> {
     this.logger.log(`Installing modules ${modules.join(' ')}`);
-    this.appLogger.info(this.runId, `Installing modules ${modules.join(' ')}`);
+    this.appLogger.info(
+      this.runId,
+      this.processId,
+      `Installing modules ${modules.join(' ')}`,
+    );
     let success = false;
     await new Promise<void>((resolve, reject) => {
       const activateCommand = this.activateCommand();
@@ -77,16 +85,17 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
           console.log('error', error, stdout, stderr);
           this.logger.error(`Error installing module ${module}`, error);
           if (stdout) {
-            this.appLogger.info(this.runId, stdout);
+            this.appLogger.info(this.runId, this.processId, stdout);
           }
           if (stderr) {
-            this.appLogger.error(this.runId, stderr);
+            this.appLogger.error(this.runId, this.processId, stderr);
           }
           reject(error);
         } else {
-          this.appLogger.info(this.runId, stdout);
+          this.appLogger.info(this.runId, this.processId, stdout);
           this.appLogger.info(
             this.runId,
+            this.processId,
             `Modules installed ${modules.join(' ')}`,
           );
 
@@ -99,7 +108,7 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
   }
 
   public startRunner(): Promise<void> {
-    this.appLogger.info(this.runId, `Starting runner`);
+    this.appLogger.info(this.runId, this.processId, `Starting runner`);
 
     try {
       let cmd: string;
@@ -129,23 +138,27 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
       });
 
       runner.stdout?.on('data', async (data) => {
-        await this.appLogger.info(this.runId, data.toString());
+        await this.appLogger.info(this.runId, this.processId, data.toString());
       });
       runner.stderr?.on('data', async (data) => {
-        await this.appLogger.error(this.runId, data.toString());
+        await this.appLogger.error(this.runId, this.processId, data.toString());
       });
 
       return new Promise<void>((resolve) => {
         runner.on('close', (code) => {
           this.logger.log(`Runner exited with code ${code}`);
-          this.appLogger.info(this.runId, `Runner exited with code ${code}`);
+          this.appLogger.info(
+            this.runId,
+            this.processId,
+            `Runner exited with code ${code}`,
+          );
           resolve();
         });
       });
     } catch (error) {
       this.logger.error(`Error starting runner`, error);
-      this.appLogger.error(this.runId, `Error starting runner`);
-      this.appLogger.error(this.runId, error.toString());
+      this.appLogger.error(this.runId, this.processId, `Error starting runner`);
+      this.appLogger.error(this.runId, this.processId, error.toString());
       return Promise.resolve();
     }
   }

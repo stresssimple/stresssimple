@@ -30,7 +30,11 @@ export class TypescriptTemplateRunnerService extends TemplateRunnerService {
 
   public async packagesInstall(modules: string[]): Promise<boolean> {
     this.logger.log(`Installing modules ${modules.join(' ')}`);
-    this.appLogger.info(this.runId, `Installing modules ${modules.join(' ')}`);
+    this.appLogger.info(
+      this.runId,
+      this.processId,
+      `Installing modules ${modules.join(' ')}`,
+    );
     let success = false;
     await new Promise<void>(async (resolve, reject) => {
       exec(
@@ -41,16 +45,17 @@ export class TypescriptTemplateRunnerService extends TemplateRunnerService {
             console.log('error', error, stdout, stderr);
             this.logger.error(`Error installing module ${module}`, error);
             if (stdout) {
-              this.appLogger.info(this.runId, stdout);
+              this.appLogger.info(this.runId, this.processId, stdout);
             }
             if (stderr) {
-              this.appLogger.error(this.runId, stderr);
+              this.appLogger.error(this.runId, this.processId, stderr);
             }
             reject(error);
           } else {
-            this.appLogger.info(this.runId, stdout);
+            this.appLogger.info(this.runId, this.processId, stdout);
             this.appLogger.info(
               this.runId,
+              this.processId,
               `Modules installed ${modules.join(' ')}`,
             );
 
@@ -76,21 +81,46 @@ export class TypescriptTemplateRunnerService extends TemplateRunnerService {
             this.logger.error(`Error compiling template`);
             this.logger.error('STDOUT\n' + stdout.substring(0, 1000));
             this.logger.error(stderr);
-            this.appLogger.error(this.runId, `Error compiling template`);
-            this.appLogger.error(this.runId, 'STDOUT\n' + stdout);
-            this.appLogger.error(this.runId, stderr.substring(0, 1000));
+            this.appLogger.error(
+              this.runId,
+              this.processId,
+              `Error compiling template`,
+            );
+            this.appLogger.error(
+              this.runId,
+              this.processId,
+              'STDOUT\n' + stdout,
+            );
+            this.appLogger.error(
+              this.runId,
+              this.processId,
+              stderr.substring(0, 1000),
+            );
             reject(error);
           } else {
             this.logger.log(`Template compiled`);
-            this.appLogger.info(this.runId, `Template compiled`);
+            this.appLogger.info(
+              this.runId,
+              this.processId,
+              `Template compiled`,
+            );
             resolve();
+            this.appLogger.info(
+              this.runId,
+              this.processId,
+              'Template compiled successfully',
+            );
             success = true;
           }
         });
       });
     } catch (error) {
-      this.appLogger.error(this.runId, `Error compiling template`);
-      this.appLogger.error(this.runId, error.toString());
+      this.appLogger.error(
+        this.runId,
+        this.processId,
+        `Error compiling template`,
+      );
+      this.appLogger.error(this.runId, this.processId, error.toString());
       this.logger.error(`Error compiling template`, error);
     }
     return success;
@@ -99,6 +129,7 @@ export class TypescriptTemplateRunnerService extends TemplateRunnerService {
   public startRunner(): Promise<void> {
     this.appLogger.info(
       this.runId,
+      this.processId,
       `Starting runner ` +
         this.processId +
         ' Test ID: ' +
@@ -125,18 +156,22 @@ export class TypescriptTemplateRunnerService extends TemplateRunnerService {
     );
 
     runner.stdout?.on('data', async (data) => {
-      await this.appLogger.info(this.runId, data.toString());
+      await this.appLogger.info(this.runId, this.processId, data.toString());
       console.log(data.toString());
     });
     runner.stderr?.on('data', async (data) => {
-      await this.appLogger.error(this.runId, data.toString());
+      await this.appLogger.error(this.runId, this.processId, data.toString());
       console.error(data.toString());
     });
 
     return new Promise<void>((resolve) => {
       runner.on('close', (code) => {
         this.logger.log(`Runner exited with code ${code}`);
-        this.appLogger.info(this.runId, `Runner exited with code ${code}`);
+        this.appLogger.info(
+          this.runId,
+          this.processId,
+          `Runner exited with code ${code}`,
+        );
         resolve();
       });
     });

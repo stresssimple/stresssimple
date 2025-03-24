@@ -11,9 +11,6 @@ export class TestEnvironment {
   @PrimaryColumn()
   id: string;
 
-  @Column()
-  serverId: string;
-
   @Column({ length: 50 })
   language: string;
 

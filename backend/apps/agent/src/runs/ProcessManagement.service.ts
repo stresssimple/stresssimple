@@ -7,7 +7,7 @@ import {
 } from '@infra/infrastructure';
 import { RunsService } from '@infra/infrastructure/mysql/runs.service';
 import { TestsService } from 'apps/application/src/app/tests/tests.service';
-import { TemplateRunnerSvcFactory } from '../../template-runner/TemplateRunnerFactory';
+import { TemplateRunnerSvcFactory } from '../template-runner/TemplateRunnerFactory';
 import { ServerInstance } from '@infra/infrastructure/servers.service';
 
 export class ServerRecord {
@@ -113,18 +113,24 @@ export class ProcessManagementService {
     const init = await templateRunner.initDirectory();
     if (!init) {
       this.logger.error('Failed to initialize directory.');
+      this.factory.removeRunnerSvc(proc.environmentId);
+      await this.envService.setEnvironmentFree(proc.environmentId);
       return false;
     }
 
     const packageInstaller = await templateRunner.packagesInstall(test.modules);
     if (!packageInstaller) {
       this.logger.error('Failed to install packages.');
+      this.factory.removeRunnerSvc(proc.environmentId);
+      await this.envService.setEnvironmentFree(proc.environmentId);
       return false;
     }
 
     const compile = await templateRunner.compileTemplate(r.source);
     if (!compile) {
       this.logger.error('Failed to compile source.');
+      this.factory.removeRunnerSvc(proc.environmentId);
+      await this.envService.setEnvironmentFree(proc.environmentId);
       return false;
     }
 
@@ -134,9 +140,14 @@ export class ProcessManagementService {
     });
     if (!runner) {
       this.logger.error('Failed to start runner.');
+      this.factory.removeRunnerSvc(proc.environmentId);
+      await this.envService.setEnvironmentFree(proc.environmentId);
       return false;
     }
     this.processes[r.processId].runner = runner;
+
+    this.factory.removeRunnerSvc(proc.environmentId);
+    await this.envService.setEnvironmentFree(proc.environmentId);
     return true;
   }
 }

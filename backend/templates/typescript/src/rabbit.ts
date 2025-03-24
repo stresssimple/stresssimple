@@ -34,19 +34,18 @@ export async function initRabbit(
   rabbit
     .createConsumer(
       {
-        queue: 'process:' + processId,
+        queue: 'run:' + runId,
         queueOptions: { autoDelete: true, durable: true },
         // handle 2 messages at a time
         qos: { prefetchCount: 1 },
         // Optionally ensure an exchange exists
-        exchanges: [{ exchange: 'process', type: 'topic', durable: true }],
+        exchanges: [{ exchange: 'run', type: 'topic', durable: true }],
         // With a "topic" exchange, messages matching this pattern are routed to the queue
-        queueBindings: [{ exchange: 'process', routingKey: runId }],
+        queueBindings: [{ exchange: 'run', routingKey: 'runCommand:' + runId }],
         lazy: true,
       },
       async (msg: AsyncMessage) => {
         const body = JSON.parse(msg.body.toString());
-        console.log('process command', body);
         switch (body.type) {
           case 'startUser':
             await runManager.startUser(body.userId);
@@ -54,8 +53,28 @@ export async function initRabbit(
           case 'stopUser':
             await runManager.stopUser(body.userId);
             break;
+          default:
+            console.log('Unknown message type', body.type);
+        }
+      },
+    )
+    .start();
+  rabbit
+    .createConsumer(
+      {
+        queue: 'process:' + processId,
+        queueOptions: { autoDelete: true, durable: true },
+        qos: { prefetchCount: 1 },
+        exchanges: [{ exchange: 'process', type: 'topic', durable: true }],
+        queueBindings: [
+          { exchange: 'process', routingKey: 'runCommand:' + processId },
+        ],
+        lazy: true,
+      },
+      async (msg: AsyncMessage) => {
+        const body = JSON.parse(msg.body.toString());
+        switch (body.type) {
           case 'stopAllUsers':
-            console.log('Stopping all users');
             await runManager.stopAllUsers();
             break;
           default:
