@@ -6,6 +6,7 @@
   "scripts": {
     "install": "cd backend && pnpm install && cd ../front && pnpm install",
     "start:backend": "cd backend && npm run start:dev",
+    "start:agent": "cd backend && nest start agent --watch",
     "start:frontend": "cd front && npm run dev",
     "compose:build": "docker compose -f docker-compose.infra.yaml -f docker-compose.dev.yaml build",
     "compose:down": "docker compose -f docker-compose.infra.yaml -f docker-compose.dev.yaml down",

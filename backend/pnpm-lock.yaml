@@ -50,6 +50,9 @@ importers:
       pino:
         specifier: ^9.6.0
         version: 9.6.0
+      rabbitmq-client:
+        specifier: ^5.0.2
+        version: 5.0.2
       reflect-metadata:
         specifier: ^0.1.13
         version: 0.1.14
@@ -2663,6 +2666,10 @@ packages:
 
   quick-format-unescaped@4.0.4:
     resolution: {integrity: sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==}
+
+  rabbitmq-client@5.0.2:
+    resolution: {integrity: sha512-rXEcDxBcGAokczKfVsyIhrIXdS4xcOqrMCMlBIMNEIxP43dNwApJWdt2PN3vKtjO/xCVAfOTT5r3rQAdXhuyyA==}
+    engines: {node: '>=16'}
 
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
@@ -6346,6 +6353,8 @@ snapshots:
   queue-microtask@1.2.3: {}
 
   quick-format-unescaped@4.0.4: {}
+
+  rabbitmq-client@5.0.2: {}
 
   randombytes@2.1.0:
     dependencies:

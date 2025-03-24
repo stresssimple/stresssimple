@@ -45,7 +45,6 @@ class RunManager:
         return True
 
     def start_user(self, user_id: str):
-        print(f"Starting user {user_id}")
         if user_id in self.users:
             print(f"User {user_id} is already running")
             return

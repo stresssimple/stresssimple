@@ -10,6 +10,13 @@
             "request": "launch",
             "command": "pnpm run start:backend",
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "node-terminal",
+            "name": "Run Script: start:agent",
+            "request": "launch",
+            "command": "pnpm run start:agent",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }

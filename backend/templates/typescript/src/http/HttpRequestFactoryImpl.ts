@@ -3,6 +3,7 @@ import { InfluxService } from '../influx/influx.service.js';
 import { HttpRequestFactory } from './HttpRequestFactory.js';
 import { HttpResponse } from './HttpResponse.js';
 import { ctx } from '../run.context.js';
+import { publisher } from '../rabbit.js';
 
 export class HttpRequestFactoryImpl implements HttpRequestFactory {
   private _url = '';
@@ -163,7 +164,12 @@ export class HttpRequestFactoryImpl implements HttpRequestFactory {
       record.responseBody = result.body?.toString();
     }
 
-    ctx.redis.publish('audit', JSON.stringify(record));
+    await publisher.send(
+      {
+        exchange: 'audit',
+      },
+      record,
+    );
   }
 
   private trace(
