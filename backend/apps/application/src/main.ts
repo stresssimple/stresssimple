@@ -6,6 +6,7 @@ import { swaggerSetup } from './app/swagger';
 import * as express from 'express';
 import { AllExceptionsFilter } from './globalErrorHandler';
 import { config } from 'dotenv';
+import { ServerInstance } from '@infra/infrastructure/servers.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(
@@ -30,5 +31,5 @@ async function bootstrap() {
   );
 }
 config();
-
+ServerInstance.instance.setType('api');
 bootstrap();

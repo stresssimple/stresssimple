@@ -17,8 +17,12 @@
 		ButtonGroup
 	} from 'flowbite-svelte';
 	import ScheduleRunModal from './ScheduleRunModal.svelte';
+	import axios from 'axios';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	let scheduleRunModalOpen = $state(false);
 	let timerInterval: number;
+	let servers = $state([]);
+	$inspect(servers);
 
 	afterNavigate(() => {
 		runsStore.clear();
@@ -26,7 +30,7 @@
 
 	onMount(() => {
 		runsStore.load(page.params.id);
-		timerInterval = setInterval(() => {
+		timerInterval = setInterval(async () => {
 			runsStore.load(page.params.id);
 		}, 1000);
 	});

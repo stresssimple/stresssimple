@@ -2,6 +2,7 @@
 	import '../app.css';
 	import { Navbar, NavBrand } from 'flowbite-svelte';
 	import Tests from '../lib/components/Tests.svelte';
+	import Servers from '$lib/components/Servers.svelte';
 
 	let { children } = $props();
 </script>
@@ -17,6 +18,7 @@
 	<div class="flex grow flex-row">
 		<div class="min-w-60 max-w-80 shadow-inner shadow-gray-200">
 			<Tests />
+			<Servers />
 		</div>
 		<div class="ml-2 h-full w-full">
 			{@render children()}

@@ -66,7 +66,12 @@ export class RunScheduler {
             routingKey: 'allocateProcess:' + server.serverId,
             run: run,
           })) as ProcessRecord;
-          if (!process) continue;
+          if (!process) {
+            this.logger.log(
+              'No process allocated on server ' + server.serverId,
+            );
+            continue;
+          }
           processes.push(process);
         } catch (e) {
           this.logger.warn('Failed to allocate process: ' + e.message);

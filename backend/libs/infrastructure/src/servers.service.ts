@@ -9,6 +9,7 @@ import { generateId } from './utils';
 
 export class ServerInstance {
   public setType(serverType: string) {
+    console.error('ServerInstance setType', serverType);
     this.type = serverType;
   }
   public type: string = 'default';
@@ -21,7 +22,9 @@ export class ServerInstance {
 
   private static _instance?: ServerInstance;
 
-  private constructor() {}
+  constructor() {
+    console.error('ServerInstance created');
+  }
 
   public static get instance() {
     return this._instance || (this._instance = new ServerInstance());
@@ -37,9 +40,6 @@ export class ServersService
   private readonly serverKey: string;
 
   constructor(private readonly redis: Redis) {
-    console.log('ServersService created');
-    this.serverType = process.env['SERVER_TYPE'] || 'default';
-    ServerInstance.instance.setType(this.serverType);
     this.serverKey = `servers:${this.serverType}:${ServerInstance.instance.serverId}`;
   }
 

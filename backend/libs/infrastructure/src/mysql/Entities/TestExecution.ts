@@ -3,6 +3,7 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 export type TestExecutionStatus =
   | 'created'
+  | 'waitingForSchedule'
   | 'running'
   | 'completed'
   | 'cancelled'

@@ -11,6 +11,8 @@ import { HttpModule } from './http/http.module';
 import { RunsController } from './api/runs.controller';
 import { RunReportController } from './api/RunReport.controller';
 import { AuditController } from './api/Audit.controller';
+import { Server } from 'mysql2/typings/mysql/lib/Server';
+import { ServersController } from './api/ServersController';
 
 @Module({
   imports: [
@@ -22,7 +24,12 @@ import { AuditController } from './api/Audit.controller';
     HttpModule,
     TestsModule,
   ],
-  controllers: [RunsController, RunReportController, AuditController],
+  controllers: [
+    RunsController,
+    RunReportController,
+    AuditController,
+    ServersController,
+  ],
   providers: [],
 })
 export class AppModule {}

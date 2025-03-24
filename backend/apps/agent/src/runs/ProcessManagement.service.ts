@@ -60,6 +60,7 @@ export class ProcessManagementService {
     if (Object.keys(this.processes).length >= this.maxProcesses) {
       return null;
     }
+    ServerInstance.instance.properties['activeProcesses']++;
 
     this.logger.log('Allocating process for ' + data.run.id);
     const testDefinitions = await this.testsService.getTest(data.run.testId);
@@ -146,8 +147,12 @@ export class ProcessManagementService {
     }
     this.processes[r.processId].runner = runner;
 
-    this.factory.removeRunnerSvc(proc.environmentId);
-    await this.envService.setEnvironmentFree(proc.environmentId);
+    runner.finally(async () => {
+      this.factory.removeRunnerSvc(proc.environmentId);
+      await this.envService.setEnvironmentFree(proc.environmentId);
+      this.logger.log('Process ended!!!!!');
+      ServerInstance.instance.properties['activeProcesses']--;
+    });
     return true;
   }
 }
