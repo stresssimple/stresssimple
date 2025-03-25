@@ -9,7 +9,7 @@ import { Module } from '@nestjs/common';
 import { TestsModule } from './tests/tests.module';
 import { HttpModule } from './http/http.module';
 import { RunsController } from './api/runs.controller';
-import { RunReportController } from './api/RunReport.controller';
+import { RunReportController } from './api/runReport.controller';
 import { AuditController } from './api/Audit.controller';
 import { ServersController } from './api/ServersController';
 
