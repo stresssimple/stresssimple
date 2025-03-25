@@ -14,6 +14,16 @@ variable "mysql-root-password" {
   sensitive = true
 }
 
+variable "mysql-user-password" {
+  type      = string
+  sensitive = true
+}
+
+variable "mysql-user-name" {
+  type      = string
+  sensitive = false
+
+}
 
 variable "influxdb-root-password" {
   type      = string

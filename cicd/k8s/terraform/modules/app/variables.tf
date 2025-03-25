@@ -29,7 +29,7 @@ variable "namespace" {
 variable "backend-api-image" {
   description = "The image of the backend API"
   type        = string
-  default     = "ghcr.io/stresssimple/backend:1742867369"
+  default     = "ghcr.io/stresssimple/backend:1742914694"
   validation {
     condition     = length(var.backend-api-image) > 0
     error_message = "The backend-api-image must not be empty"

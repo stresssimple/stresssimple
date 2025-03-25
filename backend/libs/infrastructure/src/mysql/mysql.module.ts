@@ -11,6 +11,7 @@ import * as path from 'path';
 import { RunsService } from './runs.service';
 import { ServerRecord } from './Entities/Server';
 import { ServersService } from './servers.service';
+import mysql2 from 'mysql2';
 export const mySqlEntities = [
   Test,
   TestExecution,
@@ -35,13 +36,8 @@ export const mySqlEntities = [
           database: process.env['MYSQL_DATABASE'],
           entities: mySqlEntities,
           synchronize: true,
-          extra: {
-            authPlugins: {
-              mysql_clear_password: false,
-              mysql_native_password: false,
-              caching_sha2_password: true,
-            },
-          },
+          insecureAuth: true,
+          driver: mysql2,
         };
       },
     }),

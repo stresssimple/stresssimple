@@ -39,6 +39,16 @@ resource "helm_release" "mysql" {
   }
 
   set {
+    name  = "auth.username"
+    value = var.mysql-user-name
+  }
+
+  set {
+    name  = "auth.password"
+    value = var.mysql-user-password
+  }
+
+  set {
     name  = "primary.persistence.enabled"
     value = "true"
   }

@@ -77,10 +77,14 @@ resource "random_password" "influxdb-admin-token" {
 }
 
 module "infra" {
-  source                 = "./modules/infra"
-  rabbitmq-username      = var.rabbitmq-username
-  rabbitmq-password      = random_password.rabbitmq-password.result
-  mysql-root-password    = random_password.mysql-root-password.result
+  source              = "./modules/infra"
+  rabbitmq-username   = var.rabbitmq-username
+  rabbitmq-password   = random_password.rabbitmq-password.result
+  mysql-root-password = random_password.mysql-root-password.result
+  mysql-user-name     = var.mysql-username
+  mysql-user-password = random_password.mysql-password.result
+
+
   influxdb-root-password = random_password.influxdb-root-password.result
   influxdb-password      = random_password.influxdb-password.result
   influxdb-admin-token   = random_password.influxdb-admin-token.result
