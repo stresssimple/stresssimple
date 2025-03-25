@@ -11,7 +11,6 @@ import { HttpModule } from './http/http.module';
 import { RunsController } from './api/runs.controller';
 import { RunReportController } from './api/RunReport.controller';
 import { AuditController } from './api/Audit.controller';
-import { Server } from 'mysql2/typings/mysql/lib/Server';
 import { ServersController } from './api/ServersController';
 
 @Module({
