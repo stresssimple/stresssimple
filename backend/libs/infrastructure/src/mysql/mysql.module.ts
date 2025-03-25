@@ -1,17 +1,11 @@
 import * as fs from 'fs';
-import {
-  Logger,
-  Module,
-  OnApplicationBootstrap,
-  forwardRef,
-} from '@nestjs/common';
+import { Logger, Module, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { AuditRecord } from './Entities/AuditRecord';
 import { LogRecord } from './Entities/LogRecord';
 import { Test } from './Entities/Test';
 import { TestEnvironment } from './Entities/TestEnvironment';
 import { TestExecution } from './Entities/TestExecution';
-import { TestEnvironmentService } from './TestEnvironment.service';
 import { Repository } from 'typeorm';
 import * as path from 'path';
 import { RunsService } from './runs.service';
@@ -46,8 +40,8 @@ export const mySqlEntities = [
     }),
     TypeOrmModule.forFeature(mySqlEntities),
   ],
-  providers: [TestEnvironmentService, RunsService, ServersService],
-  exports: [TestEnvironmentService, RunsService, ServersService],
+  providers: [RunsService, ServersService],
+  exports: [RunsService, ServersService],
 })
 export class MysqlModule implements OnApplicationBootstrap {
   constructor(

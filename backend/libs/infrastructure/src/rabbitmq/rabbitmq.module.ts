@@ -13,7 +13,7 @@ const config = () => {
       { name: 'audit', type: 'topic' },
       { name: 'process', type: 'topic', durable: true },
     ],
-    uri: 'amqp://guest:guest@localhost:5672',
+    uri: process.env['RABBITMQ_URI'] || 'amqp://guest:guest@localhost:5672',
   };
 };
 

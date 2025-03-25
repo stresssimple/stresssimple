@@ -16,6 +16,7 @@ import { TestsModule } from 'apps/application/src/app/tests/tests.module';
 import { TemplateRunnerModule } from '../template-runner/templateRunner.module';
 import { AuditWriter } from './audit.writer';
 import { RunnersManager } from './runners.manager';
+import { TestEnvironmentService } from '../TestEnvironment.service';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { RunnersManager } from './runners.manager';
     AuditWriter,
     ProcessManagementService,
     RunsManagementController,
+    TestEnvironmentService,
     RunScheduler,
     {
       provide: Logger,

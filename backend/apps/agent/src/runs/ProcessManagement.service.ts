@@ -1,15 +1,12 @@
 import * as os from 'os';
 import { Injectable, Logger } from '@nestjs/common';
 import { RabbitRPC } from '@golevelup/nestjs-rabbitmq';
-import {
-  generateId,
-  TestEnvironmentService,
-  PublishBus,
-} from '@infra/infrastructure';
+import { generateId, PublishBus } from '@infra/infrastructure';
 import { RunsService } from '@infra/infrastructure/mysql/runs.service';
 import { TestsService } from 'apps/application/src/app/tests/tests.service';
 import { TemplateRunnerSvcFactory } from '../template-runner/TemplateRunnerFactory';
 import { thisServer } from '@infra/infrastructure/mysql/servers.service';
+import { TestEnvironmentService } from '../TestEnvironment.service';
 
 export class ProcessRecord {
   processId: string;

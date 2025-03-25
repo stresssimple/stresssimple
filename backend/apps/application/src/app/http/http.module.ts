@@ -1,5 +1,5 @@
+import { InfluxModule } from '@infra/infrastructure';
 import { Module } from '@nestjs/common';
-import { InfluxModule } from '../../../../../libs/infrastructure/src/influxdb/influx.module';
 
 @Module({
   imports: [InfluxModule],

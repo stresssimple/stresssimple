@@ -1,5 +1,5 @@
+import { TestEnvironment } from '@infra/infrastructure';
 import { Injectable, Logger } from '@nestjs/common';
-import { TestEnvironment } from './Entities/TestEnvironment';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
 

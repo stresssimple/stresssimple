@@ -1,5 +1,4 @@
 export * from './mysql.module';
-export * from './TestEnvironment.service';
 export * from './Entities/AuditRecord';
 export * from './Entities/LogRecord';
 export * from './Entities/TestEnvironment';

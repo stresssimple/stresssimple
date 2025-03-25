@@ -1,9 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TestDefinitions } from '../dto/TestDefinitions';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Test } from '../../../../../libs/infrastructure/src/mysql/Entities/Test';
 import { Repository } from 'typeorm';
-import { generateId } from '../../../../../libs/infrastructure/src/utils/id';
+import { generateId, Test } from '@infra/infrastructure';
 
 @Injectable()
 export class TestsService {

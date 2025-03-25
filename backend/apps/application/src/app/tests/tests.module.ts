@@ -3,7 +3,7 @@ import { TestsService } from './tests.service';
 import { TestsController } from './tests.controller';
 import { INQUIRER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Test } from '../../../../../libs/infrastructure/src/mysql/Entities/Test';
+import { Test } from '@infra/infrastructure';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Test])],

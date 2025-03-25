@@ -26,52 +26,6 @@ variable "namespace" {
   }
 }
 
-variable "backend-api-image" {
-  description = "The image of the backend API"
-  type        = string
-  default     = "gcr.io/stresssimple/backend-api:latest"
-  validation {
-    condition     = length(var.backend-api-image) > 0
-    error_message = "The backend-api-image must not be empty"
-  }
-}
-
-variable "backend-api-replicas" {
-  description = "The number of replicas for the backend API"
-  type        = number
-  default     = 0
-  validation {
-    condition     = var.backend-api-replicas > 0
-    error_message = "The backend-api-replicas must be greater than 0"
-  }
-}
-
-
-///Agent
-///Agent
-///Agent
-///Agent
-variable "backend-agent-image" {
-  description = "The image of the backend worker"
-  type        = string
-  default     = "gcr.io/stresssimple/backend-agent:latest"
-  validation {
-    condition     = length(var.backend-agent-image) > 0
-    error_message = "The backend-worker-image must not be empty"
-  }
-}
-
-variable "frontend-image" {
-  description = "The image of the frontend"
-  type        = string
-  default     = "gcr.io/stresssimple/frontend:latest"
-  validation {
-    condition     = length(var.frontend-image) > 0
-    error_message = "The frontend-image must not be empty"
-  }
-}
-
-
 //// Rabbitmq
 variable "rabbitmq-username" {
   description = "The username for RabbitMQ"
@@ -83,6 +37,7 @@ variable "rabbitmq-username" {
   }
 }
 
+//// Influxdb
 variable "influxdb-username" {
   description = "The username for InfluxDB"
   type        = string
@@ -92,3 +47,15 @@ variable "influxdb-username" {
     error_message = "The influxdb-username must not be empty"
   }
 }
+
+variable "mysql-username" {
+  description = "The username for MySQL"
+  type        = string
+  default     = "stress-simple"
+  validation {
+    condition     = length(var.mysql-username) > 0
+    error_message = "The mysql-username must not be empty"
+  }
+}
+
+
