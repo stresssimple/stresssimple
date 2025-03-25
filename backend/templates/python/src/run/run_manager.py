@@ -1,3 +1,4 @@
+import asyncio
 import json
 import sys
 import time
@@ -16,7 +17,8 @@ class RunManager:
         self.influx = InfluxService()
 
     def message_handler(self, message):
-        data = json.loads(message)
+        data = message
+        print(f"Client Received message: {data}", flush=True)
         if data["type"] == "startUser":
             self.start_user(data["userId"])
         elif data["type"] == "stopUser":
@@ -50,7 +52,7 @@ class RunManager:
 
     async def run(self):
         while not self.should_stop or not self.all_users_stopped():
-            time.sleep(1)
+            await asyncio.sleep(10)
             await self.influx.write(
                 'running_users',
                 {

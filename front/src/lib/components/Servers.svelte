@@ -11,6 +11,9 @@
 			<div class="m-2">
 				<div>Processes {server.allocatedProcesses}/{server.maxProcesses}</div>
 			</div>
+			<span class="m-2 text-xs">
+				{server.lastHeartbeat}
+			</span>
 		</div>
 	{/each}
 </div>

@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { PUBLIC_API_URL } from '$env/static/public';
 import axios from 'axios';
 import { writable } from 'svelte/store';
@@ -7,6 +8,10 @@ function createServersStore() {
 	const { subscribe, set } = writable<Record<string, any>[]>([]);
 
 	setInterval(async () => {
+		if (!browser) {
+			return;
+		}
+
 		const response = await axios.get(PUBLIC_API_URL + '/servers/list/agent');
 		const data = await response.data;
 		set(data);

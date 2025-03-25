@@ -7,31 +7,43 @@ processId = None
 runId = None
 
 
-async def handle_run_queue(queue):
+async def handle_run_queue(queue, message_handler):
     print("Client Handling run queue", flush=True)
-    async with queue.iterator() as queue_iter:
-        print("Client Iterating run queue", flush=True)
-        async for message in queue_iter:
-            print("Client Processing run queue", flush=True)
-            async with message.process():
-                print(message.body.decode(), flush=True)
-                if queue.name in message.body.decode():
-                    break
+    try:
+        async with queue.iterator() as queue_iter:
+            print("Client Iterating run queue", flush=True)
+            async for message in queue_iter:
+                try:
+                    print("Client Processing run queue", flush=True)
+                    async with message.process():
+                        print(message.body.decode(), flush=True)
+                        msg = json.loads(message.body.decode())
+                        message_handler(msg)
+                except Exception as e:
+                    print(f"Error processing message: {e}", flush=True)
+    except Exception as e:
+        print(f"Error with queue iterator: {e}", flush=True)
 
 
-async def handle_process_queue(queue):
+async def handle_process_queue(queue: aio_pika.abc.AbstractQueue, message_handler):
     print("Client Handling process queue", flush=True)
-    async with queue.iterator() as queue_iter:
-        print("Client Iterating process queue", flush=True)
-        async for message in queue_iter:
-            print("Client Processing process queue", flush=True)
-            async with message.process():
-                print(message.body.decode(), flush=True)
-                if queue.name in message.body.decode():
-                    break
+    try:
+        async with queue.iterator() as queue_iter:
+            print("Client Iterating process queue", flush=True)
+            async for message in queue_iter:
+                try:
+                    print("Client Processing process queue", flush=True)
+                    async with message.process():
+                        print(message.body.decode(), flush=True)
+                        msg = json.loads(message.body.decode())
+                        message_handler(msg)
+                except Exception as e:
+                    print(f"Error processing message: {e}", flush=True)
+    except Exception as e:
+        print(f"Error with queue iterator: {e}", flush=True)
 
 
-async def init_rabbitmq(loop, process_id, run_id):
+async def init_rabbitmq(loop: asyncio.AbstractEventLoop, process_id, run_id, messsage_handler):
     global processId, runId
     processId = process_id
     runId = run_id
@@ -63,14 +75,15 @@ async def init_rabbitmq(loop, process_id, run_id):
         durable=True,
         auto_delete=True,
     )
+
     run_exchange = await run_channel.declare_exchange('run', aio_pika.ExchangeType.TOPIC, durable=True)
     proc_exchange = await proc_channel.declare_exchange('process', aio_pika.ExchangeType.TOPIC, durable=True)
 
     await proc_queue.bind(proc_exchange, routing_key='runCommand:'+process_id)
     await run_queue.bind(run_exchange, routing_key='runCommand:'+run_id)
 
-    asyncio.create_task(await handle_run_queue(run_queue))
-    asyncio.create_task(await handle_process_queue(proc_queue))
+    asyncio.create_task(handle_run_queue(run_queue, messsage_handler))
+    asyncio.create_task(handle_process_queue(proc_queue, messsage_handler))
 
     await run_exchange.publish(
         aio_pika.Message(
@@ -81,3 +94,5 @@ async def init_rabbitmq(loop, process_id, run_id):
         ),
         routing_key="runnerStarted",
     )
+
+    print("Client Published runnerStarted", flush=True)

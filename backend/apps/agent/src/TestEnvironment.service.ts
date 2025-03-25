@@ -17,7 +17,7 @@ export class TestEnvironmentService {
 
     if (!existsSync(dir)) {
       this.logger.warn(`Directory ${dir} does not exist. Creating it`);
-      mkdirSync(dir);
+      mkdirSync(dir, { recursive: true });
     }
 
     if (!existsSync(this.fileName)) {

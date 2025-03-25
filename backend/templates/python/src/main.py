@@ -24,9 +24,8 @@ async def main():
 
     loop = asyncio.get_event_loop()
 
-    await init_rabbitmq(loop, process_id, run_id)
-
     run_manager = RunManager(Test(),  run_id)
+    await init_rabbitmq(loop, process_id, run_id, run_manager.message_handler)
 
     print("Client Runner started", flush=True)
 
@@ -39,5 +38,5 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+    asyncio.run(main())
     sys.exit(0)

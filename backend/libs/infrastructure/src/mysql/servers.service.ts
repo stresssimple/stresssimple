@@ -38,15 +38,17 @@ export class ServersService
   }
 
   public async onApplicationBootstrap() {
-    const iteration = 0;
     this.interval = setInterval(async () => {
       thisServer.lastHeartbeat = new Date();
       await this.repository.save(thisServer);
-      if (iteration % 10 === 0) {
-        this.repository.delete({
-          lastHeartbeat: LessThan(new Date(Date.now() - 10000)),
-        });
-      }
+      const toDelete = await this.repository.find({
+        where: {
+          lastHeartbeat: LessThan(new Date(Date.now() - 3000)),
+        },
+      });
+      toDelete.forEach(async (server) => {
+        await this.repository.delete(server);
+      });
     }, 1000);
   }
 }
