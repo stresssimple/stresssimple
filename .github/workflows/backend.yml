@@ -33,7 +33,7 @@ jobs:
 
           # If the branch is not master, include the branch name in the tag
           if [[ "$BRANCH_NAME" != "master" ]]; then
-          docker build backend/ --file backend/Dockerfile --tag $IMAGE_NAME:$TAG_NAME
+            docker build backend/ --file backend/Dockerfile --tag $IMAGE_NAME:$TAG_NAME
           else
             TAG_NAME="$TIMESTAMP"
           docker push $IMAGE_NAME:$TAG_NAME
