@@ -10,7 +10,9 @@ from run.user_runner import UserRunner
 
 
 class RunManager:
-    def __init__(self, test: StressTest,  run_id: str):
+    audit_exchange = None
+
+    def __init__(self, test: StressTest):
         self.users = {}
         self.should_stop = False
         self.test = test
@@ -34,7 +36,8 @@ class RunManager:
         if user_id in self.users:
             print(f"User {user_id} is already running")
             return
-        self.users[user_id] = UserRunner(user_id, self.test)
+        self.users[user_id] = UserRunner(
+            user_id, self.test)
         self.users[user_id].start()
 
     def stop_user(self, user_id: str):
@@ -52,7 +55,7 @@ class RunManager:
 
     async def run(self):
         while not self.should_stop or not self.all_users_stopped():
-            await asyncio.sleep(10)
+            await asyncio.sleep(1)
             await self.influx.write(
                 'running_users',
                 {
@@ -65,6 +68,7 @@ class RunManager:
             )
         print(
             f"All users stopped: {self.should_stop}, {self.all_users_stopped()}")
+        print("Client Runner finished", flush=True)
 
     def all_users_stopped(self):
         for user_id in self.users:

@@ -37,16 +37,52 @@ variable "rabbitmq-username" {
   }
 }
 
+
+variable "rabbitmq-vhost" {
+  description = "The vhost for RabbitMQ"
+  type        = string
+  default     = "rabbitmq:5672"
+  validation {
+    condition     = length(var.rabbitmq-vhost) > 0
+    error_message = "The rabbitmq-vhost must not be empty"
+  }
+
+}
+
 //// Influxdb
-variable "influxdb-username" {
-  description = "The username for InfluxDB"
+variable "influxdb-bucket" {
+  description = "The bucket for InfluxDB"
+  type        = string
+  default     = "test-runs"
+  validation {
+    condition     = length(var.influxdb-bucket) > 0
+    error_message = "The influxdb-bucket must not be empty"
+  }
+}
+
+variable "influxdb-org" {
+  description = "The organization for InfluxDB"
   type        = string
   default     = "stress-simple"
   validation {
-    condition     = length(var.influxdb-username) > 0
-    error_message = "The influxdb-username must not be empty"
+    condition     = length(var.influxdb-org) > 0
+    error_message = "The influxdb-org must not be empty"
   }
 }
+
+
+variable "influxdb-uri" {
+  description = "The URI for InfluxDB"
+  type        = string
+  default     = "http://influxdb:8086"
+  validation {
+    condition     = length(var.influxdb-uri) > 0
+    error_message = "The influxdb-uri must not be empty"
+  }
+}
+
+
+
 
 variable "mysql-username" {
   description = "The username for MySQL"

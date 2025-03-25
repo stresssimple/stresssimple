@@ -24,12 +24,14 @@ resource "kubernetes_secret" "rabbitmq-secret" {
     }
   }
   data = {
-    RABBITMQ_USER     = var.rabbitmq-username
-    RABBITMQ_PASSWORD = var.rabbitmq-password
-    RABBITMQ_VHOST    = var.rabbitmq-vhost
+    RABBITMQ_URI = "amqp://${var.rabbitmq-username}:${var.rabbitmq-password}@${var.rabbitmq-vhost}"
   }
 }
 
+#   - INFLUXDB_URL=http://influxdb:8086
+#   - INFLUXDB_TOKEN=my-secret-token
+#   - INFLUXDB_ORG=my-org
+#   - INFLUXDB_BUCKET=test-runs
 resource "kubernetes_secret" "influx-secret" {
   metadata {
     name      = "influx-secret"
@@ -39,10 +41,9 @@ resource "kubernetes_secret" "influx-secret" {
     }
   }
   data = {
-    INFLUXDB_USER     = var.influxdb-username
-    INFLUXDB_PASSWORD = var.influxdb-password
-    INFLUXDB_DATABASE = var.influxdb-database
-    INFLUXDB_HOST     = var.influxdb-host
-    INFLUXDB_PORT     = var.influxdb-port
+    INFLUXDB_URL    = var.influxdb-uri
+    INFLUXDB_TOKEN  = var.influxdb-admin-token
+    INFLUXDB_ORG    = var.influxdb-org
+    INFLUXDB_BUCKET = var.influxdb-bucket
   }
 }

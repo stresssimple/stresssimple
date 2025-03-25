@@ -67,7 +67,14 @@ resource "random_password" "influxdb-password" {
   upper   = true
 }
 
+resource "random_password" "influxdb-admin-token" {
+  length  = 32
+  special = false
+  numeric = true
+  lower   = true
+  upper   = true
 
+}
 
 module "infra" {
   source                 = "./modules/infra"
@@ -75,8 +82,11 @@ module "infra" {
   rabbitmq-password      = random_password.rabbitmq-password.result
   mysql-root-password    = random_password.mysql-root-password.result
   influxdb-root-password = random_password.influxdb-root-password.result
-  influxdb-username      = var.influxdb-username
   influxdb-password      = random_password.influxdb-password.result
+  influxdb-admin-token   = random_password.influxdb-admin-token.result
+  influxdb-bucket        = var.influxdb-bucket
+  influxdb-org           = var.influxdb-org
+
 
   namespace  = var.namespace
   depends_on = [kubernetes_namespace.kubernetes_namespace]
@@ -85,13 +95,18 @@ module "infra" {
 module "app" {
   source = "./modules/app"
 
-  app_name          = var.app_name
-  mysql-username    = var.mysql-username
-  mysql-password    = random_password.mysql-password.result
+  app_name       = var.app_name
+  mysql-username = var.mysql-username
+  mysql-password = random_password.mysql-password.result
+
   rabbitmq-username = var.rabbitmq-username
   rabbitmq-password = random_password.rabbitmq-password.result
-  influxdb-username = var.influxdb-username
-  influxdb-password = random_password.influxdb-password.result
+  rabbitmq-vhost    = var.rabbitmq-vhost
+
+  influxdb-admin-token = random_password.influxdb-admin-token.result
+  influxdb-uri         = var.influxdb-uri
+  influxdb-org         = var.influxdb-org
+  influxdb-bucket      = var.influxdb-bucket
 
   namespace  = var.namespace
   depends_on = [module.infra]

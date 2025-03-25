@@ -89,12 +89,12 @@ class HttpRequestFactory:
 
             duration = time.time() - start
             await self.trace(duration, is_successful, result.get("status"))
-            self.audit(request_data, result, duration, is_successful)
+            await self.audit(request_data, result, duration, is_successful)
         except Exception as e:
             print(e)
         return result
 
-    def audit(self, request, result, duration, success):
+    async def audit(self, request, result, duration, success):
         record = {
             "runId": ctx.run_id,
             "baseUrl": self._base_url,
@@ -110,7 +110,15 @@ class HttpRequestFactory:
             "requestBody": json.dumps(request.get("body", {})),
             "responseBody": json.dumps(result.get("body", {}))
         }
-        Exception("Audit record", record)
+
+        if (ctx.audit_exchange is None):
+            print("Audit exchange not set")
+            return
+
+        await ctx.audit_exchange.publish(
+            json.dumps(record),
+            routing_key='audit',
+        )
 
     async def trace(self, duration, is_successful, status):
         data = {

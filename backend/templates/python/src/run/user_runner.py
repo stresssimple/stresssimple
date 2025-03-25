@@ -20,6 +20,7 @@ class UserRunner:
         self.influx = InfluxService()
 
     def stop(self):
+        print(f'Stopping user {self.user_id}')
         self.status = self.STOPPING
         if self._thread:
             self._thread.join()
@@ -61,8 +62,8 @@ class UserRunner:
                 )
                 await self._sleep(self.test.interval())
 
-                self.status = self.STOPPED
-                print(f'User {self.user_id} stopped')
+        self.status = self.STOPPED
+        print(f'User {self.user_id} stopped')
 
     async def wait_stopped(self):
         await self._thread

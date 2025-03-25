@@ -30,3 +30,23 @@ variable "influxdb-password" {
   sensitive = true
 }
 
+
+variable "influxdb-admin-token" {
+  type      = string
+  sensitive = true
+
+}
+
+variable "influxdb-org" {
+  type        = string
+  sensitive   = false
+  default     = "stress-simple"
+  description = "value for the organization"
+}
+
+variable "influxdb-bucket" {
+  type        = string
+  sensitive   = false
+  default     = "test-runs"
+  description = "value for the bucket"
+}

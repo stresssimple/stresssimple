@@ -2,97 +2,108 @@ import asyncio
 import json
 import aio_pika
 
-channel = None
-processId = None
-runId = None
 
+class RabbitMQ:
+    def __init__(self, loop: asyncio.AbstractEventLoop, process_id, run_id):
+        self.loop = loop
+        self.process_id = process_id
+        self.run_id = run_id
 
-async def handle_run_queue(queue, message_handler):
-    print("Client Handling run queue", flush=True)
-    try:
-        async with queue.iterator() as queue_iter:
-            print("Client Iterating run queue", flush=True)
-            async for message in queue_iter:
-                try:
-                    print("Client Processing run queue", flush=True)
-                    async with message.process():
-                        print(message.body.decode(), flush=True)
-                        msg = json.loads(message.body.decode())
-                        message_handler(msg)
-                except Exception as e:
-                    print(f"Error processing message: {e}", flush=True)
-    except Exception as e:
-        print(f"Error with queue iterator: {e}", flush=True)
+    async def _handle_run_queue(self, queue, message_handler):
+        try:
+            async with queue.iterator() as queue_iter:
+                async for message in queue_iter:
+                    try:
+                        async with message.process():
+                            print(message.body.decode(), flush=True)
+                            msg = json.loads(message.body.decode())
+                            message_handler(msg)
+                    except Exception as e:
+                        print(f"Error processing message: {e}", flush=True)
+        except Exception as e:
+            print(f"Error with queue iterator: {e}", flush=True)
 
+    async def _handle_process_queue(self, queue: aio_pika.abc.AbstractQueue, message_handler):
+        try:
+            async with queue.iterator() as queue_iter:
+                async for message in queue_iter:
+                    try:
+                        async with message.process():
+                            print(message.body.decode(), flush=True)
+                            msg = json.loads(message.body.decode())
+                            message_handler(msg)
+                    except Exception as e:
+                        print(f"Error processing message: {e}", flush=True)
+        except Exception as e:
+            print(f"Error with queue iterator: {e}", flush=True)
 
-async def handle_process_queue(queue: aio_pika.abc.AbstractQueue, message_handler):
-    print("Client Handling process queue", flush=True)
-    try:
-        async with queue.iterator() as queue_iter:
-            print("Client Iterating process queue", flush=True)
-            async for message in queue_iter:
-                try:
-                    print("Client Processing process queue", flush=True)
-                    async with message.process():
-                        print(message.body.decode(), flush=True)
-                        msg = json.loads(message.body.decode())
-                        message_handler(msg)
-                except Exception as e:
-                    print(f"Error processing message: {e}", flush=True)
-    except Exception as e:
-        print(f"Error with queue iterator: {e}", flush=True)
+    async def init_rabbitmq(self, messsage_handler):
 
+        # Create our connection object,
+        # passing in the on_open and on_close methods
 
-async def init_rabbitmq(loop: asyncio.AbstractEventLoop, process_id, run_id, messsage_handler):
-    global processId, runId
-    processId = process_id
-    runId = run_id
+        connection = await aio_pika.connect_robust(
+            "amqp://guest:guest@127.0.0.1/", loop=self.loop,
+        )
 
-    # Create our connection object,
-    # passing in the on_open and on_close methods
+        connection.close_callbacks.add(lambda x, y: print(
+            "Client RabbitMQ Connection closed", flush=True))
+        print("Client Connected to RabbitMQ", flush=True)
 
-    connection = await aio_pika.connect_robust(
-        "amqp://guest:guest@127.0.0.1/", loop=loop,
-    )
+        # Creating channel
+        self.run_channel: aio_pika.abc.AbstractChannel = await connection.channel()
+        self.proc_channel: aio_pika.abc.AbstractChannel = await connection.channel()
+        self.pub_channel: aio_pika.abc.AbstractChannel = await connection.channel()
+        # Declaring queue
+        audit_exchange = await self.pub_channel.declare_exchange(
+            "audit", aio_pika.ExchangeType.TOPIC, durable=True)
 
-    connection.close_callbacks.add(lambda x, y: print(
-        "!!!!!!!!!!!!!Client Connection closed!!!!!!!!!!!!!", flush=True))
-    print("Client Connected to RabbitMQ", flush=True)
+        print(f"Client Declared Audit exchange {audit_exchange}", flush=True)
 
-    # Creating channel
-    run_channel: aio_pika.abc.AbstractChannel = await connection.channel()
-    proc_channel: aio_pika.abc.AbstractChannel = await connection.channel()
+        self.run_queue: aio_pika.abc.AbstractQueue = await self.run_channel.declare_queue(
+            "run:"+self.run_id,
+            durable=True,
+            auto_delete=True,
+        )
+        self.proc_queue: aio_pika.abc.AbstractQueue = await self.proc_channel.declare_queue(
+            "process:"+self.process_id,
+            durable=True,
+            auto_delete=True,
+        )
 
-    # Declaring queue
+        self.run_exchange = await self.run_channel.declare_exchange('run', aio_pika.ExchangeType.TOPIC, durable=True)
+        self.proc_exchange = await self.proc_channel.declare_exchange('process', aio_pika.ExchangeType.TOPIC, durable=True)
 
-    run_queue: aio_pika.abc.AbstractQueue = await run_channel.declare_queue(
-        "run:"+run_id,
-        durable=True,
-        auto_delete=True,
-    )
-    proc_queue: aio_pika.abc.AbstractQueue = await proc_channel.declare_queue(
-        "process:"+processId,
-        durable=True,
-        auto_delete=True,
-    )
+        await self.proc_queue.bind(self.proc_exchange, routing_key='runCommand:'+self.process_id)
+        await self.run_queue.bind(self.run_exchange, routing_key='runCommand:'+self.run_id)
 
-    run_exchange = await run_channel.declare_exchange('run', aio_pika.ExchangeType.TOPIC, durable=True)
-    proc_exchange = await proc_channel.declare_exchange('process', aio_pika.ExchangeType.TOPIC, durable=True)
+        self.run_consumer = asyncio.create_task(
+            self._handle_run_queue(self.run_queue, messsage_handler))
+        self.process_consumer = asyncio.create_task(self._handle_process_queue(
+            self.proc_queue, messsage_handler))
+        await self.run_exchange.publish(
+            aio_pika.Message(
+                body=json.dumps({
+                    "processId": self.process_id,
+                    "runId": self.run_id
+                }).encode()
+            ),
+            routing_key="runnerStarted",
+        )
 
-    await proc_queue.bind(proc_exchange, routing_key='runCommand:'+process_id)
-    await run_queue.bind(run_exchange, routing_key='runCommand:'+run_id)
+        print("Client Published runnerStarted", flush=True)
+        return audit_exchange
 
-    asyncio.create_task(handle_run_queue(run_queue, messsage_handler))
-    asyncio.create_task(handle_process_queue(proc_queue, messsage_handler))
+    def destroy(self):
+        self.run_queue.cancel()
+        self.proc_queue.cancel()
+        self.run_exchange.cancel()
+        self.proc_exchange.cancel()
+        self.run_channel.close()
+        self.proc_channel.close()
+        self.pub_channel.close()
 
-    await run_exchange.publish(
-        aio_pika.Message(
-            body=json.dumps({
-                "processId": processId,
-                "runId": runId
-            }).encode()
-        ),
-        routing_key="runnerStarted",
-    )
-
-    print("Client Published runnerStarted", flush=True)
+        self.run_consumer.cancel()
+        self.process_consumer.cancel()
+        self.loop.stop()
+        print("Client RabbitMQ Destroyed", flush=True)

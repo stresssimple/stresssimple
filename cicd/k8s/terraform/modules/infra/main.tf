@@ -75,6 +75,21 @@ resource "helm_release" "influxdb" {
   }
 
   set {
+    name  = "auth.admin.token"
+    value = var.influxdb-admin-token
+  }
+
+  set {
+    name  = "auth.admin.org"
+    value = var.influxdb-org
+  }
+
+  set {
+    name  = "auth.admin.bucket"
+    value = var.influxdb-bucket
+  }
+
+  set {
     name  = "persistence.enabled"
     value = "true"
   }

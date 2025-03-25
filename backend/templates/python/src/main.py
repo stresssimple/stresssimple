@@ -5,7 +5,7 @@ import sys
 from run.run_manager import RunManager
 from test import Test
 from run_context import ctx
-from rabbit_mq import init_rabbitmq
+from rabbit_mq import RabbitMQ
 
 # import logging
 # logging.basicConfig(level=logging.DEBUG)
@@ -24,9 +24,10 @@ async def main():
 
     loop = asyncio.get_event_loop()
 
-    run_manager = RunManager(Test(),  run_id)
-    await init_rabbitmq(loop, process_id, run_id, run_manager.message_handler)
-
+    run_manager = RunManager(Test())
+    rabbit_mq = RabbitMQ(loop=loop, process_id=process_id, run_id=run_id)
+    audit_exchange = await rabbit_mq.init_rabbitmq(run_manager.message_handler)
+    ctx.audit_exchange = audit_exchange
     print("Client Runner started", flush=True)
 
     try:
@@ -34,7 +35,19 @@ async def main():
     except Exception as e:
         print("Client Exception in runner", e, file=sys.stderr, flush=True)
     finally:
+        print("Client Runner stopping", flush=True)
+        rabbit_mq.destroy()
+        print("Client RabbitMQ destroyed", flush=True)
         loop.stop()
+        print("Client Loop stopped", flush=True)
+        await list_pending_tasks()
+
+
+async def list_pending_tasks():
+    tasks = asyncio.all_tasks()
+    print("Pending tasks:")
+    for task in tasks:
+        print(task)
 
 
 if __name__ == "__main__":

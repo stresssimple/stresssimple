@@ -29,7 +29,7 @@ variable "namespace" {
 variable "backend-api-image" {
   description = "The image of the backend API"
   type        = string
-  default     = "gcr.io/stresssimple/backend-api:latest"
+  default     = "ghcr.io/stresssimple/backend:1742867369"
   validation {
     condition     = length(var.backend-api-image) > 0
     error_message = "The backend-api-image must not be empty"
@@ -104,55 +104,34 @@ variable "rabbitmq-vhost" {
 
 
 
-variable "influxdb-username" {
-  description = "The username for InfluxDB"
+
+variable "influxdb-admin-token" {
+  type      = string
+  sensitive = true
+
+}
+
+variable "influxdb-uri" {
+  type    = string
+  default = "http://influxdb:8086"
+
+
+}
+
+variable "influxdb-org" {
   type        = string
+  sensitive   = false
   default     = "stress-simple"
-  validation {
-    condition     = length(var.influxdb-username) > 0
-    error_message = "The influxdb-username must not be empty"
-  }
+  description = "value for the organization"
 }
 
-
-variable "influxdb-password" {
-  description = "The password for InfluxDB"
+variable "influxdb-bucket" {
   type        = string
-  validation {
-    condition     = length(var.influxdb-password) > 0
-    error_message = "The influxdb-password must not be empty"
-  }
+  sensitive   = false
+  default     = "test-runs"
+  description = "value for the bucket"
 }
 
-variable "influxdb-database" {
-  description = "The database name for InfluxDB"
-  type        = string
-  default     = "stress-simple"
-  validation {
-    condition     = length(var.influxdb-database) > 0
-    error_message = "The influxdb-database must not be empty"
-  }
-}
-
-variable "influxdb-host" {
-  description = "The host for InfluxDB"
-  type        = string
-  default     = "influxdb"
-  validation {
-    condition     = length(var.influxdb-host) > 0
-    error_message = "The influxdb-host must not be empty"
-  }
-}
-
-variable "influxdb-port" {
-  description = "The port for InfluxDB"
-  type        = number
-  default     = 8086
-  validation {
-    condition     = var.influxdb-port > 0
-    error_message = "The influxdb-port must be greater than 0"
-  }
-}
 
 variable "mysql-password" {
   description = "The password for MySQL"
