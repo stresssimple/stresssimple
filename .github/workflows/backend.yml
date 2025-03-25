@@ -36,6 +36,7 @@ jobs:
             docker build backend/ --file backend/Dockerfile --tag $IMAGE_NAME:$TAG_NAME
           else
             TAG_NAME="$TIMESTAMP"
+          fi
           docker push $IMAGE_NAME:$TAG_NAME
 
           echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
