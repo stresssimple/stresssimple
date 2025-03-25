@@ -47,6 +47,10 @@ resource "helm_release" "mysql" {
     name  = "primary.persistence.size"
     value = "8Gi"
   }
+  set {
+    name  = "auth.mysqlnativepassword"
+    value = "true"
+  }
 }
 
 

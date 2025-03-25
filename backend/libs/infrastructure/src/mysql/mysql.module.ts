@@ -35,6 +35,13 @@ export const mySqlEntities = [
           database: process.env['MYSQL_DATABASE'],
           entities: mySqlEntities,
           synchronize: true,
+          extra: {
+            authPlugins: {
+              mysql_clear_password: false,
+              mysql_native_password: false,
+              caching_sha2_password: true,
+            },
+          },
         };
       },
     }),

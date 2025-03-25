@@ -95,7 +95,7 @@ variable "rabbitmq-password" {
 variable "rabbitmq-vhost" {
   description = "The vhost for RabbitMQ"
   type        = string
-  default     = "amqp://rabbitmq"
+  default     = "rabbit-rabbitmq:5672/"
   validation {
     condition     = length(var.rabbitmq-vhost) > 0
     error_message = "The rabbitmq-vhost must not be empty"

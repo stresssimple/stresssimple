@@ -29,7 +29,7 @@ resource "kubernetes_deployment" "backend_deployment" {
 
       spec {
         container {
-          image = "ghcr.io/stresssimple/backend:latest"
+          image = "ghcr.io/stresssimple/backend:1742912854"
           name  = "backend-api"
           port {
             container_port = 3000
