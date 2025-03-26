@@ -4,6 +4,16 @@ import aio_pika
 
 
 class RabbitMQ:
+    run_channel: aio_pika.abc.AbstractChannel
+    proc_channel: aio_pika.abc.AbstractChannel
+    pub_channel: aio_pika.abc.AbstractChannel
+    run_queue: aio_pika.abc.AbstractQueue
+    proc_queue: aio_pika.abc.AbstractQueue
+    run_exchange: aio_pika.abc.AbstractExchange
+    proc_exchange: aio_pika.abc.AbstractExchange
+    run_consumer: asyncio.Task
+    process_consumer: asyncio.Task
+
     def __init__(self, loop: asyncio.AbstractEventLoop, process_id, run_id):
         self.loop = loop
         self.process_id = process_id
@@ -92,28 +102,28 @@ class RabbitMQ:
         print("Client Published runnerStarted", flush=True)
         return audit_exchange
 
-    def destroy(self):
-        # self.run_queue.cancel(nowait=True)
-        # print("Client RabbitMQ Destroyed - run_queue", flush=True)
-        # self.proc_queue.cancel(nowait=True)
-        # print("Client RabbitMQ Destroyed - proc_queue", flush=True)
-        # self.run_exchange.cancel(nowait=True)
-        # print("Client RabbitMQ Destroyed - run_exchange", flush=True)
-        # self.proc_exchange.cancel(nowait=True)
-        # print("Client RabbitMQ Destroyed - proc_exchange", flush=True)
-        # self.run_channel.close(nowait=True)
-        # print("Client RabbitMQ Destroyed - run_channel", flush=True)
-        # self.proc_channel.close(nowait=True)
-        # print("Client RabbitMQ Destroyed - proc_channel", flush=True)
-        # self.pub_channel.close(nowait=True)
-        # print("Client RabbitMQ Destroyed - pub_channel", flush=True)
+    async def destroy(self):
+        await self.run_queue.cancel(consumer_tag=self.run_consumer)
+        print("Client RabbitMQ Destroyed - run_queue", flush=True)
+        await self.proc_queue.cancel(consumer_tag=self.process_consumer)
+        print("Client RabbitMQ Destroyed - proc_queue", flush=True)
+        await self.run_channel.close()
+        print("Client RabbitMQ Destroyed - run_channel", flush=True)
+        await self.proc_channel.close()
+        print("Client RabbitMQ Destroyed - proc_channel", flush=True)
+        await self.pub_channel.close()
+        print("Client RabbitMQ Destroyed - pub_channel", flush=True)
 
-        # self.run_consumer.cancel(nowait=True)
-        # print("Client RabbitMQ Destroyed - run_consumer", flush=True)
+        self.run_consumer.cancel()
+        print("Client RabbitMQ Destroyed - run_consumer", flush=True)
 
-        # self.process_consumer.cancel(nowait=True)
-        # print("Client RabbitMQ Destroyed - process_consumer", flush=True)
-        self.connection.close()
+        self.process_consumer.cancel()
+        print("Client RabbitMQ Destroyed - process_consumer", flush=True)
+
+        await self.connection.close()
         print("Client RabbitMQ Destroyed - connection", flush=True)
+        print("waiting for connection to close", flush=True)
+        await self.connection.wait_closed()
+        print("connection closed", flush=True)
         self.loop.stop()
         print("Client RabbitMQ Destroyed", flush=True)

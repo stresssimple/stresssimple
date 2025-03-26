@@ -36,7 +36,7 @@ async def main():
         print("Client Exception in runner", e, file=sys.stderr, flush=True)
     finally:
         print("Client Runner stopping", flush=True)
-        rabbit_mq.destroy()
+        await rabbit_mq.destroy()
         print("Client RabbitMQ destroyed", flush=True)
         loop.stop()
         print("Client Loop stopped", flush=True)
