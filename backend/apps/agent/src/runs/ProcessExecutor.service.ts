@@ -7,6 +7,7 @@ import { TemplateRunnerSvcFactory } from '../template-runner/TemplateRunnerFacto
 import { thisServer } from '@infra/infrastructure/mysql/servers.service';
 import { TestEnvironmentService } from '../TestEnvironment.service';
 import { ProcessesService } from '../process/process.service';
+import { ProcessStatus } from '@dto/dto';
 
 @Injectable()
 export class ProcessesManagementService {
@@ -30,7 +31,7 @@ export class ProcessesManagementService {
     thisServer.allocatedProcesses = 0;
   }
 
-  public async run(data: {
+  public async runProcess(data: {
     payload: {
       processId: string;
       testId: string;
@@ -98,6 +99,9 @@ export class ProcessesManagementService {
         processId: r.processId,
         testId: r.testId,
         runId: r.runId,
+      });
+      await this.processesService.updateProcess(r.processId, {
+        status: ProcessStatus.ended,
       });
     });
     return true;

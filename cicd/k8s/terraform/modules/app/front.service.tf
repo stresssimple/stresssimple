@@ -6,6 +6,9 @@ resource "kubernetes_service" "front-service" {
       container = "front"
       app       = var.app_name
     }
+    annotations = {
+      "metallb.universe.tf/loadBalancerIPs" = "192.168.200.205"
+    }
   }
 
   spec {
