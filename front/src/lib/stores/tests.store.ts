@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { writable } from 'svelte/store';
 // import type { TestDefinitions } from 'stress.dto';
-import { PUBLIC_API_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 
 import axios from 'axios';
 import { browser } from '$app/environment';
@@ -10,7 +10,7 @@ function createTestsStore() {
 
 	function fetchTests() {
 		if (browser) {
-			axios.get<any[]>(`${PUBLIC_API_URL}/tests`).then((response) => {
+			axios.get<any[]>(`${env.PUBLIC_API_URL}/tests`).then((response) => {
 				update(() => response.data);
 			});
 		}
@@ -20,19 +20,19 @@ function createTestsStore() {
 	return {
 		subscribe,
 		addTest: async (test: any) => {
-			await axios.post(`${PUBLIC_API_URL}/tests`, test);
+			await axios.post(`${env.PUBLIC_API_URL}/tests`, test);
 			fetchTests();
 		},
 		deleteTest: async (id: string) => {
-			await axios.delete(`${PUBLIC_API_URL}/tests/${id}`);
+			await axios.delete(`${env.PUBLIC_API_URL}/tests/${id}`);
 			fetchTests();
 		},
 		save: async (test: any) => {
-			await axios.put(`${PUBLIC_API_URL}/tests`, test);
+			await axios.put(`${env.PUBLIC_API_URL}/tests`, test);
 			fetchTests();
 		},
 		clone: async (id: string) => {
-			await axios.post(`${PUBLIC_API_URL}/tests/${id}/clone`);
+			await axios.post(`${env.PUBLIC_API_URL}/tests/${id}/clone`);
 			fetchTests();
 		}
 	};
@@ -46,7 +46,7 @@ function createActiveTestStore() {
 	return {
 		subscribe,
 		setActiveById: async (id: string) => {
-			const response = await axios.get<any>(`${PUBLIC_API_URL}/tests/${id}`);
+			const response = await axios.get<any>(`${env.PUBLIC_API_URL}/tests/${id}`);
 			const test = response.data;
 			set(test);
 		}

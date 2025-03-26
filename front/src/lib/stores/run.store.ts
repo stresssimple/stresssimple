@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { writable } from 'svelte/store';
 import axios from 'axios';
-import { PUBLIC_API_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 
 function createRunStore() {
 	const { subscribe, set } = writable<any | undefined>();
@@ -9,7 +9,7 @@ function createRunStore() {
 	return {
 		subscribe,
 		load: async (runId: string) => {
-			const response = await axios.get<any>(`${PUBLIC_API_URL}/runs/run/${runId}`);
+			const response = await axios.get<any>(`${env.PUBLIC_API_URL}/runs/run/${runId}`);
 			const run = response.data;
 			if (!run) {
 				console.error('Run not found');
@@ -21,7 +21,7 @@ function createRunStore() {
 			set(run);
 			if (interval !== 0) return;
 			interval = setInterval(async () => {
-				const response = await axios.get<any>(`${PUBLIC_API_URL}/runs/run/${runId}`);
+				const response = await axios.get<any>(`${env.PUBLIC_API_URL}/runs/run/${runId}`);
 				const run = response.data;
 				if (!run) {
 					console.error('Run not found');

@@ -18,7 +18,7 @@
 	} from 'flowbite-svelte';
 	import ScheduleRunModal from './ScheduleRunModal.svelte';
 	import axios from 'axios';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	let scheduleRunModalOpen = $state(false);
 	let timerInterval: number;
 	let servers = $state([]);

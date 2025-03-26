@@ -83,7 +83,7 @@ module "infra" {
   mysql-root-password = random_password.mysql-root-password.result
   mysql-user-name     = var.mysql-username
   mysql-user-password = random_password.mysql-password.result
-
+  mysql-database      = var.mysql-username
 
   influxdb-root-password = random_password.influxdb-root-password.result
   influxdb-password      = random_password.influxdb-password.result
@@ -102,6 +102,7 @@ module "app" {
   app_name       = var.app_name
   mysql-username = var.mysql-username
   mysql-password = random_password.mysql-password.result
+  mysql-database = var.mysql-username
 
   rabbitmq-username = var.rabbitmq-username
   rabbitmq-password = random_password.rabbitmq-password.result

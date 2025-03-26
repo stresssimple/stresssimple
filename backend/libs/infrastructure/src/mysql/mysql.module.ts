@@ -34,6 +34,7 @@ export const mySqlEntities = [
           username: process.env['MYSQL_USER'],
           password: process.env['MYSQL_PASSWORD'],
           database: process.env['MYSQL_DATABASE'],
+
           entities: mySqlEntities,
           synchronize: true,
           insecureAuth: true,

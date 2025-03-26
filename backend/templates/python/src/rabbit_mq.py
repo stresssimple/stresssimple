@@ -15,12 +15,9 @@ class RabbitMQ:
                 async for message in queue_iter:
                     try:
                         async with message.process():
-                            print(message.body.decode(), flush=True)
                             msg = json.loads(message.body.decode())
-                            message_handler(msg)
-                            await message.ack()
+                            await message_handler(msg)
                     except Exception as e:
-                        await message.nack()
                         print(f"Error processing message: {e}", flush=True)
         except Exception as e:
             print(f"Error with queue iterator: {e}", flush=True)
@@ -31,12 +28,9 @@ class RabbitMQ:
                 async for message in queue_iter:
                     try:
                         async with message.process():
-                            print(message.body.decode(), flush=True)
                             msg = json.loads(message.body.decode())
-                            message_handler(msg)
-                            await message.ack()
+                            await message_handler(msg)
                     except Exception as e:
-                        await message.nack()
                         print(f"Error processing message: {e}", flush=True)
         except Exception as e:
             print(f"Error with queue iterator: {e}", flush=True)
@@ -119,9 +113,7 @@ class RabbitMQ:
 
         # self.process_consumer.cancel(nowait=True)
         # print("Client RabbitMQ Destroyed - process_consumer", flush=True)
-        self.connection.close(nowait=True)
+        self.connection.close()
         print("Client RabbitMQ Destroyed - connection", flush=True)
-        self.loop.run_until_complete(self.connection.wait_closed())
-        print("Client RabbitMQ Destroyed - connection wait_closed", flush=True)
-        self.loop.stop(nowait=True)
+        self.loop.stop()
         print("Client RabbitMQ Destroyed", flush=True)

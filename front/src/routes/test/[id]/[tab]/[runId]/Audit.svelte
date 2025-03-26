@@ -14,7 +14,7 @@
 		type SelectOptionType
 	} from 'flowbite-svelte';
 	import { onMount } from 'svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import axios from 'axios';
 	import AuditModal from './AuditModal.svelte';
 
@@ -44,9 +44,12 @@
 		if (filterSuccesses.length > 0) params.success = filterSuccesses.join(',');
 		if (filterBaseUrls.length > 0) params.baseUrl = filterBaseUrls.join(',');
 
-		const response = await axios.get(`${PUBLIC_API_URL}/audit/` + page.params.runId + '/audit', {
-			params
-		});
+		const response = await axios.get(
+			`${env.PUBLIC_API_URL}/audit/` + page.params.runId + '/audit',
+			{
+				params
+			}
+		);
 		const data = await response.data;
 		records = data.audits as any[];
 		total = data.total;
@@ -54,7 +57,7 @@
 
 	onMount(async () => {
 		const valuesResult = await axios.get(
-			`${PUBLIC_API_URL}/audit/` + page.params.runId + '/audit/values'
+			`${env.PUBLIC_API_URL}/audit/` + page.params.runId + '/audit/values'
 		);
 		const converted: Record<string, SelectOptionType<string>[]> = {};
 		for (const [key, value] of Object.entries(valuesResult.data)) {
@@ -67,7 +70,7 @@
 
 	async function showFileModal(id: string) {
 		const fileResponse = await axios.get(
-			`${PUBLIC_API_URL}/audit/` + page.params.runId + '/audit/' + id
+			`${env.PUBLIC_API_URL}/audit/` + page.params.runId + '/audit/' + id
 		);
 		auditRecord = fileResponse.data as any;
 		if (auditRecord.requestHeaders)

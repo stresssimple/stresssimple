@@ -13,7 +13,7 @@ RUN pnpm install
 
 COPY . .
 
-RUN PUBLIC_API_URL=${PUBLIC_API_URL} pnpm run build
+RUN PUBLIC_API_URL=${env.PUBLIC_API_URL} pnpm run build
 
 FROM node:latest AS runner
 WORKDIR /app

@@ -3,7 +3,7 @@
 	import { toHumanDate } from '$lib';
 	import axios from 'axios';
 	import { onDestroy, onMount } from 'svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 
 	let rows: any[] = $state<any[]>([]);
 	let total: number = $state<number>(0);
@@ -11,7 +11,7 @@
 
 	async function getLogs() {
 		axios
-			.get(`${PUBLIC_API_URL}/audit/${page.params.runId}/logs`)
+			.get(`${env.PUBLIC_API_URL}/audit/${page.params.runId}/logs`)
 			.then((res) => res.data)
 			.then((data) => {
 				total = data.total;
