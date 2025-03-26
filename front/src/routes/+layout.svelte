@@ -26,13 +26,15 @@
 			</div>
 		</NavContainer>
 	</Navbar>
-	<div class="flex grow flex-row">
+	<div class="flex grow flex-row overflow-hidden overscroll-none">
 		<div class="flex min-w-60 max-w-80 flex-col justify-between shadow-inner shadow-gray-200">
 			<Tests />
 			<Servers />
 		</div>
-		<div class="ml-2 h-full w-full">
-			{@render children()}
+		<div class="h-full w-full overflow-y-hidden">
+			<div class="h-full max-h-full overflow-y-scroll">
+				{@render children()}
+			</div>
 		</div>
 	</div>
 </div>

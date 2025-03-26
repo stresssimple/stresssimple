@@ -29,6 +29,11 @@ class RabbitMQ:
                             await message_handler(msg)
                     except Exception as e:
                         print(f"Error processing message: {e}", flush=True)
+        except aio_pika.AMQPException as e:
+            if e.reason == "Channel closed by RPC timeout" or e.reason == "Channel closed by server":
+                return
+            print("AMQP Exception. reason:"+e.reason, flush=True)
+
         except Exception as e:
             print(f"Error with queue iterator: {e}", flush=True)
 
@@ -42,6 +47,10 @@ class RabbitMQ:
                             await message_handler(msg)
                     except Exception as e:
                         print(f"Error processing message: {e}", flush=True)
+        except aio_pika.AMQPException as e:
+            if e.reason == "Channel closed by RPC timeout" or e.reason == "Channel closed by server":
+                return
+            print("AMQP Exception. reason:"+e.reason, flush=True)
         except Exception as e:
             print(f"Error with queue iterator: {e}", flush=True)
 

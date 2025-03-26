@@ -46,21 +46,23 @@ variable "backend-api-replicas" {
   }
 }
 
-
 ///Agent
 ///Agent
 ///Agent
 ///Agent
-variable "backend-agent-image" {
-  description = "The image of the backend worker"
-  type        = string
-  default     = "gcr.io/stresssimple/backend-agent:latest"
+variable "backend-agent-replicas" {
+  description = "The number of replicas for the backend worker"
+  type        = number
+  default     = 2
   validation {
-    condition     = length(var.backend-agent-image) > 0
-    error_message = "The backend-worker-image must not be empty"
+    condition     = var.backend-agent-replicas > 0
+    error_message = "The backend-agent-replicas must be greater than 0"
   }
 }
 
+
+
+/// Frontend
 variable "frontend-image" {
   description = "The image of the frontend"
   type        = string

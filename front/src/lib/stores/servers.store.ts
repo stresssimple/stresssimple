@@ -12,7 +12,7 @@ function createServersStore() {
 			return;
 		}
 
-		const response = await axios.get(PUBLIC_API_URL + '/servers/list/agent');
+		const response = await axios.get(env.PUBLIC_API_URL + '/servers/list/agent');
 		const data = await response.data;
 		set(data);
 	}, 1000);

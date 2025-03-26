@@ -15,7 +15,7 @@ resource "kubernetes_service" "front-service" {
     }
 
     port {
-      port        = 5000
+      port        = 80
       target_port = 5000
     }
     type = "LoadBalancer"
