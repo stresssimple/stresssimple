@@ -1,3 +1,23 @@
+variable "project_id" {
+  description = "The project ID"
+  type        = string
+  default     = "stresssimple"
+  validation {
+    condition     = length(var.project_id) > 0
+    error_message = "The project_id must not be empty"
+  }
+}
+
+variable "stab_server_version" {
+  description = "The version of the stab-server"
+  type        = string
+  default     = "latest"
+  validation {
+    condition     = length(var.stab_server_version) > 0
+    error_message = "The stab_server_version must not be empty"
+  }
+}
+
 variable "app_name" {
   description = "The name of the application"
   type        = string

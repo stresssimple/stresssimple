@@ -2,6 +2,7 @@ import { Global, Logger, Module } from '@nestjs/common';
 import { AmqpConnection, RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { PublishBus, RabbitMQPublishBus } from './publish';
 import { Log } from '@influxdata/influxdb-client';
+import { channel } from 'diagnostics_channel';
 
 const config = () => {
   return {
@@ -27,6 +28,12 @@ const config = () => {
         connectionManagerOptions: {
           heartbeatIntervalInSeconds: 2,
           connectionOptions: { wait: false, reject: false, timeout: 1000 },
+        },
+        channels: {
+          audit: { prefetchCount: 500 },
+          runs: { prefetchCount: 50 },
+          run: { prefetchCount: 50 },
+          default: { prefetchCount: 50, default: true },
         },
       }),
       inject: [Logger],
