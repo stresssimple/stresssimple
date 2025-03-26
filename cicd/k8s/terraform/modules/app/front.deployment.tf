@@ -30,7 +30,7 @@ resource "kubernetes_deployment" "front-deployment" {
 
       spec {
         container {
-          image = "ghcr.io/stresssimple/front:1742974424"
+          image = "ghcr.io/stresssimple/front:1743016351"
           name  = "front"
 
           port {

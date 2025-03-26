@@ -30,7 +30,7 @@ export class ProcessesManagementService {
     thisServer.allocatedProcesses = 0;
   }
 
-  public async start(data: {
+  public async run(data: {
     payload: {
       processId: string;
       testId: string;

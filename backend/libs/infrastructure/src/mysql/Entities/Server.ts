@@ -1,8 +1,9 @@
 import { generateId } from '@infra/infrastructure/utils';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { TestProcess } from './TestProcess';
 
 @Entity()
-export class ServerRecord {
+export class TestServer {
   @PrimaryColumn()
   id: string;
 
@@ -24,7 +25,19 @@ export class ServerRecord {
   @Column({ type: 'timestamp' })
   lastHeartbeat: Date;
 
-  constructor(server: Partial<ServerRecord>) {
+  @OneToMany(() => TestProcess, (process) => process.server, {
+    cascade: true,
+    nullable: true,
+    onDelete: 'CASCADE',
+    createForeignKeyConstraints: true,
+    orphanedRowAction: 'delete',
+  })
+  processes: TestProcess[];
+
+  @Column()
+  up: boolean;
+
+  constructor(server: Partial<TestServer>) {
     this.id = 'sv-' + generateId();
     Object.assign(this, server);
   }

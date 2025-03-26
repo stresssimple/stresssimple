@@ -9,7 +9,7 @@ import { TestExecution } from './Entities/TestExecution';
 import { Repository } from 'typeorm';
 import * as path from 'path';
 import { RunsService } from './runs.service';
-import { ServerRecord } from './Entities/Server';
+import { TestServer } from './Entities/Server';
 import { ServersService } from './servers.service';
 import mysql2 from 'mysql2';
 import { TestProcess } from './Entities/TestProcess';
@@ -19,7 +19,7 @@ export const mySqlEntities = [
   LogRecord,
   AuditRecord,
   TestEnvironment,
-  ServerRecord,
+  TestServer,
   TestProcess,
 ];
 

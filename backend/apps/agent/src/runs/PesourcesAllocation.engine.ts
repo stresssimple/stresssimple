@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PublishBus } from '@infra/infrastructure';
 import { RunsService } from '@infra/infrastructure/mysql/runs.service';
 import { ServersService } from '@infra/infrastructure/mysql/servers.service';
-import { ServerRecord } from '@infra/infrastructure/mysql/Entities/Server';
+import { TestServer } from '@infra/infrastructure/mysql/Entities/Server';
 import {
   AllocateProcessCommand,
   AllocateProcessesCommand,
@@ -26,7 +26,7 @@ export class ProcessesAllocationEngine {
   ): Promise<TestProcess[]> {
     const processes: TestProcess[] = [];
     let run = await this.runsService.getRun(cmd.runId);
-    let servers: ServerRecord[] = await this.serversService.getServers();
+    let servers: TestServer[] = await this.serversService.getServers();
     this.logger.log(
       'Allocating processes for run ' + run.id + ' status ' + run.status,
     );

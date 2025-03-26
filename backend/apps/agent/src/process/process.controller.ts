@@ -92,7 +92,7 @@ export class ProcessController {
         status: ProcessStatus.running,
       });
       const test = await this.testService.getTest(process.testId);
-      await this.processesManagementService.start({
+      await this.processesManagementService.run({
         payload: {
           processId: process.id,
           runId: process.runId,
@@ -100,8 +100,12 @@ export class ProcessController {
           testId: process.testId,
         },
       });
+
+      await this.processesService.updateProcess(message.processId, {
+        status: ProcessStatus.ended,
+      });
     } catch (error) {
-      this.logger.error('Error starting process', error);
+      this.logger.error('Error running process', error);
       this.processesService.updateProcess(message.processId, {
         status: ProcessStatus.failed,
       });

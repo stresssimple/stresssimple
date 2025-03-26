@@ -5,10 +5,11 @@ import {
   OnApplicationShutdown,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ServerRecord } from './Entities/Server';
-import { LessThan, Repository } from 'typeorm';
+import { TestServer } from './Entities/Server';
+import { In, LessThan, Not, Repository } from 'typeorm';
+import { ProcessStatus } from '@dto/dto';
 
-export const thisServer = new ServerRecord({
+export const thisServer = new TestServer({
   name: os.hostname(),
   allocatedProcesses: 0,
   maxProcesses: os.cpus().length,
@@ -23,12 +24,26 @@ export class ServersService
   private interval: NodeJS.Timeout;
 
   constructor(
-    @InjectRepository(ServerRecord)
-    private readonly repository: Repository<ServerRecord>,
+    @InjectRepository(TestServer)
+    private readonly repository: Repository<TestServer>,
   ) {}
 
-  public async getServers(): Promise<ServerRecord[]> {
-    return await this.repository.find();
+  public async getServers(): Promise<TestServer[]> {
+    const servers = await this.repository.find({
+      loadEagerRelations: true,
+      where: {
+        up: true,
+      },
+      relations: ['processes'],
+    });
+    servers.forEach((server) => {
+      server.processes = server.processes.filter(
+        (process) =>
+          process.status !== ProcessStatus.ended &&
+          process.status !== ProcessStatus.failed,
+      );
+    });
+    return servers;
   }
 
   public async onApplicationShutdown(signal?: string) {
@@ -40,14 +55,17 @@ export class ServersService
   public async onApplicationBootstrap() {
     this.interval = setInterval(async () => {
       thisServer.lastHeartbeat = new Date();
+      thisServer.up = true;
       await this.repository.save(thisServer);
       const toDelete = await this.repository.find({
         where: {
+          up: true,
           lastHeartbeat: LessThan(new Date(Date.now() - 3000)),
         },
       });
       toDelete.forEach(async (server) => {
-        await this.repository.delete(server);
+        server.up = false;
+        await this.repository.update({ id: server.id }, server);
       });
     }, 1000);
   }

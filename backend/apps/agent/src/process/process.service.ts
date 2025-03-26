@@ -1,5 +1,5 @@
 import { ProcessStatus } from '@dto/dto';
-import { ServerRecord } from '@infra/infrastructure/mysql/Entities/Server';
+import { TestServer } from '@infra/infrastructure/mysql/Entities/Server';
 import { TestProcess } from '@infra/infrastructure/mysql/Entities/TestProcess';
 import { thisServer } from '@infra/infrastructure/mysql/servers.service';
 import { Injectable } from '@nestjs/common';
@@ -39,7 +39,7 @@ export class ProcessesService {
       testId,
     });
     return await this.dataSource.transaction(async (manager) => {
-      const server = await manager.findOne(ServerRecord, {
+      const server = await manager.findOne(TestServer, {
         where: { id: thisServer.id },
       });
 
@@ -49,7 +49,7 @@ export class ProcessesService {
 
       server.allocatedProcesses++;
       server.lastHeartbeat = new Date();
-      await manager.update(ServerRecord, { id: thisServer.id }, server);
+      await manager.update(TestServer, { id: thisServer.id }, server);
 
       await manager.insert(TestProcess, process);
       return process;
