@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { generateId, TestExecutionStatus } from '@infra/infrastructure';
+import { generateId } from '@infra/infrastructure';
 import { TestExecution } from './Entities/TestExecution';
+import { TestExecutionStatus } from '@dto/dto';
 @Injectable()
 export class RunsService {
   constructor(
@@ -16,7 +17,7 @@ export class RunsService {
     const testExecution = new TestExecution({
       ...run,
       id: runId,
-      status: 'created',
+      status: TestExecutionStatus.created,
       startTime: new Date(),
       lastUpdated: new Date(),
     });
@@ -25,11 +26,11 @@ export class RunsService {
   }
 
   public async cancelRun(runId: string) {
-    await this.updateRun(runId, 'cancelled', true);
+    await this.updateRun(runId, TestExecutionStatus.cancelled, true);
   }
 
   public async deleteRun(runId: string): Promise<void | PromiseLike<void>> {
-    await this.updateRun(runId, 'deleted', true);
+    await this.updateRun(runId, TestExecutionStatus.deleted, true);
   }
 
   public async getRuns(testId: string): Promise<TestExecution[]> {
@@ -43,7 +44,7 @@ export class RunsService {
     });
   }
 
-  public async getRunStatus(runId: string): Promise<string> {
+  public async getRunStatus(runId: string): Promise<TestExecutionStatus> {
     const run = await this.getRun(runId);
     return run.status;
   }

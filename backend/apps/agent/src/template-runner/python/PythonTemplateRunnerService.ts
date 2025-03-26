@@ -134,12 +134,7 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
         stdio: ['pipe', 'pipe', 'pipe'],
         shell: true,
         windowsHide: false,
-        env: {
-          INFLUXDB_URL: process.env['INFLUXDB_URL'],
-          INFLUXDB_TOKEN: process.env['INFLUXDB_TOKEN'],
-          INFLUXDB_ORG: process.env['INFLUXDB_ORG'],
-          INFLUXDB_BUCKET: process.env['INFLUXDB_BUCKET'],
-        },
+        env: this.environmentVars,
       });
 
       runner.stdout?.on('data', async (data) => {

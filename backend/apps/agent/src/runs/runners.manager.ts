@@ -1,10 +1,10 @@
-import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Injectable, Logger } from '@nestjs/common';
-import { ProcessRecord } from './ProcessManagement.service';
 import {
   ServersService,
   thisServer,
 } from '@infra/infrastructure/mysql/servers.service';
+import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import { TestProcess } from '@infra/infrastructure/mysql/Entities/TestProcess';
 
 @Injectable()
 export class RunnersManager {
@@ -29,6 +29,7 @@ export class RunnersManager {
     runId: string;
     testId: string;
   }) {
+    this.logger.log('Runner started', data.processId);
     const runnerId = data.processId;
     this.runners.add(runnerId);
     if (this.waitingForRunners.has(runnerId)) {
@@ -68,17 +69,18 @@ export class RunnersManager {
       await new Promise<void>((resolve) => {
         this.waitingForRunners.set(runnerId, resolve);
       });
+      this.logger.log('Runner is ready', runnerId);
     });
 
     await Promise.all(tasks);
   }
 
-  public waitForFinishedRunners(processes: ProcessRecord[]) {
-    const liveRunners = processes.filter((p) => this.runners.has(p.processId));
+  public waitForFinishedRunners(processes: TestProcess[]) {
+    const liveRunners = processes.filter((p) => this.runners.has(p.id));
     console.log('Waiting for', liveRunners.length, 'runners to finish');
     const tasks = liveRunners.map(async (p) => {
       await new Promise<void>((resolve) => {
-        this.waitingForFinish.set(p.processId, resolve);
+        this.waitingForFinish.set(p.id, resolve);
       });
     });
     return Promise.all(tasks);

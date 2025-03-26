@@ -5,6 +5,17 @@ import { copyAsyncRecursive } from './fs.helpers';
 import { AppLogsService } from '@infra/infrastructure';
 
 export abstract class TemplateRunnerService {
+  protected get environmentVars(): { [key: string]: string } {
+    return {
+      INFLUXDB_URL: process.env['INFLUXDB_URL'],
+      INFLUXDB_TOKEN: process.env['INFLUXDB_TOKEN'],
+      INFLUXDB_ORG: process.env['INFLUXDB_ORG'],
+      INFLUXDB_BUCKET: process.env['INFLUXDB_BUCKET'],
+
+      RABBITMQ_URI: process.env['RABBITMQ_URI'],
+    };
+  }
+
   constructor(
     protected readonly processId: string,
     protected readonly testId: string,

@@ -25,7 +25,7 @@ export class ServerRecord {
   lastHeartbeat: Date;
 
   constructor(server: Partial<ServerRecord>) {
-    this.id = generateId();
+    this.id = 'sv-' + generateId();
     Object.assign(this, server);
   }
 }

@@ -144,12 +144,7 @@ export class TypescriptTemplateRunnerService extends TemplateRunnerService {
       {
         cwd: this.envPath,
         stdio: ['ignore', 'pipe', 'pipe'],
-        env: {
-          INFLUXDB_URL: process.env['INFLUXDB_URL'],
-          INFLUXDB_TOKEN: process.env['INFLUXDB_TOKEN'],
-          INFLUXDB_ORG: process.env['INFLUXDB_ORG'],
-          INFLUXDB_BUCKET: process.env['INFLUXDB_BUCKET'],
-        },
+        env: this.environmentVars,
       },
     );
 

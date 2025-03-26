@@ -11,6 +11,8 @@ import {
 } from '@nestjs/common';
 import { CreateRunRequest } from '../dto/runs/CreateRunRequest';
 import { RunsService } from '@infra/infrastructure/mysql/runs.service';
+import { StartRunCommand } from '@dto/dto';
+import { TestExecutionStatus } from '@dto/dto/enums';
 
 @Controller('runs')
 export class RunsController {
@@ -33,11 +35,7 @@ export class RunsController {
       this.logger.log(
         `Scheduling run for test ${request.testId} with ${request.users} users, ${request.processes} processes`,
       );
-      this.rabbitMq.publishAsync({
-        route: 'runs',
-        routingKey: 'execute',
-        ...run,
-      });
+      this.rabbitMq.publishAsync(new StartRunCommand({ runId: run.id }));
     } catch (e) {
       this.logger.error(`Failed to schedule run: ${e.message}`);
     }
@@ -50,7 +48,7 @@ export class RunsController {
   ): Promise<TestExecution[]> {
     const runs = await this.runsService.getRuns(testId);
     if (deleted) return runs;
-    return runs.filter((run) => run.status !== 'deleted');
+    return runs.filter((run) => run.status !== TestExecutionStatus.deleted);
   }
 
   @Get('run/:runId')

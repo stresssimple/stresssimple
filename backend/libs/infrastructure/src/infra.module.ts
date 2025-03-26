@@ -1,4 +1,4 @@
-import { Global, Logger, Module } from '@nestjs/common';
+import { Global, Logger, Module, Scope } from '@nestjs/common';
 import { INQUIRER } from '@nestjs/core';
 
 @Global()
@@ -6,8 +6,11 @@ import { INQUIRER } from '@nestjs/core';
   providers: [
     {
       provide: Logger,
-      useFactory: (context) => new Logger(context),
+      useFactory: (context) => {
+        return new Logger(context?.constructor?.name ?? 'General');
+      },
       inject: [INQUIRER],
+      scope: Scope.TRANSIENT,
     },
   ],
   exports: [Logger],

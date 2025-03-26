@@ -37,17 +37,6 @@ try {
 } catch (e) {
   console.error('Client Exception in runner', e);
 } finally {
-  await publisher.send(
-    {
-      exchange: 'run',
-      routingKey: 'runnerStopped',
-    },
-    {
-      processId,
-      testId,
-      runId,
-    },
-  );
 }
 console.log('Client Runner stopped');
 process.exit(0);

@@ -6,7 +6,7 @@ let rabbit: Connection;
 const connectionTask = new Promise<void>((resolve) => {
   // Initialize:
   rabbit = new Connection({
-    url: 'amqp://guest:guest@localhost:5672',
+    url: process.env['RABBITMQ_URI'] || 'amqp://guest:guest@localhost:5672',
     connectionName: 'clientTypeScript',
   });
 

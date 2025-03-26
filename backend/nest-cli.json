@@ -16,7 +16,9 @@
       "entryFile": "main",
       "sourceRoot": "apps/agent/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/agent/tsconfig.app.json"
+        "tsConfigPath": "apps/agent/tsconfig.app.json",
+        "webpack": true,
+        "deleteOutDir": true
       }
     },
     "application": {
@@ -25,7 +27,9 @@
       "entryFile": "main",
       "sourceRoot": "apps/application/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/application/tsconfig.app.json"
+        "tsConfigPath": "apps/application/tsconfig.app.json",
+        "webpack": true,
+        "deleteOutDir": true
       }
     },
     "dto": {
@@ -48,3 +52,4 @@
     }
   }
 }
+

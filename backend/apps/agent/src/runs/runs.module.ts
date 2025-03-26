@@ -1,6 +1,3 @@
-import { ProcessManagementService } from './ProcessManagement.service';
-import { RunsManagementController } from './RunsManagment.controller';
-import { RunScheduler } from './run.scheduler';
 import {
   InfluxModule,
   AppLogsModule,
@@ -14,9 +11,7 @@ import { INQUIRER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TestsModule } from 'apps/application/src/app/tests/tests.module';
 import { TemplateRunnerModule } from '../template-runner/templateRunner.module';
-import { AuditWriter } from './audit.writer';
-import { RunnersManager } from './runners.manager';
-import { TestEnvironmentService } from '../TestEnvironment.service';
+import { AuditWriter } from '../audit.writer';
 
 @Module({
   imports: [
@@ -29,12 +24,7 @@ import { TestEnvironmentService } from '../TestEnvironment.service';
   ],
   providers: [
     RunsService,
-    RunnersManager,
     AuditWriter,
-    ProcessManagementService,
-    RunsManagementController,
-    TestEnvironmentService,
-    RunScheduler,
     {
       provide: Logger,
       useFactory: (context) => new Logger(context),

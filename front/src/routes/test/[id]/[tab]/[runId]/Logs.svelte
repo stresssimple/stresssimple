@@ -52,7 +52,7 @@
 		<div class="flex">
 			<pre class="w-24 text-sm text-blue-600">{toHumanDate(new Date(row.timestamp))}</pre>
 			<pre class="w-12 text-sm">{row.level}</pre>
-			<pre class="w-12 text-sm">{row.processId}</pre>
+			<pre class="w-24 text-sm">{row.processId}</pre>
 			<pre class="text-sm">{row.message}</pre>
 		</div>
 	{/each}

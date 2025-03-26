@@ -1,6 +1,7 @@
 import asyncio
 import json
 import aio_pika
+import os
 
 
 class RabbitMQ:
@@ -35,6 +36,8 @@ class RabbitMQ:
             print("AMQP Exception. reason:"+e.reason, flush=True)
 
         except Exception as e:
+            if e == "Channel closed by RPC timeout":
+                return
             print(f"Error with queue iterator: {e}", flush=True)
 
     async def _handle_process_queue(self, queue: aio_pika.abc.AbstractQueue, message_handler):
@@ -58,9 +61,9 @@ class RabbitMQ:
 
         # Create our connection object,
         # passing in the on_open and on_close methods
-
+        conn_uri = os.getenv("RABBITMQ_URI", "amqp://guest:guest@127.0.0.1/")
         self.connection = await aio_pika.connect_robust(
-            "amqp://guest:guest@127.0.0.1/", loop=self.loop,
+            conn_uri, loop=self.loop,
         )
 
         self.connection.close_callbacks.add(lambda x, y: print(
@@ -68,9 +71,9 @@ class RabbitMQ:
         print("Client Connected to RabbitMQ", flush=True)
 
         # Creating channel
-        self.run_channel: aio_pika.abc.AbstractChannel = await self.connection.channel()
-        self.proc_channel: aio_pika.abc.AbstractChannel = await self.connection.channel()
-        self.pub_channel: aio_pika.abc.AbstractChannel = await self.connection.channel()
+        self.run_channel: aio_pika.abc.AbstractRobustChannel = await self.connection.channel()
+        self.proc_channel: aio_pika.abc.AbstractRobustChannel = await self.connection.channel()
+        self.pub_channel: aio_pika.abc.AbstractRobustChannel = await self.connection.channel()
         # Declaring queue
         audit_exchange = await self.pub_channel.declare_exchange(
             "audit", aio_pika.ExchangeType.TOPIC, durable=True)
@@ -82,6 +85,8 @@ class RabbitMQ:
             durable=True,
             auto_delete=True,
         )
+
+        self.run_channel
         self.proc_queue: aio_pika.abc.AbstractQueue = await self.proc_channel.declare_queue(
             "process:"+self.process_id,
             durable=True,
@@ -112,10 +117,11 @@ class RabbitMQ:
         return audit_exchange
 
     async def destroy(self):
-        await self.run_queue.cancel(consumer_tag=self.run_consumer)
-        print("Client RabbitMQ Destroyed - run_queue", flush=True)
-        await self.proc_queue.cancel(consumer_tag=self.process_consumer)
-        print("Client RabbitMQ Destroyed - proc_queue", flush=True)
+        print("Destroying Client RabbitMQ", flush=True)
+        # await self.run_queue.cancel(consumer_tag=self.run_consumer.get_context())
+        # print("Client RabbitMQ Destroyed - run_queue", flush=True)
+        # await self.proc_queue.cancel(consumer_tag=self.process_consumer)
+        # print("Client RabbitMQ Destroyed - proc_queue", flush=True)
         await self.run_channel.close()
         print("Client RabbitMQ Destroyed - run_channel", flush=True)
         await self.proc_channel.close()
@@ -131,8 +137,6 @@ class RabbitMQ:
 
         await self.connection.close()
         print("Client RabbitMQ Destroyed - connection", flush=True)
-        print("waiting for connection to close", flush=True)
-        await self.connection.wait_closed()
-        print("connection closed", flush=True)
+
         self.loop.stop()
         print("Client RabbitMQ Destroyed", flush=True)

@@ -1,14 +1,6 @@
+import { TestExecutionStatus } from '@dto/dto/enums';
 import { generateId } from '@infra/infrastructure/utils';
 import { Entity, PrimaryColumn, Column } from 'typeorm';
-
-export type TestExecutionStatus =
-  | 'created'
-  | 'waitingForSchedule'
-  | 'running'
-  | 'completed'
-  | 'cancelled'
-  | 'failed'
-  | 'deleted';
 
 @Entity()
 export class TestExecution {
@@ -23,7 +15,7 @@ export class TestExecution {
   @Column()
   testId: string;
 
-  @Column()
+  @Column({ type: 'enum', enum: TestExecutionStatus })
   status: TestExecutionStatus;
 
   @Column({ type: 'timestamp' })

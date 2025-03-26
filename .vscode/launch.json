@@ -6,16 +6,16 @@
     "configurations": [
         {
             "type": "node-terminal",
-            "name": "Run Script: start:backend",
+            "name": "Run Script: start:api:debug",
             "request": "launch",
-            "command": "pnpm run start:backend",
+            "command": "pnpm run start:api:debug",
             "cwd": "${workspaceFolder}"
         },
         {
             "type": "node-terminal",
-            "name": "Run Script: start:agent",
+            "name": "Run Script: start:agent:debug",
             "request": "launch",
-            "command": "pnpm run start:agent",
+            "command": "pnpm run start:agent:debug",
             "cwd": "${workspaceFolder}"
         }
     ]
