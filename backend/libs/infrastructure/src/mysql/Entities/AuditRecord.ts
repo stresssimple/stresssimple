@@ -1,5 +1,5 @@
 import { generateId } from '@infra/infrastructure/utils';
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, Index } from 'typeorm';
 
 @Entity()
 export class AuditRecord {
@@ -16,6 +16,7 @@ export class AuditRecord {
   name: string;
 
   @Column()
+  @Index({})
   runId: string;
 
   @Column({ type: 'timestamp' })
