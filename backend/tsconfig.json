@@ -17,6 +17,19 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    
-  },
+    "paths": {
+      "@dto/dto": [
+        "libs/dto/src"
+      ],
+      "@dto/dto/*": [
+        "libs/dto/src/*"
+      ],
+      "@infra/infrastructure": [
+        "libs/infrastructure/src"
+      ],
+      "@infra/infrastructure/*": [
+        "libs/infrastructure/src/*"
+      ]
+    }
+  }
 }

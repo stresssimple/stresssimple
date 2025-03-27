@@ -4,7 +4,7 @@
 	import axios from 'axios';
 	import { onDestroy, onMount } from 'svelte';
 	import { writable } from 'svelte/store';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 	import ScatterChart from '$lib/components/ScatterChart.svelte';
 
 	let usersLabels = writable<string[]>([]);
@@ -16,7 +16,7 @@
 	let durVsRpsData = writable<Record<string, { x: number; y: number }[]>>({});
 	function getData() {
 		axios
-			.get(`${PUBLIC_API_URL}/runs/report/${page.params.runId}`)
+			.get(`${env.PUBLIC_API_URL}/runs/report/${page.params.runId}`)
 			.then((res) => {
 				const data = res.data;
 				if (data?.users) {

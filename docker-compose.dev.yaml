@@ -11,19 +11,16 @@ services:
       - PORT=5000
       - PUBLIC_API_URL=http://localhost:3030
     depends_on:
-      - backend
-  backend:
+      - api
+  api:
     build:
       context: ./Backend/.
       dockerfile: ./Dockerfile
     image: backend:latest
-    container_name: backend
-    volumes:
-      - tests_data:/app/tmp
+    container_name: api
     environment:
       - RUNNER_TEMPLATE_FOLDER=tmp/runner_templates
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672/
       - INFLUXDB_URL=http://influxdb:8086
       - INFLUXDB_TOKEN=my-secret-token
       - INFLUXDB_ORG=my-org
@@ -38,8 +35,31 @@ services:
       - "3030:3000"
     depends_on:
       - influxdb
-      - redis
       - mysql
+
+  agent:
+    image: backend:latest
+    command: ["npm", "run", "start:agent:prod"]
+    container_name: agent
+    volumes:
+      - tests_data:/app/tmp
+    environment:
+      - RUNNER_TEMPLATE_FOLDER=tmp/runner_templates
+      - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672/
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=my-secret-token
+      - INFLUXDB_ORG=my-org
+      - INFLUXDB_BUCKET=test-runs
+      - MYSQL_DATABASE=stresssimple
+      - MYSQL_USER=stresssimple
+      - MYSQL_PASSWORD=securepassword
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - CONTAINER=true
+    depends_on:
+      - influxdb
+      - mysql
+
   stubjs:
     build:
       context: ./stab-server/.

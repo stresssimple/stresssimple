@@ -1,0 +1,19 @@
+auth:
+  enabled: true
+  # service:
+  # type: LoadBalancer
+  # LoadBalancerIP: 192.168.220.2
+# global:
+#   storageClass: nfs-fast
+ingress:
+  enabled: true
+  hostname: rabbitmq.k8s.home
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: infra
+              operator: In
+              values:
+                - "true"

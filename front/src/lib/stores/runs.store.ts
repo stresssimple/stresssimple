@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { writable } from 'svelte/store';
-import { PUBLIC_API_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 import { browser } from '$app/environment';
 
 function createRunsStore() {
@@ -10,7 +10,7 @@ function createRunsStore() {
 	async function load(testId: string) {
 		if (!browser) return;
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const result = await axios.get<any[]>(`${PUBLIC_API_URL}/runs/${testId}`);
+		const result = await axios.get<any[]>(`${env.PUBLIC_API_URL}/runs/${testId}`);
 		set(
 			result.data
 				.filter((r) => r)
@@ -34,19 +34,26 @@ function createRunsStore() {
 			await load(testId);
 		},
 		clear: () => set([]),
-		start: async (testId: string, duration: number, users: number, rampUp: number) => {
-			await axios.post(`${PUBLIC_API_URL}/runs`, {
+		start: async (
+			testId: string,
+			duration: number,
+			users: number,
+			rampUp: number,
+			processes: number
+		) => {
+			await axios.post(`${env.PUBLIC_API_URL}/runs`, {
 				durationMinutes: duration,
 				users,
 				rampUpMinutes: rampUp,
-				testId
+				testId,
+				processes
 			});
 		},
 		stop: async (runId: string) => {
-			await axios.post(`${PUBLIC_API_URL}/runs/${runId}/stop`);
+			await axios.post(`${env.PUBLIC_API_URL}/runs/${runId}/stop`);
 		},
 		delete: async (runId: string) => {
-			await axios.delete(`${PUBLIC_API_URL}/runs/${runId}`);
+			await axios.delete(`${env.PUBLIC_API_URL}/runs/${runId}`);
 		}
 	};
 }

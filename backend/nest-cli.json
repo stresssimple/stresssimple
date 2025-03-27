@@ -1,8 +1,55 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/application/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/application/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/application",
+  "projects": {
+    "agent": {
+      "type": "application",
+      "root": "apps/agent",
+      "entryFile": "main",
+      "sourceRoot": "apps/agent/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/agent/tsconfig.app.json",
+        "webpack": true,
+        "deleteOutDir": true
+      }
+    },
+    "application": {
+      "type": "application",
+      "root": "apps/application",
+      "entryFile": "main",
+      "sourceRoot": "apps/application/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/application/tsconfig.app.json",
+        "webpack": true,
+        "deleteOutDir": true
+      }
+    },
+    "dto": {
+      "type": "library",
+      "root": "libs/dto",
+      "entryFile": "index",
+      "sourceRoot": "libs/dto/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/dto/tsconfig.lib.json"
+      }
+    },
+    "infrastructure": {
+      "type": "library",
+      "root": "libs/infrastructure",
+      "entryFile": "index",
+      "sourceRoot": "libs/infrastructure/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/infrastructure/tsconfig.lib.json"
+      }
+    }
   }
 }
+

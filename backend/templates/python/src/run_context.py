@@ -1,11 +1,11 @@
-import redis
+import aio_pika
 
 
 class RunContent:
     def __init__(self):
         self.run_id: str = ""
         self.test_id: str = ""
-        self.redis_pub: redis.Redis = None
+        self.audit_exchange: aio_pika.abc.AbstractExchange = None
 
 
 ctx = RunContent()

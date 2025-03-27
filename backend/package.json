@@ -6,31 +6,40 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "build:api": "nest build application",
+    "build:agent": "nest build agent",
+    "build:all": "npm run build:api && npm run build:agent",
+    "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+    "start:api": "nest start application",
+    "start:agent": "nest start agent",
+    "start:api:dev": "nest start application --watch",
+    "start:agent:dev": "nest start agent --watch",
+    "start:api:debug": "nest start application --debug --watch",
+    "start:agent:debug": "nest start agent --debug --watch",
+    "start:api:prod": "node dist/apps/application/main",
+    "start:agent:prod": "node dist/apps/agent/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./apps/application/test/jest-e2e.json"
   },
   "dependencies": {
+    "@golevelup/nestjs-rabbitmq": "^5.7.0",
     "@influxdata/influxdb-client": "^1.35.0",
+    "@nestjs/cache-manager": "^3.0.0",
     "@nestjs/common": "^11.0.11",
     "@nestjs/core": "^11.0.11",
     "@nestjs/platform-express": "^11.0.11",
     "@nestjs/swagger": "^11.0.6",
     "@nestjs/typeorm": "^11.0.0",
+    "amqplib": "^0.10.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "ioredis": "^5.6.0",
     "mysql2": "^3.13.0",
     "pino": "^9.6.0",
+    "rabbitmq-client": "^5.0.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.21",
@@ -65,7 +74,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
@@ -73,8 +82,16 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageDirectory": "./coverage",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@dto/dto(|/.*)$": "<rootDir>/libs/dto/src/$1",
+      "^@infra/infrastructure(|/.*)$": "<rootDir>/libs/infrastructure/src/$1"
+    }
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -82,3 +99,4 @@
     ]
   }
 }
+

@@ -16,30 +16,22 @@ class UserRunner:
         self.user_id = user_id
         self.test = test
         self.status = self.STARTING
-        self._thread = None
+        self._task = None
         self.influx = InfluxService()
 
-    def stop(self):
+    async def stop(self):
+        print(f'Stopping user {self.user_id}')
         self.status = self.STOPPING
-        if self._thread:
-            self._thread.join()
-        self._thread = None
+        if self._task is not None:
+            await self._task
+        self._task = None
 
     def start(self):
         self.status = self.RUNNING
-        if self._thread:
-            print('Task already running')
-            return
-        # Create and start the thread to run the async method
-        self._thread = threading.Thread(
-            target=self._start_async_task, daemon=True)
-        self._thread.start()
-
-    def _start_async_task(self):
-        # Create a new event loop for this thread and set it as the current event loop
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(self.run())
+        if self._task is None:
+            self._task = asyncio.create_task(self.run())
+        else:
+            print(f'User {self.user_id} is already running')
 
     async def run(self):
         while self.status != self.STOPPING:
@@ -61,11 +53,11 @@ class UserRunner:
                 )
                 await self._sleep(self.test.interval())
 
-                self.status = self.STOPPED
-                print(f'User {self.user_id} stopped')
+        self.status = self.STOPPED
+        print(f'User {self.user_id} stopped')
 
     async def wait_stopped(self):
-        await self._thread
+        await self._task
 
     async def _sleep(self, interval):
         await asyncio.sleep(interval/1000.0)

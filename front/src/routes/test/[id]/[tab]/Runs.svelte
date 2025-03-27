@@ -7,8 +7,6 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { activeTest, toHumanDate, toHumanTime } from '$lib';
 	import {
-		Label,
-		Select,
 		Button,
 		Table,
 		TableHead,
@@ -16,18 +14,15 @@
 		TableBody,
 		TableBodyRow,
 		TableBodyCell,
-		Range,
 		ButtonGroup
 	} from 'flowbite-svelte';
-	let duration = $state(10);
-	let users = $state(1);
-	let rampUp = $state(0);
-
+	import ScheduleRunModal from './ScheduleRunModal.svelte';
+	import axios from 'axios';
+	import { env } from '$env/dynamic/public';
+	let scheduleRunModalOpen = $state(false);
 	let timerInterval: number;
-
-	async function run() {
-		await runsStore.start(page.params.id, duration / 60, users, rampUp / 60);
-	}
+	let servers = $state([]);
+	$inspect(servers);
 
 	afterNavigate(() => {
 		runsStore.clear();
@@ -35,7 +30,7 @@
 
 	onMount(() => {
 		runsStore.load(page.params.id);
-		timerInterval = setInterval(() => {
+		timerInterval = setInterval(async () => {
 			runsStore.load(page.params.id);
 		}, 1000);
 	});
@@ -61,31 +56,8 @@
 	<div class="flex w-full flex-row justify-between">
 		<div class="text-2xl">{$activeTest.name}</div>
 		<ButtonGroup>
-			<Button class="w-24" on:click={run}>Run</Button>
+			<Button class="w-24" on:click={() => (scheduleRunModalOpen = true)}>Schedule</Button>
 		</ButtonGroup>
-	</div>
-</div>
-<div class="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
-	<div>
-		<Label>Duration</Label>
-		<div>
-			<Range min="10" max="600" step="10" bind:value={duration} />
-			<span>{Math.floor(duration / 60)} min {Math.round(duration % 60)} sec</span>
-		</div>
-	</div>
-	<div>
-		<Label>Ramp up</Label>
-		<div>
-			<Range min="0" bind:max={duration} step="10" bind:value={rampUp} />
-			<span>{Math.floor(rampUp / 60)} min {Math.round(rampUp % 60)} sec</span>
-		</div>
-	</div>
-	<div>
-		<Label>Users</Label>
-		<div>
-			<Range min="1" max="100" step="1" bind:value={users} />
-			<span>{users}</span>
-		</div>
 	</div>
 </div>
 
@@ -143,6 +115,8 @@
 		</Table>
 	</div>
 {/if}
+
+<ScheduleRunModal bind:open={scheduleRunModalOpen} />
 
 <style lang="postcss">
 	@reference 'tailwindcss';

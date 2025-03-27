@@ -16,7 +16,8 @@ RUN pnpm install
 COPY . .
 
 # Build the NestJS application
-RUN npm run build
+RUN pnpm run build:api
+RUN pnpm run build:agent
 
 FROM node:latest AS production
 WORKDIR /app
@@ -36,4 +37,4 @@ RUN pnpm install --prod
 EXPOSE 3000
 
 # Define the command to run the app
-CMD ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:api:prod"]

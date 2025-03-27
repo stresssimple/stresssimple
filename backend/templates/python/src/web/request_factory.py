@@ -1,5 +1,6 @@
 import time
 import json
+import aio_pika
 import requests
 from influxdb_client import InfluxDBClient, WriteApi
 from run_context import ctx  # Assuming a similar context module exists
@@ -89,12 +90,12 @@ class HttpRequestFactory:
 
             duration = time.time() - start
             await self.trace(duration, is_successful, result.get("status"))
-            self.audit(request_data, result, duration, is_successful)
+            await self.audit(request_data, result, duration, is_successful)
         except Exception as e:
-            print(e)
+            print("Audit failed?!", e)
         return result
 
-    def audit(self, request, result, duration, success):
+    async def audit(self, request, result, duration, success):
         record = {
             "runId": ctx.run_id,
             "baseUrl": self._base_url,
@@ -110,7 +111,16 @@ class HttpRequestFactory:
             "requestBody": json.dumps(request.get("body", {})),
             "responseBody": json.dumps(result.get("body", {}))
         }
-        ctx.redis_pub.publish("audit", json.dumps(record))
+        if (ctx.audit_exchange is None):
+            print("Audit exchange not set")
+            return
+
+        await ctx.audit_exchange.publish(
+            aio_pika.Message(
+                body=json.dumps(record).encode()
+            ),
+            routing_key='audit',
+        )
 
     async def trace(self, duration, is_successful, status):
         data = {

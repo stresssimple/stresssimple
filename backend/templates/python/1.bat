@@ -42,7 +42,7 @@ echo Running Python script...
 :: Use "python" - it should work *after* activation.  If you had a global Python installation
 :: and the venv's python is different, you *could* use the full path to the venv's python.exe:
 :: "%BATCH_FILE_DIR%venv\Scripts\python.exe" "%PYTHON_SCRIPT%"
-python %PYTHON_SCRIPT% %1 %2 2>&1
+python %PYTHON_SCRIPT% %1 %2 %3 2>&1
 
 
 if errorlevel 1 (
