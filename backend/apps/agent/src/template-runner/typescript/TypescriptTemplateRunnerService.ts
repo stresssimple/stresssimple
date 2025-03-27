@@ -122,6 +122,7 @@ export class TypescriptTemplateRunnerService extends TemplateRunnerService {
       );
       this.appLogger.error(this.runId, this.processId, error.toString());
       this.logger.error(`Error compiling template`, error);
+      return false;
     }
     return success;
   }

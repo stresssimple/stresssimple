@@ -8,7 +8,6 @@ import {
   AllocateProcessesCommand,
   TestExecutionStatus,
 } from '@dto/dto';
-import { ProcessesService } from '../process/process.service';
 import { TestProcess } from '@infra/infrastructure/mysql/Entities/TestProcess';
 
 @Injectable()
@@ -18,7 +17,6 @@ export class ProcessesAllocationEngine {
     private publish: PublishBus,
     private logger: Logger,
     private serversService: ServersService,
-    private processesService: ProcessesService,
   ) {}
 
   public async requireProcesses(
