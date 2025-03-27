@@ -29,9 +29,10 @@ resource "kubernetes_deployment" "agent_deployment" {
 
       spec {
         container {
-          image   = var.backend-api-image
-          name    = "backend-agent"
-          command = ["npm", "run", "start:agent:prod"]
+          image             = "ghcr.io/${var.project_id}/backend:${var.backend_version}"
+          image_pull_policy = "Always"
+          name              = "backend-agent"
+          command           = ["npm", "run", "start:agent:prod"]
           port {
             container_port = 3000
           }

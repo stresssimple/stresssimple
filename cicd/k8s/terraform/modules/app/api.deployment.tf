@@ -29,8 +29,9 @@ resource "kubernetes_deployment" "backend_deployment" {
 
       spec {
         container {
-          image = var.backend-api-image
-          name  = "backend-api"
+          image             = "ghcr.io/${var.project_id}/backend:${var.backend_version}"
+          image_pull_policy = "Always"
+          name              = "backend-api"
           port {
             container_port = 3000
           }

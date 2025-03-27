@@ -1,10 +1,9 @@
 import { Global, Logger, Module } from '@nestjs/common';
 import { AmqpConnection, RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { PublishBus, RabbitMQPublishBus } from './publish';
-import { Log } from '@influxdata/influxdb-client';
-import { channel } from 'diagnostics_channel';
 
 const config = () => {
+  console.log('RABBITMQ_URI', process.env['RABBITMQ_URI']);
   return {
     exchanges: [
       { name: 'runs', type: 'topic' },

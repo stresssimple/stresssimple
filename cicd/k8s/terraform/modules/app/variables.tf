@@ -18,6 +18,27 @@ variable "stab_server_version" {
   }
 }
 
+variable "front_version" {
+  description = "The version of the front"
+  type        = string
+  default     = "latest"
+  validation {
+    condition     = length(var.front_version) > 0
+    error_message = "The front_version must not be empty"
+  }
+}
+
+variable "backend_version" {
+  description = "The version of the backend"
+  type        = string
+  default     = "latest"
+  validation {
+    condition     = length(var.backend_version) > 0
+    error_message = "The backend_version must not be empty"
+  }
+
+}
+
 variable "app_name" {
   description = "The name of the application"
   type        = string
@@ -46,15 +67,6 @@ variable "namespace" {
   }
 }
 
-variable "backend-api-image" {
-  description = "The image of the backend API"
-  type        = string
-  default     = "ghcr.io/stresssimple/backend:1743023533"
-  validation {
-    condition     = length(var.backend-api-image) > 0
-    error_message = "The backend-api-image must not be empty"
-  }
-}
 
 variable "backend-api-replicas" {
   description = "The number of replicas for the backend API"
@@ -82,16 +94,6 @@ variable "backend-agent-replicas" {
 
 
 
-/// Frontend
-variable "frontend-image" {
-  description = "The image of the frontend"
-  type        = string
-  default     = "gcr.io/stresssimple/frontend:latest"
-  validation {
-    condition     = length(var.frontend-image) > 0
-    error_message = "The frontend-image must not be empty"
-  }
-}
 
 
 //// Rabbitmq

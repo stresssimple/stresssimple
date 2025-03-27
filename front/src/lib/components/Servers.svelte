@@ -38,7 +38,8 @@
 	<h2 class="m-2 text-lg font-semibold">Servers</h2>
 	{#each servers as server}
 		<div class="m-2 rounded-lg border border-gray-400 bg-gray-100 p-2">
-			<pre class="m-2">{server.name}:{server.id}</pre>
+			<pre class="m-2 text-sm">{server.name}</pre>
+			<pre class="m-2 text-sm">{server.id}</pre>
 			<div class="m-2 w-40">
 				<div class="grid grid-cols-8">
 					{#each server.indicators as i}
