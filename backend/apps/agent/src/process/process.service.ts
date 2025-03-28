@@ -43,11 +43,10 @@ export class ProcessesService {
         where: { id: thisServer.id },
       });
 
-      if (server.allocatedProcesses >= server.maxProcesses) {
+      if (server.processes.length >= server.maxProcesses) {
         return null;
       }
 
-      server.allocatedProcesses++;
       server.lastHeartbeat = new Date();
       await manager.update(TestServer, { id: thisServer.id }, server);
 

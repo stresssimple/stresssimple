@@ -17,9 +17,6 @@ export class TestServer {
   startTimestamp: Date;
 
   @Column()
-  allocatedProcesses: number;
-
-  @Column()
   maxProcesses: number;
 
   @Column({ type: 'timestamp' })

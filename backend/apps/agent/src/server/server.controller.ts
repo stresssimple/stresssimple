@@ -40,7 +40,6 @@ export class ServerController {
       this.logger.log('No free processes available');
       return null;
     }
-    thisServer.allocatedProcesses++;
     const testDefinitions = await this.testsService.getTest(data.testId);
     const env = await this.envService.getFreeEnvironment(
       thisServer.id,

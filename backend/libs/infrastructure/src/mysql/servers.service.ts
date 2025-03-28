@@ -6,12 +6,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TestServer } from './Entities/Server';
-import { In, LessThan, Not, Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { ProcessStatus } from '@dto/dto';
 
 export const thisServer = new TestServer({
   name: os.hostname(),
-  allocatedProcesses: 0,
   maxProcesses: os.cpus().length,
   lastHeartbeat: new Date(),
   startTimestamp: new Date(),

@@ -28,7 +28,6 @@ export class ProcessesManagementService {
       process.env.MAX_PROCESSES ?? os.cpus().length.toString(),
     );
     thisServer.maxProcesses = this.maxProcesses;
-    thisServer.allocatedProcesses = 0;
   }
 
   public async runProcess(data: {

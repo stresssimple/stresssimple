@@ -42,7 +42,7 @@ export class ProcessesAllocationEngine {
 
       servers = await this.serversService.getServers();
       servers = servers.filter(
-        (s) => s.type === 'agent' && s.allocatedProcesses < s.maxProcesses,
+        (s) => s.type === 'agent' && s.processes.length < s.maxProcesses,
       );
       if (servers.length === 0) {
         this.logger.log('No servers available, waiting...');
