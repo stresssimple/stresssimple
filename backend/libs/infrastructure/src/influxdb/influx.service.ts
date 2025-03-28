@@ -5,19 +5,20 @@ import { InfluxDB, Point, QueryApi } from '@influxdata/influxdb-client';
 export class InfluxService implements OnModuleDestroy {
   private influxDB: InfluxDB;
   private writeApi;
+  private _org: string;
 
   constructor() {
     const url = process.env['INFLUXDB_URL']; // 'http://localhost:8086'; // Change to your InfluxDB URL
     const token = process.env['INFLUXDB_TOKEN']; // 'my-secret-token';
-    const org = process.env['INFLUXDB_ORG']; //'my-org';
+    this._org = process.env['INFLUXDB_ORG']; //'my-org';
     const bucket = process.env['INFLUXDB_BUCKET']; //'my-bucket';
 
     this.influxDB = new InfluxDB({ url, token });
-    this.writeApi = this.influxDB.getWriteApi(org, bucket);
+    this.writeApi = this.influxDB.getWriteApi(this._org, bucket);
   }
 
   public get queryApi(): QueryApi {
-    return this.influxDB.getQueryApi('my-org');
+    return this.influxDB.getQueryApi(this._org);
   }
 
   public async writeData(

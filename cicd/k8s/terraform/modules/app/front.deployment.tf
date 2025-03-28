@@ -56,6 +56,15 @@ resource "kubernetes_deployment" "front-deployment" {
             value = kubernetes_service.api-service.spec[0].port[0].port
           }
         }
+        node_selector = {
+          agentpool = "app"
+        }
+        toleration {
+          key      = "kubernetes.azure.com/scalesetpriority"
+          operator = "Equal"
+          value    = "spot"
+          effect   = "NoSchedule"
+        }
       }
     }
   }

@@ -59,6 +59,15 @@ resource "kubernetes_deployment" "agent_deployment" {
             }
           }
         }
+        node_selector = {
+          agentpool = "app"
+        }
+        toleration {
+          key      = "kubernetes.azure.com/scalesetpriority"
+          operator = "Equal"
+          value    = "spot"
+          effect   = "NoSchedule"
+        }
       }
     }
   }

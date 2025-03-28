@@ -26,6 +26,16 @@ variable "namespace" {
   }
 }
 
+variable "kube-config-context" {
+  description = "The context to use in the kubeconfig"
+  type        = string
+  validation {
+    condition     = length(var.kube-config-context) > 0
+    error_message = "The kube-config-context must not be empty"
+  }
+}
+
+
 //// Rabbitmq
 variable "rabbitmq-username" {
   description = "The username for RabbitMQ"

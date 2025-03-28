@@ -7,6 +7,10 @@ resource "helm_release" "influxdb" {
   dependency_update = true
   version           = "6.6.1"
 
+  values = [
+    file("${path.module}/values/influxdb-values.yaml")
+  ]
+
   set {
     name  = "auth.rootPassword"
     value = var.influxdb-root-password

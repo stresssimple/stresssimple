@@ -3,17 +3,12 @@ auth:
   # service:
   # type: LoadBalancer
   # LoadBalancerIP: 192.168.220.2
-# global:
-#   storageClass: nfs-fast
-ingress:
-  enabled: true
-  hostname: rabbitmq.k8s.home
-affinity:
-  nodeAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: infra
-              operator: In
-              values:
-                - "true"
+  # global:
+  #   storageClass: nfs-fast
+tolerations:
+- key: "kubernetes.azure.com/scalesetpriority"
+  operator: "Equal"
+  value: "spot"
+  effect: "NoSchedule"
+nodeSelector:
+  agentpool: infra

@@ -60,6 +60,15 @@ resource "kubernetes_stateful_set" "mysql-statefulset" {
             claim_name = "mysql-data"
           }
         }
+        node_selector = {
+          agentpool = "infra"
+        }
+        toleration {
+          key      = "kubernetes.azure.com/scalesetpriority"
+          operator = "Equal"
+          value    = "spot"
+          effect   = "NoSchedule"
+        }
       }
     }
   }
