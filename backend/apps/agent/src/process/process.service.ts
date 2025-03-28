@@ -2,9 +2,9 @@ import { ProcessStatus } from '@dto/dto';
 import { TestServer } from '@infra/infrastructure/mysql/Entities/Server';
 import { TestProcess } from '@infra/infrastructure/mysql/Entities/TestProcess';
 import { thisServer } from '@infra/infrastructure/mysql/servers.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Not, Repository } from 'typeorm';
 
 @Injectable()
 export class ProcessesService {
@@ -12,6 +12,7 @@ export class ProcessesService {
     @InjectRepository(TestProcess)
     private readonly processRepository: Repository<TestProcess>,
     private readonly dataSource: DataSource,
+    private readonly logger: Logger,
   ) {}
 
   public async createProcess(process: TestProcess): Promise<TestProcess> {
@@ -40,10 +41,21 @@ export class ProcessesService {
     });
     return await this.dataSource.transaction(async (manager) => {
       const server = await manager.findOne(TestServer, {
-        where: { id: thisServer.id },
+        where: {
+          id: thisServer.id,
+        },
       });
-
-      if (server.processes.length >= server.maxProcesses) {
+      const processes = await manager.find(TestProcess, {
+        where: {
+          serverId: thisServer.id,
+          status: Not(In([ProcessStatus.ended, ProcessStatus.failed])),
+        },
+      });
+      if (!server || !server.up) {
+        this.logger.warn('Server is down or not available ' + server?.id);
+        return null;
+      }
+      if (processes.length >= server.maxProcesses) {
         return null;
       }
 
