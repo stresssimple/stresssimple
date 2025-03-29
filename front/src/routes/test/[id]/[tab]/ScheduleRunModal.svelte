@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { runsStore } from '$lib';
-	import { Button, Input, Label, Modal, Radio, RadioButton, Range } from 'flowbite-svelte';
+	import {
+		Button,
+		ButtonGroup,
+		Input,
+		Label,
+		Modal,
+		Radio,
+		RadioButton,
+		Range
+	} from 'flowbite-svelte';
 	let { open = $bindable() } = $props();
 
 	const percentNames = [
@@ -51,6 +60,16 @@
 		);
 		open = false;
 	}
+
+	function adjustUsers(value: number): void {
+		if (users + value < 1) {
+			users = 1;
+		} else if (users + value > 9999) {
+			users = 9999;
+		} else {
+			users += value;
+		}
+	}
 </script>
 
 <Modal {open} title="Schedule run" on:close={() => (open = false)}>
@@ -72,8 +91,18 @@
 		<div>
 			<Label>Users</Label>
 			<div>
-				<Range min="1" max="1000" step="1" bind:value={users} />
-				<span>{users}</span>
+				<Range min="1" max="9999" step="1" bind:value={users} />
+				<div class="flex flex-row items-center justify-between">
+					<span class="mr-4">{users}</span>
+					<ButtonGroup class="" size="xs">
+						<Button class="" size="xs" on:click={() => adjustUsers(-100)}>-100</Button>
+						<Button class="" size="xs" on:click={() => adjustUsers(-10)}>-10</Button>
+						<Button class="" size="xs" on:click={() => adjustUsers(-1)}>-1</Button>
+						<Button class="" size="xs" on:click={() => adjustUsers(1)}>+1</Button>
+						<Button class="" size="xs" on:click={() => adjustUsers(10)}>+10</Button>
+						<Button class="" size="xs" on:click={() => adjustUsers(100)}>+100</Button>
+					</ButtonGroup>
+				</div>
 			</div>
 		</div>
 		<div>

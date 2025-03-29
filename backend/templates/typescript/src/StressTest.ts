@@ -1,9 +1,8 @@
 import { HttpClientFactory } from './http/HttpClientFactory.js';
 import { HttpClientFactoryImpl } from './http/HttpClientFactoryImpl.js';
-import { InfluxService } from './influx/influx.service.js';
 
 export abstract class StressTest {
-  private httpFactory = new HttpClientFactoryImpl(new InfluxService());
+  private httpFactory = new HttpClientFactoryImpl();
 
   public interval(): number {
     return 1000;

@@ -13,6 +13,8 @@
 	let httpData = writable<Record<string, number[]>>({});
 	let rpsLabels = writable<string[]>([]);
 	let rpsData = writable<Record<string, number[]>>({});
+	let testRunsData = writable<Record<string, number[]>>({});
+	let testRunsLabels = writable<string[]>([]);
 	let durVsRpsData = writable<Record<string, { x: number; y: number }[]>>({});
 	function getData() {
 		axios
@@ -34,13 +36,19 @@
 				if (data?.durationVsRps) {
 					durVsRpsData.set(data.durationVsRps);
 				}
+				if (data?.testExecution) {
+					testRunsData.set(data.testExecution.data);
+					testRunsLabels.set(data.testExecution.labels);
+				}
 			})
-			.catch((err) => {});
+			.catch((err) => {
+				console.error('Error fetching data:', err);
+			});
 	}
 
 	let interval: number;
 	async function getRun() {
-		getData();
+		await getData();
 		interval = setInterval(getData, 2000);
 	}
 
@@ -154,6 +162,39 @@
 						title: {
 							display: true,
 							text: 'Requests per second'
+						}
+					}
+				}
+			}}
+			dataOptions={{}}
+		/>
+	</div>
+	<div class="container col-span-2 h-60">
+		<LineChart
+			labels={$testRunsLabels}
+			data={$testRunsData}
+			options={{
+				maintainAspectRatio: false,
+				plugins: {
+					legend: {
+						position: 'bottom'
+					},
+					title: {
+						display: true,
+						text: 'Test Runs'
+					},
+					subtitle: {
+						display: true,
+						text: 'Test runs over time',
+						padding: 4
+					}
+				},
+				scales: {
+					y: {
+						beginAtZero: true,
+						title: {
+							display: true,
+							text: 'Test runs'
 						}
 					}
 				}

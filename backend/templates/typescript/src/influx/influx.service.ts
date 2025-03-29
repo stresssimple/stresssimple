@@ -5,7 +5,13 @@ import {
   WriteApi,
 } from '@influxdata/influxdb-client';
 import { ctx } from '../run.context.js';
-
+export class InfluxRecord {
+  constructor(
+    public measurement: string,
+    public fields: Record<string, number>,
+    public tags?: Record<string, string>,
+  ) {}
+}
 export class InfluxService {
   private readonly influxDB: InfluxDB;
   private readonly org: string;
@@ -29,41 +35,32 @@ export class InfluxService {
     return this.influxDB.getQueryApi(this.org);
   }
 
-  public async write(
-    measurement: string,
-    fields: Record<string, number>,
-    tags?: Record<string, string>,
-  ) {
-    await this.writeData(measurement, fields, tags);
-  }
-
-  public async writeData(
-    measurement: string,
-    fields: Record<string, number>,
-    tags?: Record<string, string>,
-  ) {
+  public async writeData(points: InfluxRecord[]) {
     try {
-      const point = new Point(measurement);
+      for (const point of points) {
+        const influxPoint = new Point(point.measurement);
+        const { fields, tags } = point;
 
-      if (tags) {
-        Object.entries(tags).forEach(([key, value]) => point.tag(key, value));
+        // Add fields to the point
+        for (const [key, value] of Object.entries(fields)) {
+          influxPoint.floatField(key, value);
+        }
+
+        // Add tags to the point if they exist
+        if (tags) {
+          for (const [key, value] of Object.entries(tags)) {
+            influxPoint.tag(key, value);
+          }
+        }
+
+        influxPoint.tag('testId', ctx.testId);
+        influxPoint.tag('runId', ctx.runId);
+
+        this.writeApi.writePoint(influxPoint);
       }
-      Object.entries(fields).forEach(([key, value]) =>
-        point.floatField(key, value),
-      );
-
-      point.tag('testId', ctx.testId);
-      point.tag('runId', ctx.runId);
-
-      this.writeApi.writePoint(point);
-      this.writeApi.flush(); // Flush the write buffer to InfluxDB
+      await this.writeApi.flush(); // Flush the write buffer to InfluxDB
     } catch (e) {
-      console.warn(
-        'Failed to write data to InfluxDB',
-        measurement,
-        fields,
-        tags,
-      );
+      console.warn('Failed to write data to InfluxDB');
     }
   }
 }

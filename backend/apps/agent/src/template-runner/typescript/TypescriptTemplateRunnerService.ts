@@ -165,11 +165,9 @@ export class TypescriptTemplateRunnerService extends TemplateRunnerService {
 
     runner.stdout?.on('data', async (data) => {
       await this.appLogger.info(this.runId, this.processId, data.toString());
-      console.log(data.toString());
     });
     runner.stderr?.on('data', async (data) => {
       await this.appLogger.error(this.runId, this.processId, data.toString());
-      console.error(data.toString());
     });
 
     return new Promise<void>((resolve) => {

@@ -1,4 +1,4 @@
-import { InfluxService } from '../influx/influx.service.js';
+import { influxProxy } from '../influx/influxProxy.js';
 import { ctx } from '../run.context.js';
 import { StressTest } from '../StressTest.js';
 import { UserRunner } from './UserRunner.js';
@@ -6,7 +6,6 @@ import { UserRunner } from './UserRunner.js';
 export class RunManager {
   private readonly users: Record<string, UserRunner> = {};
   private shouldStop = false;
-  private readonly influx = new InfluxService();
 
   constructor(private readonly test: StressTest) {}
 
@@ -39,16 +38,16 @@ export class RunManager {
   public async run(): Promise<void> {
     while (!this.shouldStop || !this.AllUsersStopped()) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      await this.influx.write(
-        'running_users',
-        {
+      await influxProxy.write({
+        measurement: 'running_users',
+        fields: {
           value: Object.keys(this.users).length,
         },
-        {
+        tags: {
           testId: ctx.testId,
           runId: ctx.runId,
         },
-      );
+      });
     }
     console.log('All users stopped', this.shouldStop, this.AllUsersStopped());
   }

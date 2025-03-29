@@ -47,6 +47,12 @@ export class RunReportController {
         windowPeriod,
       ),
       rps: await this.rpsData(runId, startTime, endTime, windowPeriod),
+      testExecution: await this.testExecutionData(
+        runId,
+        startTime,
+        endTime,
+        windowPeriod,
+      ),
     };
 
     const durationVsRps: Record<string, { x: number; y: number }[]> = {};
@@ -152,6 +158,52 @@ export class RunReportController {
   |> aggregateWindow(every: ${windowPeriod}, fn: median, createEmpty: true)
   |> yield(name: "median")`;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await this.influx.queryApi.collectRows<any>(query);
+    return result
+      .map((r) => ({
+        label: (Date.parse(r._time) - startTime.getTime()) / 1000,
+        value: r._value,
+        category: r.name,
+      }))
+      .reduce(
+        (
+          acc: {
+            labels: number[];
+            data: Record<string, number[]>;
+          },
+          cur,
+        ) => {
+          if (!acc.labels.includes(cur.label)) {
+            acc.labels.push(cur.label);
+          }
+          if (!acc.data[cur.category]) {
+            acc.data[cur.category] = [];
+          }
+          acc.data[cur.category].push(cur.value);
+          return acc;
+        },
+        {
+          labels: [],
+          data: {},
+        },
+      );
+  }
+
+  private async testExecutionData(
+    runId: string,
+    startTime: Date,
+    endTime: Date,
+    windowPeriod: string,
+  ) {
+    const query = `from(bucket: "test-runs")
+  |> range(start: ${startTime.toISOString()}, stop: ${endTime.toISOString()})
+  |> filter(fn: (r) => r["_measurement"] == "test_run")
+  |> filter(fn: (r) => r["runId"] == "${runId}")
+  |> filter(fn: (r) => r["_field"] == "duration")
+  |> group()
+  |> aggregateWindow(every: ${windowPeriod}, fn: count, createEmpty: true)
+  |> yield(name: "count")`;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await this.influx.queryApi.collectRows<any>(query);
     return result

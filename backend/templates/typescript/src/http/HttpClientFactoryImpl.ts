@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { HttpRequestFactoryImpl } from './HttpRequestFactoryImpl.js';
-import { InfluxService } from '../influx/influx.service.js';
 import { HttpClientFactory } from './HttpClientFactory.js';
 import { HttpRequestFactory } from './HttpRequestFactory.js';
 import { ctx } from '../run.context.js';
@@ -10,7 +9,7 @@ export class HttpClientFactoryImpl implements HttpClientFactory {
   private _baseUrl = '';
   private _headers: { [key: string]: string } = {};
 
-  constructor(private influx: InfluxService) {}
+  constructor() {}
 
   create(): HttpRequestFactory {
     const client = axios.create({
@@ -23,7 +22,7 @@ export class HttpClientFactoryImpl implements HttpClientFactory {
       config.headers['X-Request-Id'] = v7();
       return config;
     });
-    return new HttpRequestFactoryImpl(client, this.influx);
+    return new HttpRequestFactoryImpl(client);
   }
 
   public baseUrl(url: string): HttpClientFactory {

@@ -1,9 +1,9 @@
 import { AxiosError, AxiosInstance } from 'axios';
-import { InfluxService } from '../influx/influx.service.js';
 import { HttpRequestFactory } from './HttpRequestFactory.js';
 import { HttpResponse } from './HttpResponse.js';
 import { ctx } from '../run.context.js';
 import { auditProxy } from '../audit.proxy.js';
+import { influxProxy } from '../influx/influxProxy.js';
 
 export class HttpRequestFactoryImpl implements HttpRequestFactory {
   private _url = '';
@@ -13,10 +13,7 @@ export class HttpRequestFactoryImpl implements HttpRequestFactory {
   private _successOn: number[] = [];
   private _failOn: number[] = [];
 
-  constructor(
-    private client: AxiosInstance,
-    private influx: InfluxService,
-  ) {}
+  constructor(private client: AxiosInstance) {}
 
   public get(url: string): HttpRequestFactory {
     this._url = url;
@@ -174,21 +171,20 @@ export class HttpRequestFactoryImpl implements HttpRequestFactory {
     isSuccessful: boolean,
     status: number | undefined,
   ): Promise<void> {
-    await this.influx.writeData(
-      'http_request',
-      {
+    await influxProxy.write({
+      measurement: 'http_request',
+      fields: {
         duration,
         success: isSuccessful ? 1 : 0,
       },
-      {
+      tags: {
         status: status?.toString() ?? '',
         testId: ctx.testId,
         runId: ctx.runId,
         name: this._name ?? 'No name',
       },
-    );
+    });
   }
-
   baseUrl(url: string): HttpRequestFactory {
     this.client.defaults.baseURL = url;
     return this;

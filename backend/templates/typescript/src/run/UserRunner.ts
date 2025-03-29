@@ -1,5 +1,5 @@
 import { StressTest } from '../StressTest.js';
-import { InfluxService } from '../influx/influx.service.js';
+import { influxProxy } from '../influx/influxProxy.js';
 import { ctx } from '../run.context.js';
 
 type UserRunnerStatus = 'stopped' | 'stopping' | 'running' | 'starting';
@@ -7,7 +7,6 @@ type UserRunnerStatus = 'stopped' | 'stopping' | 'running' | 'starting';
 export class UserRunner {
   public status: UserRunnerStatus = 'stopped';
   private task: Promise<void> | null = null;
-  private influx = new InfluxService();
 
   stop() {
     this.status = 'stopping';
@@ -34,20 +33,29 @@ export class UserRunner {
       } finally {
         const endTime = process.hrtime.bigint();
         const duration = Number(endTime - startTime) / 1e9;
-        await this.influx.write(
-          'test_run',
-          {
+        await influxProxy.write({
+          measurement: 'test_run',
+          fields: {
             duration,
             success: success ? 1.0 : 0.0,
           },
-          {
+          tags: {
             testId: ctx.testId,
             runId: ctx.runId,
             userId: this.userId,
           },
-        );
+        });
       }
-      await new Promise((resolve) => setTimeout(resolve, this.test.interval()));
+      // We only wait if the test is not stopping, otherwise we stop immediately
+      if (this.status === 'stopped') {
+        break;
+      }
+      // Wait for the interval before running the test again
+      // Only read once to avoid messing with randomness
+      const interval = this.test.interval();
+      if (interval > 0) {
+        await new Promise((resolve) => setTimeout(resolve, interval));
+      }
     }
     this.status = 'stopped';
     console.log(`User ${this.userId} stopped`);
