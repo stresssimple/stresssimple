@@ -3,7 +3,7 @@ import { InfluxService } from '../influx/influx.service.js';
 import { HttpRequestFactory } from './HttpRequestFactory.js';
 import { HttpResponse } from './HttpResponse.js';
 import { ctx } from '../run.context.js';
-import { publisher } from '../rabbit.js';
+import { auditProxy } from '../audit.proxy.js';
 
 export class HttpRequestFactoryImpl implements HttpRequestFactory {
   private _url = '';
@@ -164,23 +164,17 @@ export class HttpRequestFactoryImpl implements HttpRequestFactory {
       record.responseBody = result.body?.toString();
     }
 
-    await publisher.send(
-      {
-        exchange: 'audit',
-        routingKey: 'audit',
-      },
-      record,
-    );
+    if (auditProxy) {
+      auditProxy.audit(record, success);
+    }
   }
 
-  private trace(
+  private async trace(
     duration: number,
     isSuccessful: boolean,
     status: number | undefined,
-  ): void {
-    const api = this.influx.getWriteApi();
-    this.influx.writeData(
-      api,
+  ): Promise<void> {
+    await this.influx.writeData(
       'http_request',
       {
         duration,

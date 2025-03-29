@@ -1,35 +1,36 @@
 import { TestEnvironment } from '@infra/infrastructure';
 import { Injectable, Logger } from '@nestjs/common';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
-import { readFile, writeFile } from 'fs/promises';
+import { InjectRepository } from '@nestjs/typeorm';
+import { existsSync, mkdirSync } from 'fs';
+import { readdir } from 'fs/promises';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class TestEnvironmentService {
-  private readonly fileName: string;
-
+  private readonly basePath;
   constructor(
-    // @InjectRepository(TestEnvironment)
-    // private readonly repository: Repository<TestEnvironment>,
-
+    @InjectRepository(TestEnvironment)
+    private readonly repository: Repository<TestEnvironment>,
     private readonly logger: Logger,
   ) {
-    const dir = process.env['RUNNER_TEMPLATE_FOLDER'] || '/tmp';
-    this.fileName = `${dir}/test-environment.json`;
+    this.basePath = process.env['RUNNER_TEMPLATE_FOLDER'] || '/tmp';
 
-    if (!existsSync(dir)) {
-      this.logger.warn(`Directory ${dir} does not exist. Creating it`);
-      mkdirSync(dir, { recursive: true });
-    }
-
-    if (!existsSync(this.fileName)) {
-      this.logger.warn(`File ${this.fileName} does not exist. Creating it`);
-      writeFileSync(this.fileName, '[]');
+    if (!existsSync(this.basePath)) {
+      this.logger.warn(
+        `Directory ${this.basePath} does not exist. Creating it`,
+      );
+      mkdirSync(this.basePath, { recursive: true });
     }
   }
 
   public async getEnvironmentById(id: string): Promise<TestEnvironment> {
-    const envs = await this.getEnvironments();
-    return envs.find((env: TestEnvironment) => env.id === id);
+    const env = await this.repository.findOneBy({ id });
+    if (!env) {
+      this.logger.warn(`Environment ${id} not found`);
+      return null;
+    }
+    this.logger.log(`Environment ${id} found`);
+    return env;
   }
 
   public async getFreeEnvironment(
@@ -64,35 +65,26 @@ export class TestEnvironmentService {
   }
 
   public async setEnvironmentFree(id: string): Promise<void> {
-    const envs = await this.getEnvironments();
-    const environment = envs.find((env: TestEnvironment) => env.id === id);
-    environment.isFree = true;
-    await this.saveEnvironment(environment);
-  }
-
-  public async removeEnvironment(id: string): Promise<void> {
-    const envs = await this.getEnvironments();
-    const index = envs.findIndex((env: TestEnvironment) => env.id === id);
-    envs.splice(index, 1);
-    await writeFile(this.fileName, JSON.stringify(envs));
+    const env = await this.repository.findOneBy({ id });
+    if (!env) {
+      this.logger.warn(`Environment ${id} not found`);
+      return;
+    }
+    env.isFree = true;
+    env.runId = null;
+    await this.saveEnvironment(env);
+    this.logger.log(`Environment ${id} is free now`);
   }
 
   private async saveEnvironment(environment: TestEnvironment): Promise<void> {
-    const json = await readFile(this.fileName);
-    const envs = JSON.parse(json.toString());
-    const index = envs.findIndex(
-      (env: TestEnvironment) => env.id === environment.id,
-    );
-    if (index === -1) {
-      envs.push(environment);
-    } else {
-      envs[index] = environment;
-    }
-    await writeFile(this.fileName, JSON.stringify(envs));
+    await this.repository.save(environment);
   }
 
   private async getEnvironments(): Promise<TestEnvironment[]> {
-    const json = await readFile(this.fileName);
-    return JSON.parse(json.toString());
+    const files = await readdir(this.basePath);
+    const envs = await this.repository.find({
+      where: { id: In(files) },
+    });
+    return envs;
   }
 }

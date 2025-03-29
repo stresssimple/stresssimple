@@ -31,6 +31,10 @@ export class RunsController {
         numberOfUsers: request.users,
         processes: request.processes,
         testId: request.testId,
+        auditFailure: request.auditErrors,
+        auditFailureThreshold: request.auditErrorsThreshold,
+        auditSuccess: request.auditSuccesses,
+        auditSuccessThreshold: request.auditSuccessesThreshold,
       });
       this.logger.log(
         `Scheduling run for test ${request.testId} with ${request.users} users, ${request.processes} processes`,

@@ -39,14 +39,22 @@ function createRunsStore() {
 			duration: number,
 			users: number,
 			rampUp: number,
-			processes: number
+			processes: number,
+			auditErrors: string,
+			auditErrorsThreshold: number,
+			auditSuccesses: string,
+			auditSuccessesThreshold: number
 		) => {
 			await axios.post(`${env.PUBLIC_API_URL}/runs`, {
 				durationMinutes: duration,
 				users,
 				rampUpMinutes: rampUp,
 				testId,
-				processes
+				processes,
+				auditErrors,
+				auditErrorsThreshold,
+				auditSuccesses,
+				auditSuccessesThreshold
 			});
 		},
 		stop: async (runId: string) => {

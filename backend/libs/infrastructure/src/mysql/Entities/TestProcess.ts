@@ -1,13 +1,6 @@
 import { ProcessStatus } from '@dto/dto/enums';
 import { generateId } from '@infra/infrastructure/utils';
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne } from 'typeorm';
 import { TestServer } from './Server';
 
 @Entity({})
@@ -36,7 +29,12 @@ export class TestProcess {
   @Column({ nullable: true })
   environmentId?: string;
 
-  @ManyToOne(() => TestServer, (process) => process.processes)
+  @ManyToOne(() => TestServer, (process) => process.processes, {
+    onDelete: 'CASCADE',
+    nullable: true,
+    createForeignKeyConstraints: true,
+    orphanedRowAction: 'delete',
+  })
   server: TestServer;
 
   constructor(testProcess: Partial<TestProcess>) {

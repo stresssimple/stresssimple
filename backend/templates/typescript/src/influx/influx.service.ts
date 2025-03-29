@@ -10,6 +10,7 @@ export class InfluxService {
   private readonly influxDB: InfluxDB;
   private readonly org: string;
   private readonly bucket: string;
+  private writeApi: WriteApi;
 
   constructor() {
     const url = process.env['INFLUXDB_URL'] ?? 'http://localhost:8086'; // Change to your InfluxDB URL
@@ -18,6 +19,7 @@ export class InfluxService {
     this.bucket = process.env['INFLUXDB_BUCKET'] ?? 'test-runs';
 
     this.influxDB = new InfluxDB({ url, token });
+    this.writeApi = this.influxDB.getWriteApi(this.org, this.bucket, 'ns');
   }
   onModuleDestroy() {
     throw new Error('Method not implemented.');
@@ -27,21 +29,15 @@ export class InfluxService {
     return this.influxDB.getQueryApi(this.org);
   }
 
-  public getWriteApi(): WriteApi {
-    return this.influxDB.getWriteApi(this.org, this.bucket);
-  }
-
   public async write(
     measurement: string,
     fields: Record<string, number>,
     tags?: Record<string, string>,
   ) {
-    const writeApi = this.getWriteApi();
-    await this.writeData(writeApi, measurement, fields, tags);
+    await this.writeData(measurement, fields, tags);
   }
 
   public async writeData(
-    writeApi: WriteApi,
     measurement: string,
     fields: Record<string, number>,
     tags?: Record<string, string>,
@@ -59,8 +55,8 @@ export class InfluxService {
       point.tag('testId', ctx.testId);
       point.tag('runId', ctx.runId);
 
-      writeApi.writePoint(point);
-      await writeApi.flush();
+      this.writeApi.writePoint(point);
+      this.writeApi.flush(); // Flush the write buffer to InfluxDB
     } catch (e) {
       console.warn(
         'Failed to write data to InfluxDB',

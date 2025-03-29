@@ -20,6 +20,6 @@ export class TestEnvironment {
   @Column({ type: 'boolean' })
   isFree: boolean;
 
-  @Column()
-  runId: string;
+  @Column({ nullable: true })
+  runId?: string;
 }

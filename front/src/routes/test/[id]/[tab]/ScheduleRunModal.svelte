@@ -1,15 +1,54 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { runsStore } from '$lib';
-	import { Button, Label, Modal, Range } from 'flowbite-svelte';
+	import { Button, Input, Label, Modal, Radio, RadioButton, Range } from 'flowbite-svelte';
 	let { open = $bindable() } = $props();
+
+	const percentNames = [
+		{ value: 1, name: '100%' },
+		{ value: 0.5, name: '50%' },
+		{ value: 0.1, name: '10%' },
+		{ value: 0.01, name: '1%' },
+		{ value: 0.001, name: '0.1%' },
+		{ value: 0.0001, name: '0.01%' }
+	] as { value: number; name: string }[];
 
 	let duration = $state(10);
 	let users = $state(1);
 	let rampUp = $state(0);
 	let processes = $state(1);
+	let auditErrors = $state('all');
+	let auditErrorsPercent = $state(1);
+	let auditErrorsPercentValue = $state(4);
+	let auditErrorsPercentName = $state('');
+
+	$effect(() => {
+		auditErrorsPercent = percentNames[auditErrorsPercentValue].value;
+		auditErrorsPercentName = percentNames[auditErrorsPercentValue].name;
+	});
+
+	let auditSuccess = $state('some');
+	let auditSuccessPercent = $state(1);
+	let auditSuccessPercentValue = $state(1);
+	let auditSuccessPercentName = $state('');
+
+	$effect(() => {
+		auditSuccessPercent = percentNames[auditSuccessPercentValue].value;
+		auditSuccessPercentName = percentNames[auditSuccessPercentValue].name;
+	});
+
 	async function run() {
-		await runsStore.start(page.params.id, duration / 60, users, rampUp / 60, processes);
+		await runsStore.start(
+			page.params.id,
+			duration / 60,
+			users,
+			rampUp / 60,
+			processes,
+			auditErrors,
+			auditErrorsPercent,
+			auditSuccess,
+			auditSuccessPercent
+		);
 		open = false;
 	}
 </script>
@@ -19,7 +58,7 @@
 		<div>
 			<Label>Duration</Label>
 			<div>
-				<Range min="10" max="600" step="10" bind:value={duration} />
+				<Range min="10" max="3600" step="10" bind:value={duration} />
 				<span>{Math.floor(duration / 60)} min {Math.round(duration % 60)} sec</span>
 			</div>
 		</div>
@@ -33,19 +72,63 @@
 		<div>
 			<Label>Users</Label>
 			<div>
-				<Range min="1" max="100" step="1" bind:value={users} />
+				<Range min="1" max="1000" step="1" bind:value={users} />
 				<span>{users}</span>
 			</div>
 		</div>
 		<div>
 			<Label>Processes</Label>
 			<div>
-				<Range min="1" max="10" step="1" bind:value={processes} />
+				<Range min="1" max="50" step="1" bind:value={processes} />
 				<span>{processes}</span>
 			</div>
 		</div>
-		<div class="col-span-2 flex justify-end">
+		<h2 class="col-span-2 text-xl">Auditing</h2>
+		<div class="">
+			<h3 class="m-4 text-lg">Errors</h3>
+			<div class="flex flex-col gap-2">
+				<Radio name="audit-errors" value={'none'} bind:group={auditErrors}>None</Radio>
+				<Radio name="audit-errors" value={'all'} bind:group={auditErrors}>All</Radio>
+				<Radio name="audit-errors" value={'some'} bind:group={auditErrors}>
+					<span>Some</span>
+					{#if auditErrors === 'some'}
+						<Range
+							min="0"
+							max={percentNames.length - 1}
+							step="1"
+							bind:value={auditErrorsPercentValue}
+							class="m-2"
+						/>
+						<span>{auditErrorsPercentName}</span>
+					{/if}
+				</Radio>
+			</div>
+		</div>
+		<div>
+			<h3 class="m-4 text-lg">Success</h3>
+			<div class="flex flex-col gap-2">
+				<Radio name="audit-success" value={'none'} bind:group={auditSuccess}>None</Radio>
+				<Radio name="audit-success" value={'all'} bind:group={auditSuccess}>All</Radio>
+				<Radio name="audit-success" value={'some'} bind:group={auditSuccess}>
+					<span>Some</span>
+					{#if auditSuccess === 'some'}
+						<Range
+							min="0"
+							max={percentNames.length - 1}
+							step="1"
+							bind:value={auditSuccessPercentValue}
+							class="m-2"
+						/>
+						<span>{auditSuccessPercentName}</span>
+					{/if}
+				</Radio>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-span-2 w-full" slot="footer">
+		<div class="flex w-full flex-row justify-end">
 			<Button on:click={run}>Run</Button>
 		</div>
-	</div></Modal
->
+	</div>
+</Modal>

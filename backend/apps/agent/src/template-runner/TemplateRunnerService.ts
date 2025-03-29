@@ -53,7 +53,12 @@ export abstract class TemplateRunnerService {
 
   public abstract packagesInstall(modules: string[]): Promise<boolean>;
   public abstract compileTemplate(source: string): Promise<boolean>;
-  public abstract startRunner(): Promise<void>;
+  public abstract startRunner(
+    auditFailure: 'none' | 'all' | 'some',
+    auditSuccess: 'none' | 'all' | 'some',
+    auditFailureThreshold: number,
+    auditSuccessThreshold: number,
+  ): Promise<void>;
 
   public async cleanup() {
     this.logger.log(`Cleaning up`);

@@ -127,7 +127,12 @@ export class TypescriptTemplateRunnerService extends TemplateRunnerService {
     return success;
   }
 
-  public startRunner(): Promise<void> {
+  public startRunner(
+    auditFailure: 'none' | 'all' | 'some',
+    auditSuccess: 'none' | 'all' | 'some',
+    auditFailureThreshold: number,
+    auditSuccessThreshold: number,
+  ): Promise<void> {
     this.appLogger.info(
       this.runId,
       this.processId,
@@ -141,7 +146,16 @@ export class TypescriptTemplateRunnerService extends TemplateRunnerService {
     const nodePath = os.platform() !== 'win32' ? '/usr/local/bin/node' : 'node';
     const runner = spawn(
       nodePath,
-      ['dist/index.js', this.processId, this.testId, this.runId],
+      [
+        'dist/index.js',
+        this.processId,
+        this.testId,
+        this.runId,
+        auditFailure,
+        auditSuccess,
+        auditFailureThreshold.toString(),
+        auditSuccessThreshold.toString(),
+      ],
       {
         cwd: this.envPath,
         stdio: ['ignore', 'pipe', 'pipe'],

@@ -92,12 +92,17 @@ export class ProcessController {
         status: ProcessStatus.running,
       });
       const test = await this.testService.getTest(process.testId);
+      const run = await this.runsService.getRun(process.runId);
       const procResult = await this.processesManagementService.runProcess({
         payload: {
           processId: process.id,
           runId: process.runId,
           source: test.source,
           testId: process.testId,
+          auditFailure: run.auditFailure,
+          auditSuccess: run.auditSuccess,
+          auditFailureThreshold: run.auditFailureThreshold,
+          auditSuccessThreshold: run.auditSuccessThreshold,
         },
       });
       if (!procResult) {

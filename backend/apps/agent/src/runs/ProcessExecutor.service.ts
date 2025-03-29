@@ -36,6 +36,10 @@ export class ProcessesManagementService {
       testId: string;
       runId: string;
       source: string;
+      auditFailure: 'none' | 'all' | 'some';
+      auditSuccess: 'none' | 'all' | 'some';
+      auditFailureThreshold: number;
+      auditSuccessThreshold: number;
     };
   }): Promise<boolean> {
     const r = data.payload;
@@ -76,10 +80,17 @@ export class ProcessesManagementService {
       return false;
     }
 
-    const runner = templateRunner.startRunner().catch((e) => {
-      this.logger.error('Failed to start runner.');
-      this.logger.error(e);
-    });
+    const runner = templateRunner
+      .startRunner(
+        data.payload.auditFailure,
+        data.payload.auditSuccess,
+        data.payload.auditFailureThreshold,
+        data.payload.auditSuccessThreshold,
+      )
+      .catch((e) => {
+        this.logger.error('Failed to start runner.');
+        this.logger.error(e);
+      });
     if (!runner) {
       this.logger.error('Failed to start runner.');
       this.factory.removeRunnerSvc(proc.environmentId);

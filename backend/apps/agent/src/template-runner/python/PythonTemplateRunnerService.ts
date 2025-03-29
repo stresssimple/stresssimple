@@ -108,7 +108,12 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
     return success;
   }
 
-  public startRunner(): Promise<void> {
+  public startRunner(
+    auditFailure: 'none' | 'all' | 'some',
+    auditSuccess: 'none' | 'all' | 'some',
+    auditFailureThreshold: number,
+    auditSuccessThreshold: number,
+  ): Promise<void> {
     this.appLogger.info(this.runId, this.processId, `Starting runner`);
 
     try {
@@ -119,7 +124,7 @@ export class PythonTemplateRunnerService extends TemplateRunnerService {
         cmd = 'cmd.exe';
         args = [
           '/c',
-          `1.bat ${this.processId} ${this.testId} ${this.runId} && exit`,
+          `1.bat ${this.processId} ${this.testId} ${this.runId} ${auditFailure} ${auditSuccess} ${auditFailureThreshold} ${auditSuccessThreshold} && exit`,
         ];
       } else {
         cmd = 'bash';
