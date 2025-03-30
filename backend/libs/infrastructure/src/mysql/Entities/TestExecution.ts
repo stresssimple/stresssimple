@@ -5,7 +5,7 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 @Entity()
 export class TestExecution {
   constructor(source: Partial<TestExecution> = {}) {
-    this.id = generateId();
+    this.id = 'exe-' + generateId();
     Object.assign(this, source);
   }
 

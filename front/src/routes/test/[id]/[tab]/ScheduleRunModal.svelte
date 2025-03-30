@@ -38,7 +38,7 @@
 
 	let auditSuccess = $state('some');
 	let auditSuccessPercent = $state(1);
-	let auditSuccessPercentValue = $state(1);
+	let auditSuccessPercentValue = $state(3);
 	let auditSuccessPercentName = $state('');
 
 	$effect(() => {
@@ -70,15 +70,36 @@
 			users += value;
 		}
 	}
+
+	function adjustDuration(value: number): void {
+		if (duration + value < 10) {
+			duration = 10;
+		} else if (duration + value > 3600) {
+			duration = 3600;
+		} else {
+			duration += value;
+		}
+	}
 </script>
 
-<Modal {open} title="Schedule run" on:close={() => (open = false)}>
+<Modal {open} title="Schedule run" on:close={() => (open = false)} size="lg">
 	<div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
+		<h2 class="col-span-2 text-center text-xl">Run definitions</h2>
 		<div>
 			<Label>Duration</Label>
 			<div>
 				<Range min="10" max="3600" step="10" bind:value={duration} />
-				<span>{Math.floor(duration / 60)} min {Math.round(duration % 60)} sec</span>
+				<div class="flex flex-row items-center justify-between">
+					<span class="mr-4">{Math.floor(duration / 60)}m{Math.round(duration % 60)}s</span>
+					<ButtonGroup class="" size="xs">
+						<Button class="" size="xs" on:click={() => adjustDuration(-60)}>-1m</Button>
+						<Button class="" size="xs" on:click={() => adjustDuration(-30)}>-30s</Button>
+						<Button class="" size="xs" on:click={() => adjustDuration(-10)}>-10s</Button>
+						<Button class="" size="xs" on:click={() => adjustDuration(10)}>+10s</Button>
+						<Button class="" size="xs" on:click={() => adjustDuration(30)}>+30s</Button>
+						<Button class="" size="xs" on:click={() => adjustDuration(60)}>+1m</Button>
+					</ButtonGroup>
+				</div>
 			</div>
 		</div>
 		<div>
@@ -112,7 +133,7 @@
 				<span>{processes}</span>
 			</div>
 		</div>
-		<h2 class="col-span-2 text-xl">Auditing</h2>
+		<h2 class="col-span-2 text-center text-xl">Request auditing</h2>
 		<div class="">
 			<h3 class="m-4 text-lg">Errors</h3>
 			<div class="flex flex-col gap-2">

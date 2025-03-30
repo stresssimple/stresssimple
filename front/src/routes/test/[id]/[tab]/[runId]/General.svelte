@@ -6,6 +6,7 @@
 	import { writable } from 'svelte/store';
 	import { env } from '$env/dynamic/public';
 	import ScatterChart from '$lib/components/ScatterChart.svelte';
+	import { runStore } from '$lib';
 
 	let usersLabels = writable<string[]>([]);
 	let usersData = writable<Record<string, number[]>>({});
@@ -69,6 +70,21 @@
 </script>
 
 <div class="grid grid-cols-2 gap-4 p-4">
+	<div class="col-span-2 flex flex-row gap-4">
+		<div>Run id</div>
+		<pre class="text-blue-500">{$runStore.id}</pre>
+		<div>Status</div>
+		<pre class="text-blue-500">{$runStore.status}</pre>
+		<div>
+			{$runStore.numberOfUsers} user{$runStore.numberOfUsers > 1 ? 's' : ''}
+			{#if $runStore.rampUp > 0}
+				with {$runStore.rampUp} ramp up
+			{/if}
+			for {Math.round($runStore.durationMinutes)} min {Math.round(
+				($runStore.durationMinutes * 60) % 60
+			)} sec on {$runStore.processes} process{$runStore.processes > 1 ? 'es' : ''}
+		</div>
+	</div>
 	<div class="container h-60">
 		<LineChart
 			labels={$usersLabels}

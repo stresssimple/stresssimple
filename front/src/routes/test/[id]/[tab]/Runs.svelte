@@ -17,8 +17,6 @@
 		ButtonGroup
 	} from 'flowbite-svelte';
 	import ScheduleRunModal from './ScheduleRunModal.svelte';
-	import axios from 'axios';
-	import { env } from '$env/dynamic/public';
 	let scheduleRunModalOpen = $state(false);
 	let timerInterval: number;
 	let servers = $state([]);
@@ -61,11 +59,19 @@
 	</div>
 </div>
 
-{#if $runsStore.length > 0}
+{#if !$runsStore}
+	<div></div>
+{:else if $runsStore.length === 0}
+	<div class="left-0 top-0 flex h-full w-full flex-col items-center justify-center" transition:fade>
+		<div class="pt-28 text-3xl">Runs will appear here</div>
+		<div class="pt-8 text-xl">Click on Schedule to start a new run</div>
+	</div>
+{:else}
 	<div transition:fade>
 		<Table hoverable={true} class="mt-6" noborder={true}>
 			<TableHead>
 				<TableHeadCell>Users</TableHeadCell>
+				<TableHeadCell>Processes</TableHeadCell>
 				<TableHeadCell>Duration</TableHeadCell>
 				<TableHeadCell>Ramp up</TableHeadCell>
 				<TableHeadCell>Start time</TableHeadCell>
@@ -78,6 +84,7 @@
 				{#each $runsStore as run}
 					<TableBodyRow on:click={() => goto('runs/' + run.id)} class="cursor-pointer">
 						<TableBodyCell>{run.numberOfUsers}</TableBodyCell>
+						<TableBodyCell>{run.processes}</TableBodyCell>
 						<TableBodyCell
 							>{Math.floor((run.durationMinutes * 60) / 60)}min {Math.round(
 								(run.durationMinutes * 60) % 60

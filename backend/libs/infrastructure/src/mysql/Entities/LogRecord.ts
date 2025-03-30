@@ -4,7 +4,7 @@ import { generateId } from '../../utils/id';
 @Entity()
 export class LogRecord {
   constructor(source: Partial<LogRecord> = {}) {
-    this.id = generateId(10);
+    this.id = 'lg-' + generateId(10);
     Object.assign(this, source);
   }
 

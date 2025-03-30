@@ -4,7 +4,7 @@ import { Entity, PrimaryColumn, Column, Index } from 'typeorm';
 @Entity()
 export class AuditRecord {
   constructor(source: Partial<AuditRecord> = {}) {
-    this.id = generateId(10);
+    this.id = 'a-' + generateId(10);
     this.timestamp = new Date();
     Object.assign(this, source);
   }

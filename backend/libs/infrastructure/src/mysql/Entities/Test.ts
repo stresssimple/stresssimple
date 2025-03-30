@@ -6,7 +6,7 @@ import { generateId } from '@infra/infrastructure';
 @Entity()
 export class Test {
   constructor(source: Partial<Test> = {}) {
-    this.id = generateId();
+    this.id = 'tst-' + generateId();
     Object.assign(this, source);
   }
 

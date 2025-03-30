@@ -11,20 +11,20 @@
 
 <div class="flex h-full w-full flex-col">
 	<Navbar let:hidden let:toggle class="shadow">
-		<NavBrand href="/" class="">
-			<div>
+		<div class="flex w-full flex-row gap-8 px-3">
+			<NavBrand href="/" class="flex flex-row">
 				<span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white"
 					>Stress Simple</span
 				>
 				<span class="ml-2 self-center text-xs text-gray-500 dark:text-gray-400">v0.1</span>
-			</div>
-		</NavBrand>
-		<NavContainer>
-			<div class="text-xs text-gray-500 dark:text-gray-400">
-				<span>API server</span>
-				<a href={env.PUBLIC_API_URL}>{env.PUBLIC_API_URL}</a>
-			</div>
-		</NavContainer>
+			</NavBrand>
+			<NavContainer>
+				<div class="text-xs text-gray-500 dark:text-gray-400">
+					<span>API server</span>
+					<a href={env.PUBLIC_API_URL}>{env.PUBLIC_API_URL}</a>
+				</div>
+			</NavContainer>
+		</div>
 	</Navbar>
 	<div class="flex grow flex-row overflow-hidden overscroll-none">
 		<div class="flex min-w-60 max-w-80 flex-col justify-between shadow-inner shadow-gray-200">

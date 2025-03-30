@@ -5,7 +5,7 @@ import { browser } from '$app/environment';
 
 function createRunsStore() {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const { subscribe, set } = writable<any[]>([]);
+	const { subscribe, set } = writable<any[] | undefined>(undefined);
 
 	async function load(testId: string) {
 		if (!browser) return;
@@ -33,7 +33,7 @@ function createRunsStore() {
 		load: async (testId: string) => {
 			await load(testId);
 		},
-		clear: () => set([]),
+		clear: () => set(undefined),
 		start: async (
 			testId: string,
 			duration: number,

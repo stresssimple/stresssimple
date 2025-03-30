@@ -4,7 +4,7 @@ import { generateId } from '../../utils/id';
 @Entity()
 export class TestEnvironment {
   constructor(source: Partial<TestEnvironment> = {}) {
-    this.id = generateId();
+    this.id = 'env-' + generateId();
     Object.assign(this, source);
   }
 
