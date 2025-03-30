@@ -1,7 +1,7 @@
 ## Getting started
 ### TL;DR; Installation with docker-compose
 ```bash
-git clone https://github.com/your-repo/stresssimple.git
+git clone https://github.com/stresssimple/stresssimple.git
 cd stresssimple
 npm run compose:up:app
 ```

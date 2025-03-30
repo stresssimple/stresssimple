@@ -8,14 +8,13 @@ services:
       - PORT=5000
       - PUBLIC_API_URL=http://localhost:3030
     depends_on:
-      - backend
-  backend:
+      - api
+  api:
     image: ghcr.io/stresssimple/backend:latest
-    container_name: backend
-    volumes:
-      - tests_data:/app/tmp
+    container_name: api
     environment:
       - RUNNER_TEMPLATE_FOLDER=tmp/runner_templates
+      - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672/
       - INFLUXDB_URL=http://influxdb:8086
       - INFLUXDB_TOKEN=my-secret-token
       - INFLUXDB_ORG=my-org
@@ -29,14 +28,34 @@ services:
     ports:
       - "3030:3000"
     depends_on:
+      - agent
+  agent:
+    image: ghcr.io/stresssimple/backend:latest
+    command: ["npm", "run", "start:agent:prod"]
+    container_name: agent
+    volumes:
+      - tests_data:/app/tmp
+    environment:
+      - RUNNER_TEMPLATE_FOLDER=tmp/runner_templates
+      - RABBITMQ_URI=amqp://guest:guest@rabbitmq:5672/
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=my-secret-token
+      - INFLUXDB_ORG=my-org
+      - INFLUXDB_BUCKET=test-runs
+      - MYSQL_DATABASE=stresssimple
+      - MYSQL_USER=stresssimple
+      - MYSQL_PASSWORD=securepassword
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - CONTAINER=true
+    depends_on:
       - influxdb
       - mysql
+      - rabbitmq
   stubjs:
     image: ghcr.io/stresssimple/stabjs:latest
     container_name: stabjs
     ports:
       - "3333:3333"
 volumes:
-  influxdb_data:
-  mysql_data:
   tests_data:
