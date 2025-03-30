@@ -70,9 +70,10 @@ export class Test extends StressTest {
 - **Number of Users**: The number of users to simulate.
 - **Duration**: The duration of the test in seconds.
 - **Ramp-Up Time**: The time in seconds to gradually increase to the specified number of users.
-
+- **Processes**: The number of processes across running agents to use for the test execution.
 ### Screen Actions
-- Click the `Run` button to start a test execution.
+- Click the `Schedule` button to start a test execution.
+### Test actions
 - Click the `Stop` button to cancel a running test execution.
 - Click the `Delete` button to remove a test execution.
 - Click on a test execution row to view detailed results.
