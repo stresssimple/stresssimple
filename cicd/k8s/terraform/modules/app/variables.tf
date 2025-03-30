@@ -9,7 +9,7 @@ variable "project_id" {
 }
 
 variable "stab_server_version" {
-  description = "The version of the stab-server"
+  description = "The version of the stub-server"
   type        = string
   default     = "latest"
   validation {

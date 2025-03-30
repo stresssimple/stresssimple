@@ -3,13 +3,13 @@ on:
   push:
     branches: ["master"]
     paths:
-      - "stab-server/**"
-      - ".github/workflows/stabJs.yml"
+      - "stub-server/**"
+      - ".github/workflows/stub-server.yml"
   pull_request:
     branches: ["master"]
     paths:
-      - "stab-server/**"
-      - ".github/workflows/stabJs.yml"
+      - "stub-server/**"
+      - ".github/workflows/stub-server.yml"
   # allow manual trigger
   workflow_dispatch:
 
@@ -26,13 +26,13 @@ jobs:
       - name: Build and push the Docker image
         run: |
           TIMESTAMP=$(date +%s)
-          IMAGE_NAME=ghcr.io/stresssimple/stabjs
+          IMAGE_NAME=ghcr.io/stresssimple/stub-server
 
           echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
           docker login ghcr.io -u USERNAME -p ${{ secrets.GITHUB_TOKEN }}
 
           # Build the image with the timestamp tag
-          docker build stab-server/ --file stab-server/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
+          docker build stub-server/ --file stub-server/Dockerfile --tag $IMAGE_NAME:$TIMESTAMP
 
           # Push the timestamped image
           docker push $IMAGE_NAME:$TIMESTAMP

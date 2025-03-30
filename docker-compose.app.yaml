@@ -53,8 +53,8 @@ services:
       - mysql
       - rabbitmq
   stubjs:
-    image: ghcr.io/stresssimple/stabjs:latest
-    container_name: stabjs
+    image: ghcr.io/stresssimple/stub-server:latest
+    container_name: stub-server
     ports:
       - "3333:3333"
 volumes:

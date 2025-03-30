@@ -16,8 +16,8 @@
     "compose:up:dev": "npm run compose:up:infra && docker compose -f ./docker-compose.infra.yaml -f docker-compose.dev.yaml up -d",
     "compose:up:app": "npm run compose:up:infra && docker compose -f ./docker-compose.infra.yaml -f docker-compose.app.yaml up -d",
     "compose:up:infra": "docker compose -f ./docker-compose.infra.yaml up -d --wait && sleep 5",
-    "docker:stbjs:build": "docker build -f ./stab-server/Dockerfile ./stab-server/ -t stabjs",
-    "docker:stbjs:run": "docker run -d -p 3333:3333 stabjs"
+    "docker:stbjs:build": "docker build -f ./stub-server/Dockerfile ./stub-server/ -t stub-server",
+    "docker:stbjs:run": "docker run -d -p 3333:3333 stub-server"
   },
   "repository": {
     "type": "git",

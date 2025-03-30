@@ -62,7 +62,7 @@ services:
 
   stubjs:
     build:
-      context: ./stab-server/.
+      context: ./stub-server/.
       dockerfile: ./Dockerfile
     image: stubjs:latest
     container_name: stubjs

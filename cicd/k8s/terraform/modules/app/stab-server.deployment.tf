@@ -1,9 +1,9 @@
-resource "kubernetes_deployment" "stab-server-deployment" {
+resource "kubernetes_deployment" "stub-server-deployment" {
   metadata {
-    name      = "stab-server"
+    name      = "stub-server"
     namespace = var.namespace
     labels = {
-      app = "stab-server"
+      app = "stub-server"
     }
   }
 
@@ -12,21 +12,21 @@ resource "kubernetes_deployment" "stab-server-deployment" {
 
     selector {
       match_labels = {
-        app = "stab-server"
+        app = "stub-server"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "stab-server"
+          app = "stub-server"
         }
       }
 
       spec {
         container {
-          image = "ghcr.io/${var.project_id}/stabjs:${var.stab_server_version}"
-          name  = "stab-server"
+          image = "ghcr.io/${var.project_id}/stub-server:${var.stab_server_version}"
+          name  = "stub-server"
 
           env {
             name  = "PORT"

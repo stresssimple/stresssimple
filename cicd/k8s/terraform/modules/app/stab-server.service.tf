@@ -1,15 +1,15 @@
-resource "kubernetes_service" "stab-server-service" {
+resource "kubernetes_service" "stub-server-service" {
   metadata {
-    name      = "stab-server"
+    name      = "stub-server"
     namespace = var.namespace
     labels = {
-      app = "stab-server"
+      app = "stub-server"
     }
   }
 
   spec {
     selector = {
-      app = "stab-server"
+      app = "stub-server"
     }
 
     port {
