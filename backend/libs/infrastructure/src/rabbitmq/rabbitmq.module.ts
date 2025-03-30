@@ -22,12 +22,24 @@ const config = () => {
     RabbitMQModule.forRootAsync({
       useFactory: (logger: Logger) => ({
         ...config(),
-        connectionInitOptions: { wait: false, reject: false, timeout: 1000 },
-        logger: logger,
-        connectionManagerOptions: {
-          heartbeatIntervalInSeconds: 2,
-          connectionOptions: { wait: false, reject: false, timeout: 1000 },
+        connectionInitOptions: {
+          wait: true,
+          reject: false,
+          timeout: 60000,
+          skipConnectionFailedLogging: true,
         },
+        connectionManagerOptions: {
+          heartbeat: 2,
+          reconnectTimeInSeconds: 2,
+          connectionOptions: {
+            clientProperties: {
+              connection_name: 'nest-rabbitmq',
+            },
+            timeout: 20000,
+            noDelay: true,
+          },
+        },
+        logger: logger,
         channels: {
           audit: { prefetchCount: 500 },
           runs: { prefetchCount: 50 },
