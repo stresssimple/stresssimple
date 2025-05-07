@@ -3,7 +3,6 @@ import { AmqpConnection, RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { PublishBus, RabbitMQPublishBus } from './publish';
 
 const config = () => {
-  console.log('RABBITMQ_URI', process.env['RABBITMQ_URI']);
   return {
     exchanges: [
       { name: 'runs', type: 'topic' },
